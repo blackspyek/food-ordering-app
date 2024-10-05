@@ -16,7 +16,7 @@
          <children>
             <ImageView fx:id="pencilImageView" fitHeight="42.0" fitWidth="69.0" layoutX="26.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../../../images/pencil.png" />
+                  <Image url="@images/pencil.png" />
                </image>
             </ImageView>
             <Label layoutX="92.0" layoutY="37.0" text="User Registration">

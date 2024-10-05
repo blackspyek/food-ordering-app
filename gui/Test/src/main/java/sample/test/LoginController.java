@@ -20,6 +20,7 @@ import java.security.PrivateKey;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
@@ -39,12 +40,10 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        File brandingFile = new File("images/_1c91bbc2-7932-4482-b967-78a06a1a5e12.jpeg");
-        Image brandingImage = new Image(brandingFile.toURI().toString());
+        Image brandingImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/_1c91bbc2-7932-4482-b967-78a06a1a5e12.jpeg")).toString());
         brandingImageView.setImage(brandingImage);
 
-        File lockFile = new File("images/padlock.png");
-        Image lockImage = new Image(lockFile.toURI().toString());
+        Image lockImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/padlock.png")).toString());
         lockImageView.setImage(lockImage);
 
     }

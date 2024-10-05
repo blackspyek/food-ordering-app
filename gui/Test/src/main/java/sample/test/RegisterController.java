@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class RegisterController implements Initializable {
@@ -41,8 +42,7 @@ public class RegisterController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        File pencilFile = new File("images/pencil.png");
-        Image pencilImage = new Image(pencilFile.toURI().toString());
+        Image pencilImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/padlock.png")).toString());
         pencilImageView.setImage(pencilImage);
 
     }

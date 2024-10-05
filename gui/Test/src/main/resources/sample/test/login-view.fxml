@@ -16,7 +16,7 @@
       <children>
         <ImageView fx:id="brandingImageView" fitHeight="322.0" fitWidth="329.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
           <image>
-            <Image url="@../../../../../images/_1c91bbc2-7932-4482-b967-78a06a1a5e12.jpeg" />
+            <Image url="@images/_1c91bbc2-7932-4482-b967-78a06a1a5e12.jpeg" />
           </image>
         </ImageView>
       </children>
@@ -44,7 +44,7 @@
         </Button>
         <ImageView fx:id="lockImageView" fitHeight="65.0" fitWidth="70.0" layoutX="211.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
           <image>
-            <Image url="@../../../../../images/padlock.png" />
+            <Image url="@images/padlock.png" />
           </image>
         </ImageView>
         <Button fx:id="cancelButton" layoutX="114.0" layoutY="392.0" mnemonicParsing="false" onAction="#cancelButtonOnAction" prefHeight="28.0" prefWidth="260.0" style="-fx-background-color: #f7e4b9; -fx-background-radius: 15;" text="Cancel">
