@@ -74,26 +74,11 @@ public class LoginController implements Initializable {
 
             while (queryResult.next()) {
                 if (queryResult.getInt(1) == 1) {
-                    //loginMessageLabel.setText("Congratulations!");
-                    createAccountForm();
+                    loginMessageLabel.setText("Congratulations!");
                 } else {
                     loginMessageLabel.setText("Invalid login. Try again.");
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            e.getCause();
-        }
-    }
-
-    public void createAccountForm() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("register.fxml"));
-            Stage registerStage = new Stage();
-            //stage.initStyle(StageStyle.UNDECORATED);
-            registerStage.setScene(new Scene(root, 520, 615));
-            registerStage.setTitle("Register Page");
-            registerStage.show();
         } catch (Exception e) {
             e.printStackTrace();
             e.getCause();
