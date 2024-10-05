@@ -1,9 +1,6 @@
 package sample.test;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
@@ -14,16 +11,14 @@ import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 
-import java.io.File;
 import java.net.URL;
-import java.security.PrivateKey;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class LoginController implements Initializable {
+public class LoginViewController implements Initializable {
 
     @FXML
     private Button cancelButton;

@@ -15,14 +15,14 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
-import java.io.File;
+
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class RegisterController implements Initializable {
+public class RegisterViewController implements Initializable {
 
     @FXML
     private ImageView pencilImageView;
