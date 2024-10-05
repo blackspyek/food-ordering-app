@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="539.0" prefWidth="809.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.test.LoginController">
+  <left>
+    <AnchorPane prefHeight="539.0" prefWidth="303.0" style="-fx-background-color: #f7e4b9;" BorderPane.alignment="CENTER">
+      <children>
+        <ImageView fx:id="brandingImageView" fitHeight="322.0" fitWidth="329.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
+          <image>
+            <Image url="@../../../../../images/_1c91bbc2-7932-4482-b967-78a06a1a5e12.jpeg" />
+          </image>
+        </ImageView>
+      </children>
+    </AnchorPane>
+  </left>
+  <right>
+    <AnchorPane prefHeight="539.0" prefWidth="496.0" style="-fx-background-color: #ECECE7;" BorderPane.alignment="CENTER">
+      <children>
+        <Label layoutX="112.0" layoutY="176.0" text="Username">
+          <font>
+            <Font name="System Bold" size="13.0" />
+          </font>
+        </Label>
+        <TextField fx:id="usernameTextField" layoutX="211.0" layoutY="170.0" prefHeight="30.0" prefWidth="163.0" promptText="Username" style="-fx-background-color: #ECECE7; -fx-border-color: #000000; -fx-border-radius: 15;" />
+        <Label layoutX="114.0" layoutY="221.0" text="Password">
+          <font>
+            <Font name="System Bold" size="13.0" />
+          </font>
+        </Label>
+        <PasswordField fx:id="enterPasswordField" layoutX="211.0" layoutY="215.0" prefHeight="30.0" prefWidth="159.0" promptText="Password" style="-fx-background-color: #ECECE7; -fx-border-color: #000000; -fx-border-radius: 15;" />
+        <Button fx:id="loginButton" layoutX="114.0" layoutY="349.0" mnemonicParsing="false" onAction="#loginButtonOnAction" prefHeight="28.0" prefWidth="260.0" style="-fx-background-color: #f7e4b9; -fx-background-radius: 15;" text="Login">
+          <font>
+            <Font name="System Bold" size="13.0" />
+          </font>
+        </Button>
+        <ImageView fx:id="lockImageView" fitHeight="65.0" fitWidth="70.0" layoutX="211.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
+          <image>
+            <Image url="@../../../../../images/padlock.png" />
+          </image>
+        </ImageView>
+        <Button fx:id="cancelButton" layoutX="114.0" layoutY="392.0" mnemonicParsing="false" onAction="#cancelButtonOnAction" prefHeight="28.0" prefWidth="260.0" style="-fx-background-color: #f7e4b9; -fx-background-radius: 15;" text="Cancel">
+          <font>
+            <Font name="System Bold" size="13.0" />
+          </font>
+        </Button>
+        <Label fx:id="loginMessageLabel" alignment="CENTER" layoutX="114.0" layoutY="313.0" prefHeight="18.0" prefWidth="260.0" textFill="#f81414">
+          <font>
+            <Font name="System Bold" size="13.0" />
+          </font>
+        </Label>
+      </children>
+    </AnchorPane>
+  </right>
+</BorderPane>
