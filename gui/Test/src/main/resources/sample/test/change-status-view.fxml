@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="353.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.test.ChangeStatusViewController">
+   <children>
+      <Label layoutX="35.0" layoutY="49.0" prefHeight="56.0" prefWidth="280.0" text="Change Status:" />
+      <RadioButton layoutX="35.0" layoutY="144.0" mnemonicParsing="false" text="Preparing" />
+      <RadioButton layoutX="35.0" layoutY="191.0" mnemonicParsing="false" text="Serving" />
+      <RadioButton layoutX="35.0" layoutY="236.0" mnemonicParsing="false" text="Served" />
+      <AnchorPane prefHeight="38.0" prefWidth="600.0">
+         <children>
+            <Label layoutX="25.0" layoutY="10.0" text="Slurp" />
+            <Button layoutX="522.0" layoutY="5.0" mnemonicParsing="false">
+               <graphic>
+                  <FontAwesomeIconView glyphName="MINUS" />
+               </graphic>
+            </Button>
+            <Button layoutX="558.0" layoutY="5.0" mnemonicParsing="false">
+               <graphic>
+                  <FontAwesomeIconView glyphName="CLOSE" />
+               </graphic>
+            </Button>
+         </children>
+      </AnchorPane>
+      <Button layoutX="27.0" layoutY="301.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="264.0" text="Confirm" />
+      <Button layoutX="300.0" layoutY="301.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="280.0" text="Cancel" />
+   </children>
+</AnchorPane>

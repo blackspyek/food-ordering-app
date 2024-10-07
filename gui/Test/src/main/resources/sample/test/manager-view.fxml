@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1059.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.test.ManagerViewController">
+    <children>
+        <BorderPane layoutX="214.0" layoutY="182.0" prefHeight="670.0" prefWidth="1059.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <top>
+                <AnchorPane prefHeight="32.0" prefWidth="1059.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <AnchorPane layoutY="11.0" prefHeight="39.0" prefWidth="1059.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                                <Button layoutX="1017.0" layoutY="5.0" mnemonicParsing="false">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="CLOSE" />
+                                    </graphic>
+                                </Button>
+                                <Button layoutX="977.0" layoutY="5.0" mnemonicParsing="false">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="MINUS" wrappingWidth="9.428571701049805" />
+                                    </graphic>
+                                </Button>
+                                <Label layoutX="42.0" layoutY="10.0" text="Slurp" />
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </AnchorPane>
+            </top>
+            <left>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #fda403;" BorderPane.alignment="CENTER">
+                    <children>
+                        <FontAwesomeIconView glyphName="USER" layoutX="53.0" layoutY="149.0" size="10em" />
+                        <Label layoutX="72.0" layoutY="168.0" text="Welcome" />
+                        <Label layoutX="68.0" layoutY="195.0" text="Username" />
+                        <Button layoutX="13.0" layoutY="595.0" mnemonicParsing="false" text="Sign Out">
+                            <graphic>
+                                <FontAwesomeIconView glyphName="SIGN_OUT" />
+                            </graphic>
+                        </Button>
+                  <Button layoutX="-1.0" layoutY="255.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="200.0" text="Dashboard" />
+                  <Button layoutX="-1.0" layoutY="283.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="200.0" text="Menu" />
+                  <Button layoutX="-1.0" layoutY="311.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="200.0" text="Staff" />
+                  <Button layoutX="-1.0" layoutY="339.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="200.0" text="Orders" />
+                    </children></AnchorPane>
+            </left>
+            <center>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <AnchorPane layoutX="238.0" layoutY="233.0" prefHeight="637.0" prefWidth="859.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                        <AnchorPane prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <AnchorPane layoutX="30.0" layoutY="27.0" prefHeight="340.0" prefWidth="369.0">
+                                 <children>
+                                    <FontAwesomeIconView glyphName="USER" layoutX="137.0" layoutY="121.0" size="10em" />
+                                    <Label layoutX="20.0" layoutY="173.0" text="Name" />
+                                    <Label layoutX="21.0" layoutY="249.0" text="Date of employment" />
+                                    <Label layoutX="20.0" layoutY="210.0" text="Position" />
+                                    <Button layoutX="231.0" layoutY="293.0" mnemonicParsing="false" text="Edit" />
+                                    <TextField layoutX="184.0" layoutY="168.0" />
+                                    <TextField layoutX="184.0" layoutY="205.0" />
+                                    <TextField layoutX="184.0" layoutY="244.0" />
+                                    <Button layoutX="288.0" layoutY="293.0" mnemonicParsing="false" text="Delete" />
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="438.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                 <children>
+                                    <TableView layoutX="9.0" layoutY="48.0" prefHeight="528.0" prefWidth="351.0">
+                                      <columns>
+                                        <TableColumn prefWidth="30.0" text="Id" />
+                                        <TableColumn prefWidth="155.0" text="Username" />
+                                          <TableColumn prefWidth="165.0" text="Position" />
+                                      </columns>
+                                    </TableView>
+                                    <TextField layoutX="9.0" layoutY="14.0" text="Search" />
+                                    <Button layoutX="185.0" layoutY="14.0" mnemonicParsing="false">
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="SEARCH" />
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </AnchorPane>
+                              <Button layoutX="30.0" layoutY="579.0" mnemonicParsing="false" text="Register new employee" />
+                           </children>
+                        </AnchorPane>
+                                <AnchorPane layoutX="15.0" layoutY="12.0" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <AnchorPane layoutX="29.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                            <children>
+                                                <TextField alignment="CENTER" layoutX="120.0" layoutY="14.0" prefHeight="88.0" prefWidth="136.0" text="Order Number" />
+                                                <Label layoutX="24.0" layoutY="399.0" prefHeight="18.0" prefWidth="42.0" text="Type:" />
+                                                <TextField layoutX="79.0" layoutY="394.0" text="Type of order" />
+                                                <TableView layoutX="24.0" layoutY="112.0" prefHeight="242.0" prefWidth="327.0">
+                                                    <columns>
+                                                        <TableColumn prefWidth="75.0" text="Product" />
+                                                        <TableColumn prefWidth="75.0" text="Quantity" />
+                                                        <TableColumn prefWidth="75.0" text="Price" />
+                                                        <TableColumn prefWidth="112.0" text="Total" />
+                                                    </columns>
+                                                </TableView>
+                                                <Label layoutX="24.0" layoutY="422.0" text="Notes:" />
+                                                <TextField layoutX="24.0" layoutY="442.0" prefHeight="80.0" prefWidth="327.0" />
+                                                <Label layoutX="24.0" layoutY="367.0" text="Total: " />
+                                                <TextField layoutX="79.0" layoutY="362.0" text="Total amount" />
+                                                <Button layoutX="24.0" layoutY="534.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="327.0" text="Change Status" />
+                                            </children></AnchorPane>
+                                        <AnchorPane layoutX="430.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                            <children>
+                                                <TableView layoutX="3.0" layoutY="19.0" prefHeight="553.0" prefWidth="388.0">
+                                                    <columns>
+                                                        <TableColumn prefWidth="43.0" text="Id" />
+                                                        <TableColumn prefWidth="65.0" text="Number" />
+                                                        <TableColumn minWidth="9.0" prefWidth="147.0" text="Date" />
+                                                        <TableColumn prefWidth="156.0" text="Status" />
+                                                    </columns>
+                                                </TableView>
+                                            </children>
+                                        </AnchorPane>
+                                    </children>
+                                </AnchorPane>
+                        <AnchorPane prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <AnchorPane layoutX="444.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                 <children>
+                                    <TableView layoutX="5.0" layoutY="48.0" prefHeight="519.0" prefWidth="356.0">
+                                      <columns>
+                                        <TableColumn prefWidth="46.0" text="Id" />
+                                        <TableColumn prefWidth="309.0" text="Dish Name" />
+                                      </columns>
+                                    </TableView>
+                                    <TextField layoutX="5.0" layoutY="14.0" prefHeight="28.0" prefWidth="182.0" text="Search" />
+                                    <Button layoutX="199.0" layoutY="14.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="31.0">
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="SEARCH" />
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="34.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                 <children>
+                                    <Button layoutX="14.0" layoutY="534.0" mnemonicParsing="false" text="Add new dish" />
+                                    <AnchorPane layoutX="15.0" layoutY="14.0" prefHeight="303.0" prefWidth="343.0">
+                                       <children>
+                                          <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="72.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
+                                          <Label layoutX="22.0" layoutY="181.0" text="Name" />
+                                          <Label layoutX="25.0" layoutY="217.0" text="Price" />
+                                          <Button layoutX="20.0" layoutY="263.0" mnemonicParsing="false" text="Edit" />
+                                          <Button layoutX="72.0" layoutY="263.0" mnemonicParsing="false" text="Delete" />
+                                          <TextField layoutX="72.0" layoutY="176.0" />
+                                          <TextField layoutX="72.0" layoutY="212.0" />
+                                       </children>
+                                    </AnchorPane>
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="637.0" prefWidth="859.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </AnchorPane>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

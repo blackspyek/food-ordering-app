@@ -5,10 +5,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1059.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1059.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.test.EmployeeViewController">
    <children>
       <BorderPane layoutX="214.0" layoutY="182.0" prefHeight="670.0" prefWidth="1059.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
@@ -26,7 +28,7 @@
                               <FontAwesomeIconView glyphName="MINUS" wrappingWidth="9.428571701049805" />
                            </graphic>
                         </Button>
-                        <Label layoutX="42.0" layoutY="10.0" text="Instant Noodles" />
+                        <Label layoutX="42.0" layoutY="10.0" text="Slurp" />
                      </children>
                   </AnchorPane>
                </children>
@@ -35,14 +37,16 @@
          <left>
             <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <children>
-                  <FontAwesomeIconView glyphName="USER" layoutX="53.0" layoutY="133.0" size="10em" />
-                  <Label layoutX="72.0" layoutY="152.0" text="Welcome" />
-                  <Label layoutX="68.0" layoutY="179.0" text="Username" />
+                  <FontAwesomeIconView glyphName="USER" layoutX="53.0" layoutY="149.0" size="10em" />
+                  <Label layoutX="72.0" layoutY="168.0" text="Welcome" />
+                  <Label layoutX="68.0" layoutY="195.0" text="Username" />
                   <Button layoutX="13.0" layoutY="595.0" mnemonicParsing="false" text="Sign Out">
                      <graphic>
                         <FontAwesomeIconView glyphName="SIGN_OUT" />
                      </graphic>
                   </Button>
+                  <Button layoutX="1.0" layoutY="253.0" mnemonicParsing="false" prefWidth="200.0" text="Menu" />
+                  <Button layoutX="1.0" layoutY="281.0" mnemonicParsing="false" prefWidth="200.0" text="Orders" />
                </children></AnchorPane>
          </left>
          <center>
@@ -50,17 +54,70 @@
                <children>
                   <AnchorPane layoutX="238.0" layoutY="233.0" prefHeight="637.0" prefWidth="859.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <AnchorPane layoutX="15.0" layoutY="12.0" prefHeight="616.0" prefWidth="829.0">
+                        <AnchorPane layoutX="15.0" layoutY="12.0" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <TableView layoutX="397.0" layoutY="22.0" prefHeight="576.0" prefWidth="412.0">
-                                <columns>
-                                  <TableColumn prefWidth="75.0" text="Order id" />
-                                  <TableColumn prefWidth="128.0" text="Order number" />
-                                    <TableColumn prefWidth="75.0" text="Quantity" />
-                                    <TableColumn prefWidth="131.0" text="Status" />
-                                </columns>
-                              </TableView>
-                              <AnchorPane layoutX="11.0" layoutY="22.0" prefHeight="576.0" prefWidth="369.0" />
+                              <AnchorPane layoutX="14.0" layoutY="22.0" prefHeight="576.0" prefWidth="369.0">
+                                 <children>
+                                    <TextField alignment="CENTER" layoutX="120.0" layoutY="14.0" prefHeight="88.0" prefWidth="136.0" text="Order Number" />
+                                    <Label layoutX="24.0" layoutY="399.0" prefHeight="18.0" prefWidth="42.0" text="Type:" />
+                                    <TextField layoutX="79.0" layoutY="394.0" text="Type of order" />
+                                    <TableView layoutX="24.0" layoutY="112.0" prefHeight="242.0" prefWidth="327.0">
+                                      <columns>
+                                        <TableColumn prefWidth="75.0" text="Product" />
+                                        <TableColumn prefWidth="75.0" text="Quantity" />
+                                          <TableColumn prefWidth="75.0" text="Price" />
+                                          <TableColumn prefWidth="112.0" text="Total" />
+                                      </columns>
+                                    </TableView>
+                                    <Label layoutX="24.0" layoutY="422.0" text="Notes:" />
+                                    <TextField layoutX="24.0" layoutY="442.0" prefHeight="80.0" prefWidth="327.0" />
+                                    <Label layoutX="24.0" layoutY="367.0" text="Total: " />
+                                    <TextField layoutX="79.0" layoutY="362.0" text="Total amount" />
+                                    <Button layoutX="24.0" layoutY="534.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="327.0" text="Change Status" />
+                                 </children></AnchorPane>
+                              <AnchorPane layoutX="403.0" layoutY="12.0" prefHeight="576.0" prefWidth="369.0">
+                                 <children>
+                                    <TableView layoutX="3.0" layoutY="19.0" prefHeight="553.0" prefWidth="388.0">
+                                      <columns>
+                                        <TableColumn prefWidth="43.0" text="Id" />
+                                        <TableColumn prefWidth="65.0" text="Number" />
+                                          <TableColumn minWidth="9.0" prefWidth="147.0" text="Date" />
+                                          <TableColumn prefWidth="156.0" text="Status" />
+                                      </columns>
+                                    </TableView>
+                                 </children>
+                              </AnchorPane>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="637.0" prefWidth="858.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <AnchorPane layoutX="446.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                 <children>
+                                    <TableView layoutX="14.0" layoutY="52.0" prefHeight="511.0" prefWidth="341.0">
+                                      <columns>
+                                        <TableColumn prefWidth="40.0" text="Id" />
+                                        <TableColumn prefWidth="167.0" text="Dish name" />
+                                          <TableColumn prefWidth="132.0" text="Stauts" />
+                                      </columns>
+                                    </TableView>
+                                    <TextField layoutX="14.0" layoutY="14.0" text="Search" />
+                                    <Button layoutX="185.0" layoutY="14.0" mnemonicParsing="false">
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="SEARCH" />
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane layoutX="34.0" layoutY="31.0" prefHeight="348.0" prefWidth="369.0">
+                                 <children>
+                                    <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="85.0" layoutY="34.0" pickOnBounds="true" preserveRatio="true" />
+                                    <Label layoutX="14.0" layoutY="221.0" text="Dish name" />
+                                    <Button layoutX="232.0" layoutY="300.0" mnemonicParsing="false" text="Change Status" />
+                                    <Label layoutX="14.0" layoutY="258.0" text="Status" />
+                                    <TextField layoutX="178.0" layoutY="216.0" />
+                                    <TextField layoutX="178.0" layoutY="253.0" />
+                                 </children>
+                              </AnchorPane>
                            </children>
                         </AnchorPane>
                      </children>
