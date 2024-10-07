@@ -15,5 +15,7 @@ public interface MenuItemsRepository extends CrudRepository<MenuItem, Long> {
 
     List<MenuItem> findByCategory(Category category);
 
+    Optional<MenuItem> findById(int id);
+
 
 }

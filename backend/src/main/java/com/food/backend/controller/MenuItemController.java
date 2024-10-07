@@ -1,16 +1,13 @@
 package com.food.backend.controller;
 
+import com.food.backend.dto.MenuItemDto;
 import com.food.backend.model.Enums.Category;
 import com.food.backend.model.MenuItem;
-import com.food.backend.model.User;
 import com.food.backend.service.MenuItemService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,5 +44,54 @@ public class MenuItemController {
         MenuItem menuItem = menuItemService.findByNameIgnoreCase(name).orElse(null);
         return menuItem == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(menuItem);
     }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteMenuItem(
+            @PathVariable("id") int id
+    ) {
+        try{
+            menuItemService.deleteMenuItem(id);
+            return ResponseEntity.ok("MenuItem" + id + " deleted successfully");
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("Failed to delete menu item: " + e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateMenuItem(
+            @PathVariable("id") int id,
+            @RequestBody MenuItemDto menuItem
+    ) {
+        try{
+            return ResponseEntity.ok(menuItemService.patchUpdate(id, menuItem));
+        }
+        catch (MethodArgumentNotValidException e) {
+            return ResponseEntity.badRequest().body("Validation failed: " + e.getBindingResult().getAllErrors());
+        }
+            catch (Exception e){
+            return ResponseEntity.badRequest().body("Failed to update menu item: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<?> createMenuItem(
+            @Valid
+            @RequestBody MenuItemDto menuItemDto
+    ) {
+        try{
+            MenuItem newMenuItem = menuItemService.createNewMenuItem(menuItemDto);
+            return ResponseEntity.ok(newMenuItem);
+        }
+        catch (MethodArgumentNotValidException e) {
+            return ResponseEntity.badRequest().body("Validation failed: " + e.getBindingResult().getAllErrors());
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("Failed to update menu item: " + e.getMessage());
+        }
+    }
+
+
 
 }
