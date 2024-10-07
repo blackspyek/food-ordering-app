@@ -2,6 +2,7 @@ package com.food.backend.controller;
 
 import com.food.backend.dto.LoginUserDto;
 import com.food.backend.dto.RegisterUserDto;
+import com.food.backend.model.Role;
 import com.food.backend.model.User;
 import com.food.backend.responses.LoginResponse;
 import com.food.backend.service.AuthenticationService;
@@ -10,9 +11,12 @@ import com.food.backend.service.JwtService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @RequestMapping("/auth")
@@ -79,6 +83,19 @@ public class AuthenticationController {
         catch (MessagingException e) {
             logger.warning("Error sending email: " + e.getMessage());
         }
+    }
+
+    @PatchMapping("/patch/roles/{username}")
+    public ResponseEntity<User> changeRoles(@PathVariable String username, @RequestBody Set<Role> roles) {
+        Optional<User> userOptional = authenticationService.changeRoles(username, roles);
+        return userOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @GetMapping("/user/{username}")
+    public ResponseEntity<User> getUser(@PathVariable String username) {
+        Optional<User> userOptional = authenticationService.findByUsername(username);
+        return userOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }

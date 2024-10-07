@@ -8,7 +8,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -29,8 +30,11 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean enabled;
 
-    @Column(nullable = false, name = "is_manager")
-    private Boolean isManager;
+    @ElementCollection(fetch = FetchType.EAGER) //
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<Role> roles;
 
     public User(String username, String password) {
         this.username = username;
@@ -39,7 +43,9 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return roles.stream()
+                .map(role -> (GrantedAuthority) role::name)
+                .collect(Collectors.toList());
     }
 
     @Override

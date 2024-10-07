@@ -51,7 +51,6 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, User userDetails) {
-        extraClaims.put("isManager", userDetails.getIsManager());
         extraClaims.put("enabled", userDetails.isEnabled());
         extraClaims.put("id", userDetails.getId());
         return buildToken(extraClaims, userDetails, jwtExpiration);
