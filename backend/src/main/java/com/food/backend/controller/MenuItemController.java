@@ -68,6 +68,7 @@ public class MenuItemController {
             return ResponseEntity.ok(menuItemService.patchUpdate(id, menuItem));
         }
         catch (MethodArgumentNotValidException e) {
+            assert e.getBindingResult() != null;
             return ResponseEntity.badRequest().body("Validation failed: " + e.getBindingResult().getAllErrors());
         }
             catch (Exception e){
@@ -83,9 +84,6 @@ public class MenuItemController {
         try{
             MenuItem newMenuItem = menuItemService.createNewMenuItem(menuItemDto);
             return ResponseEntity.ok(newMenuItem);
-        }
-        catch (MethodArgumentNotValidException e) {
-            return ResponseEntity.badRequest().body("Validation failed: " + e.getBindingResult().getAllErrors());
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body("Failed to update menu item: " + e.getMessage());
