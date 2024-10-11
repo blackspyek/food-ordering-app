@@ -4,9 +4,10 @@ import com.food.backend.dto.MenuItemDto;
 import com.food.backend.model.Enums.Category;
 import com.food.backend.model.MenuItem;
 import com.food.backend.service.MenuItemService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,19 +60,20 @@ public class MenuItemController {
         }
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateMenuItem(
             @PathVariable("id") int id,
+            @Valid
             @RequestBody MenuItemDto menuItem
     ) {
         try{
-            return ResponseEntity.ok(menuItemService.patchUpdate(id, menuItem));
+            MenuItem patchedMenuItem = menuItemService.updateMenuItem(id, menuItem);
+            return ResponseEntity.ok(patchedMenuItem);
         }
-        catch (MethodArgumentNotValidException e) {
-            assert e.getBindingResult() != null;
-            return ResponseEntity.badRequest().body("Validation failed: " + e.getBindingResult().getAllErrors());
+        catch (EntityNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Menu item with id " + id + " does not exist");
         }
-            catch (Exception e){
+        catch (Exception e){
             return ResponseEntity.badRequest().body("Failed to update menu item: " + e.getMessage());
         }
     }
