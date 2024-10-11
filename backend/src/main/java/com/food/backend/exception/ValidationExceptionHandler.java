@@ -3,6 +3,7 @@ package com.food.backend.exception;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.food.backend.model.Enums.Category;
+import org.apache.coyote.BadRequestException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,6 +61,11 @@ public class ValidationExceptionHandler {
     public ResponseEntity<String> handleInvalidEnum() throws JsonProcessingException {
         String message = "Category must be one of " + Arrays.toString(Category.values());
         return getResponseEntity("Invalid Enum", message);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequest(Exception e) throws JsonProcessingException {
+        return getResponseEntity("Invalid Enum", e.getMessage());
     }
 
 
