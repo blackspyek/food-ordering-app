@@ -49,20 +49,16 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
+    public ResponseEntity<ApiResponse<Object>> authenticate(@RequestBody LoginUserDto loginUserDto) {
         try{
             User authenticatedUser = authenticationService.authenticate(loginUserDto);
             String token = jwtService.generateToken(authenticatedUser);
-            LoginResponse loginResponse = new LoginResponse(token, jwtService.getJwtExpirationTime());
-            return ResponseEntity.ok(loginResponse);
-
+            LoginResponse loginResponse = new LoginResponse(token, jwtService.getJwtExpirationTime(), authenticatedUser.getRoles());
+            return ResponseUtil.successResponse(loginResponse, "Login successful");
         }
         catch (UsernameNotFoundException e) {
-            return ResponseEntity.badRequest().
-                    body(new LoginResponse("Invalid username or password", 0));
+            return ResponseUtil.badRequestResponse("Invalid username or password");
         }
-
-
     }
 
     // temporary for email testing
