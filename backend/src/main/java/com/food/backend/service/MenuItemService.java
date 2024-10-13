@@ -100,4 +100,8 @@ public class MenuItemService {
             throw new RuntimeException("Failed to delete menu item with id " + id, e);
         }
     }
+
+    public Optional<MenuItem> findById(Long id) {
+        return menuItemsRepository.findById(id);
+    }
 }

@@ -6,12 +6,9 @@ import com.food.backend.model.Role;
 import com.food.backend.model.User;
 import com.food.backend.responses.LoginResponse;
 import com.food.backend.service.AuthenticationService;
-import com.food.backend.service.EmailService;
 import com.food.backend.service.JwtService;
 import com.food.backend.utils.classes.ApiResponse;
 import com.food.backend.utils.classes.ResponseUtil;
-import jakarta.mail.MessagingException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,15 +24,11 @@ public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
     // temporary
-    private final EmailService emailService;
-    @Value("${temp.email}")
-    private String tempEmail;
 
-    private final Logger logger = Logger.getLogger(AuthenticationController.class.getName());
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, EmailService emailService) {
+
+    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
-        this.emailService = emailService;
     }
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<User>> register(@RequestBody RegisterUserDto registerUserDto) {
@@ -58,33 +51,6 @@ public class AuthenticationController {
         }
         catch (UsernameNotFoundException e) {
             return ResponseUtil.badRequestResponse("Invalid username or password");
-        }
-    }
-
-    // temporary for email testing
-    @GetMapping("/sendtest")
-    public ResponseEntity<String> sendTest() {
-        sendTestEmail();
-        return ResponseEntity.ok("Email sent");
-    }
-
-    public void sendTestEmail() {
-        String subject = "Test Email";
-        String htmlMessage = "<html>"
-                + "<body style=\"font-family: Arial, sans-serif;\">"
-                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
-                + "<h2 style=\"color: #333;\">Welcome to our app!</h2>"
-                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
-                + "</div>"
-                + "</div>"
-                + "</body>"
-                + "</html>";
-
-        try{
-            emailService.sendTestEmail(tempEmail, subject, htmlMessage);
-        }
-        catch (MessagingException e) {
-            logger.warning("Error sending email: " + e.getMessage());
         }
     }
 
