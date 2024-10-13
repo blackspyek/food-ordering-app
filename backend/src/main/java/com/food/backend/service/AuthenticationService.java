@@ -28,13 +28,27 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public User signup(RegisterUserDto registerUserDto) {
+    public Optional<User> registerUser(RegisterUserDto registerUserDto) {
+        validateUserDoesNotExist(registerUserDto.getUsername());
+
+        User user = createUser(registerUserDto);
+        User savedUser = userRepository.save(user);
+
+        return Optional.of(savedUser);
+    }
+    private void validateUserDoesNotExist(String username) {
+        if (findByUsername(username.toLowerCase()).isPresent()) {
+            throw new IllegalArgumentException("User already exists");
+        }
+    }
+
+    private User createUser(RegisterUserDto registerUserDto) {
         User user = new User();
-        user.setUsername(registerUserDto.getUsername());
+        user.setUsername(registerUserDto.getUsername().toLowerCase());
         user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
         user.setRoles(Set.of(Role.ROLE_EMPLOYEE));
         user.setEnabled(true);
-        return userRepository.save(user);
+        return user;
     }
     @Transactional
     public Optional<User> changeRoles(String username, Set<Role> roles) {

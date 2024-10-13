@@ -8,6 +8,8 @@ import com.food.backend.responses.LoginResponse;
 import com.food.backend.service.AuthenticationService;
 import com.food.backend.service.EmailService;
 import com.food.backend.service.JwtService;
+import com.food.backend.utils.classes.ApiResponse;
+import com.food.backend.utils.classes.ResponseUtil;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +38,14 @@ public class AuthenticationController {
         this.emailService = emailService;
     }
     @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto) {
-        User user = authenticationService.signup(registerUserDto);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<ApiResponse<User>> register(@RequestBody RegisterUserDto registerUserDto) {
+        try {
+            return authenticationService.registerUser(registerUserDto)
+                    .map(user -> ResponseUtil.successResponse(user, "User registered"))
+                    .orElseGet(() -> ResponseUtil.badRequestResponse("Registration failed"));
+        } catch (IllegalArgumentException e) {
+            return ResponseUtil.badRequestResponse(e.getMessage());
+        }
     }
 
     @PostMapping("/login")
