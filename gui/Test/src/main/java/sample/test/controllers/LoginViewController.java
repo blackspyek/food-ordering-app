@@ -3,6 +3,9 @@ package sample.test.controllers;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
@@ -12,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import sample.test.Main;
 import sample.test.service.JwtTokenService;
 
 import java.net.URI;
@@ -111,6 +115,24 @@ public class LoginViewController implements Initializable {
         String jwtToken = extractTokenFromResponse(response.body());
         JwtTokenService.getInstance().setJwtToken(jwtToken);
         loginMessageLabel.setText("Login successful! JWT token stored.");
+
+        try {
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource("register-view.fxml"));
+            Parent registerViewRoot = loader.load();
+
+            Stage registerStage = new Stage();
+            registerStage.setTitle("Register Page");
+            registerStage.setScene(new Scene(registerViewRoot));
+
+            registerStage.show();
+
+            Stage loginStage = (Stage) loginMessageLabel.getScene().getWindow();
+            loginStage.close();
+
+        } catch (Exception e) {
+            loginMessageLabel.setText("Error occurred while loading manager view.");
+        }
+
     }
 
     private void handleInvalidLogin() {

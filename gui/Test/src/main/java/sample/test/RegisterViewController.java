@@ -1,24 +1,23 @@
 package sample.test;
 
+import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
+import sample.test.dto.RegisterUserDto;
+import sample.test.service.JwtTokenService;
 
+import java.net.URI;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.Statement;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -39,17 +38,20 @@ public class RegisterViewController implements Initializable {
     @FXML
     private PasswordField confirmPasswordField;
     @FXML
-    private TextField firstnameTextField;
-    @FXML
-    private TextField lastnameTextField;
-    @FXML
     private TextField usernameTextField;
+    @FXML
+    private ChoiceBox<String> roleChoiceBox;
+
+    private String jwtToken;
+    private String[] roles = {"ROLE_USER", "ROLE_MANAGER", "ROLE_EMPLOYEE"};
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         Image pencilImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/padlock.png")).toString());
         pencilImageView.setImage(pencilImage);
 
+        roleChoiceBox.getItems().addAll(roles);
+        roleChoiceBox.setValue("ROLE_USER");
     }
 
     public void closeButtonOnAction(ActionEvent event) {
@@ -59,57 +61,74 @@ public class RegisterViewController implements Initializable {
     }
 
     public void registerButtonOnAction(ActionEvent event) {
-        if (firstnameTextField.getText().isBlank() || lastnameTextField.getText().isBlank() || usernameTextField.getText().isBlank() || setPasswordField.getText().isBlank() || confirmPasswordField.getText().isBlank()) {
-            registrationMessageLabel.setText("Please enter all fields.");
-        }
-        else if (setPasswordField.getText().equals(confirmPasswordField.getText())) {
+        if (areFieldsValid()) {
             registerUser();
-            confirmPasswordLabel.setText("");
-            registrationMessageLabel.setText("User has been registered successfully.");
-            loginForm();
-            Stage stage = (Stage) registerButton.getScene().getWindow();
-            stage.close();
-        } else {
-            registrationMessageLabel.setText("Password does not match");
         }
+    }
+
+    private boolean areFieldsValid() {
+        if (usernameTextField.getText().isBlank() || setPasswordField.getText().isBlank() || confirmPasswordField.getText().isBlank()) {
+            registrationMessageLabel.setText("Please enter all fields.");
+            return false;
+        }
+        if (!setPasswordField.getText().equals(confirmPasswordField.getText())) {
+            confirmPasswordLabel.setText("Password does not match.");
+            return false;
+        }
+        if (roleChoiceBox.getValue() == null || roleChoiceBox.getValue().isBlank()) {
+            registrationMessageLabel.setText("Please select a role.");
+            return false;
+        }
+        return true;
     }
 
     public void registerUser() {
-        DatabaseConnection connectNow = new DatabaseConnection();
-        Connection connectDB = connectNow.getConnection();
-
-        String firstname = firstnameTextField.getText();
-        String lastname = lastnameTextField.getText();
         String username = usernameTextField.getText();
         String password = setPasswordField.getText();
+        String role = roleChoiceBox.getValue();
 
-        String insertFields = "INSERT INTO user_account(firstname, lastname, username, password) VALUES ('";
-        String insertValues = firstname + "','" + lastname + "','" + username + "','" + password + "')";
-        String insertToRegister = insertFields + insertValues;
-
+        RegisterUserDto registerUserDto = new RegisterUserDto(username, password, role);
         try {
-            Statement statement = connectDB.createStatement();
-            statement.executeUpdate(insertToRegister);
-            registrationMessageLabel.setText("User has been registered successfully.");
+            Gson gson = new Gson();
+            String jsonBody = gson.toJson(registerUserDto);
+
+            String jwtToken = JwtTokenService.getInstance().getJwtToken();
+
+            if (jwtToken != null && !jwtToken.isBlank()) {
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("http://localhost:8080/auth/signup"))
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", "Bearer " + jwtToken)
+                        .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                        .build();
+
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                handleRegistrationResponse(response);
+            } else {
+                registrationMessageLabel.setText("You must be logged in to register a new user.");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
-            e.getCause();
-        }
-
-    }
-
-    public void loginForm() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("login-view.fxml"));
-            Stage registerStage = new Stage();
-            //stage.initStyle(StageStyle.UNDECORATED);
-            registerStage.setScene(new Scene(root, 809, 539));
-            registerStage.setTitle("Login Page");
-            registerStage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            e.getCause();
+            registrationMessageLabel.setText("Error occurred during registration.");
         }
     }
 
+    private void handleRegistrationResponse(HttpResponse<String> response) {
+        if (isRegistrationSuccessful(response)) {
+            registrationMessageLabel.setText("User registered successfully.");
+        } else {
+            handleRegistrationFailure(response);
+        }
+    }
+
+    private boolean isRegistrationSuccessful(HttpResponse<String> response) {
+        return response.statusCode() == 200;
+    }
+
+    private void handleRegistrationFailure(HttpResponse<String> response) {
+        registrationMessageLabel.setText("Registration failed: " + response.body());
+    }
 }
