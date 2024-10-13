@@ -18,6 +18,7 @@ import javafx.fxml.Initializable;
 import sample.test.Main;
 import sample.test.service.JwtTokenService;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -117,22 +118,27 @@ public class LoginViewController implements Initializable {
         loginMessageLabel.setText("Login successful! JWT token stored.");
 
         try {
-            FXMLLoader loader = new FXMLLoader(Main.class.getResource("register-view.fxml"));
-            Parent registerViewRoot = loader.load();
-
-            Stage registerStage = new Stage();
-            registerStage.setTitle("Register Page");
-            registerStage.setScene(new Scene(registerViewRoot));
-
-            registerStage.show();
-
-            Stage loginStage = (Stage) loginMessageLabel.getScene().getWindow();
-            loginStage.close();
-
+            loadRegisterView();
+            closeCurrentStage();
         } catch (Exception e) {
-            loginMessageLabel.setText("Error occurred while loading manager view.");
+            loginMessageLabel.setText("Error occurred while loading register view.");
         }
 
+    }
+
+    private void loadRegisterView() throws IOException {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("register-view.fxml"));
+        Parent registerViewRoot = loader.load();
+
+        Stage registerStage = new Stage();
+        registerStage.setTitle("Register Page");
+        registerStage.setScene(new Scene(registerViewRoot));
+        registerStage.show();
+    }
+
+    private void closeCurrentStage() {
+        Stage loginStage = (Stage) loginMessageLabel.getScene().getWindow();
+        loginStage.close();
     }
 
     private void handleInvalidLogin() {

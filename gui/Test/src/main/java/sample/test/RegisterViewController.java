@@ -13,6 +13,7 @@ import javafx.event.ActionEvent;
 import sample.test.dto.RegisterUserDto;
 import sample.test.service.JwtTokenService;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -39,19 +40,13 @@ public class RegisterViewController implements Initializable {
     private PasswordField confirmPasswordField;
     @FXML
     private TextField usernameTextField;
-    @FXML
-    private ChoiceBox<String> roleChoiceBox;
 
     private String jwtToken;
-    private String[] roles = {"ROLE_USER", "ROLE_MANAGER", "ROLE_EMPLOYEE"};
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         Image pencilImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/padlock.png")).toString());
         pencilImageView.setImage(pencilImage);
-
-        roleChoiceBox.getItems().addAll(roles);
-        roleChoiceBox.setValue("ROLE_USER");
     }
 
     public void closeButtonOnAction(ActionEvent event) {
@@ -75,46 +70,47 @@ public class RegisterViewController implements Initializable {
             confirmPasswordLabel.setText("Password does not match.");
             return false;
         }
-        if (roleChoiceBox.getValue() == null || roleChoiceBox.getValue().isBlank()) {
-            registrationMessageLabel.setText("Please select a role.");
-            return false;
-        }
         return true;
     }
 
     public void registerUser() {
-        String username = usernameTextField.getText();
-        String password = setPasswordField.getText();
-        String role = roleChoiceBox.getValue();
-
-        RegisterUserDto registerUserDto = new RegisterUserDto(username, password, role);
         try {
-            Gson gson = new Gson();
-            String jsonBody = gson.toJson(registerUserDto);
-
+            RegisterUserDto registerUserDto = collectUserInput();
             String jwtToken = JwtTokenService.getInstance().getJwtToken();
 
             if (jwtToken != null && !jwtToken.isBlank()) {
-                HttpClient client = HttpClient.newHttpClient();
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:8080/auth/signup"))
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", "Bearer " + jwtToken)
-                        .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                        .build();
-
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+                HttpResponse<String> response = sendRegistrationRequest(registerUserDto, jwtToken);
                 handleRegistrationResponse(response);
             } else {
                 registrationMessageLabel.setText("You must be logged in to register a new user.");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             registrationMessageLabel.setText("Error occurred during registration.");
         }
     }
+
+    private RegisterUserDto collectUserInput() {
+        String username = usernameTextField.getText();
+        String password = setPasswordField.getText();
+        return new RegisterUserDto(username, password);
+    }
+
+    private HttpResponse<String> sendRegistrationRequest(RegisterUserDto registerUserDto, String jwtToken) throws IOException, InterruptedException {
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(registerUserDto);
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/auth/signup"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + jwtToken)
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
 
     private void handleRegistrationResponse(HttpResponse<String> response) {
         if (isRegistrationSuccessful(response)) {

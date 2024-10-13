@@ -11,6 +11,7 @@ module sample.test {
     requires java.desktop;
     requires java.net.http;
     requires com.google.gson;
+    requires static lombok;
 
     opens sample.test to javafx.fxml;
     exports sample.test;
