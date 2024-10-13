@@ -1,24 +1,24 @@
 package com.food.backend.controller;
 
+import com.food.backend.dto.UserDto;
 import com.food.backend.model.User;
-import com.food.backend.service.EmailService;
 import com.food.backend.service.UserService;
-import jakarta.mail.MessagingException;
+
+import com.food.backend.utils.classes.ApiResponse;
+import com.food.backend.utils.classes.MessageUtil;
+import com.food.backend.utils.classes.ResponseUtil;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 @RequestMapping("/users")
 @RestController
 public class UserController {
 
-    private final Logger logger = Logger.getLogger(UserController.class.getName());
     private final UserService userService;
 
 
@@ -33,10 +33,34 @@ public class UserController {
         return ResponseEntity.ok(currentUser);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<User>> allUsers() {
-        return ResponseEntity.ok(userService.allUsers());
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<User>> findUserById(@PathVariable Long id) {
+        return userService.findUserById(id)
+                .map(user -> ResponseUtil.successResponse(user, "User found"))
+                .orElseGet(() -> ResponseUtil.notFoundResponse(MessageUtil.userFoundMessage(id)));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<User>> deleteUserById(@PathVariable Long id) {
+        return userService.deleteUserById(id)
+                .map(user -> ResponseUtil.successResponse(user, MessageUtil.userDeletedMessage(id)))
+                .orElseGet(() -> ResponseUtil.notFoundResponse(MessageUtil.userNotFoundMessage(id)));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<User>> updateUserById(@PathVariable Long id,
+                                                            @Valid
+                                                            @RequestBody UserDto userDto){
+        if (!UserService.hasRoles(userDto)) return ResponseUtil.badRequestResponse("Roles cannot be empty");
+        return userService.updateUserById(id, userDto)
+                .map(user -> ResponseUtil.successResponse(user, MessageUtil.userUpdatedMessage(id)))
+                .orElseGet(() -> ResponseUtil.notFoundResponse(MessageUtil.userNotFoundMessage(id)));
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<ApiResponse<List<User>>> allUsers() {
+        List<User> users = userService.allUsers();
+        return ResponseUtil.successResponse(users, "All users retrieved");
+    }
 
 }

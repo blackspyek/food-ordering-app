@@ -5,7 +5,6 @@ import com.food.backend.dto.RegisterUserDto;
 import com.food.backend.model.Role;
 import com.food.backend.model.User;
 import com.food.backend.repository.UserRepository;
-import jakarta.mail.MessagingException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,6 +32,7 @@ public class AuthenticationService {
         User user = new User();
         user.setUsername(registerUserDto.getUsername());
         user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
+        user.setRoles(Set.of(Role.ROLE_EMPLOYEE));
         user.setEnabled(true);
         return userRepository.save(user);
     }
