@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -32,10 +31,17 @@ public class Order {
     @Column(name = "order_type", nullable = false)
     private OrderType orderType;
 
-    @Column(name = "total_price", nullable = false)
+    @Column(name = "total_price", nullable = true)
     private Double totalPrice;
 
     @Column(name = "order_time", nullable = false, updatable = false)
     private LocalDateTime orderTime;
+
+    @Column(name = "board_code", nullable = true)
+    private String boardCode;
+
+    @Column(name = "email", nullable = false)
+    private String email;
+
 
 }
