@@ -1,5 +1,6 @@
 package sample.test.controllers;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.fxml.FXML;
@@ -24,6 +25,8 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -113,9 +116,16 @@ public class LoginViewController implements Initializable {
     }
 
     private void handleSuccessfulLogin(HttpResponse<String> response) {
-        String jwtToken = extractTokenFromResponse(response.body());
+        JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        JsonObject data = responseObject.getAsJsonObject("data");
+
+        String jwtToken = data.get("token").getAsString();
+        List<String> roles = extractRolesFromResponse(data.get("roles").getAsJsonArray());
+
         JwtTokenService.getInstance().setJwtToken(jwtToken);
-        loginMessageLabel.setText("Login successful! JWT token stored.");
+        JwtTokenService.getInstance().setUserRoles(roles);
+
+        loginMessageLabel.setText("Login successful! JWT token and roles stored.");
 
         try {
             loadRegisterView();
@@ -123,7 +133,12 @@ public class LoginViewController implements Initializable {
         } catch (Exception e) {
             loginMessageLabel.setText("Error occurred while loading register view.");
         }
+    }
 
+    private List<String> extractRolesFromResponse(JsonArray rolesArray) {
+        List<String> roles = new ArrayList<>();
+        rolesArray.forEach(roleElement -> roles.add(roleElement.getAsString()));
+        return roles;
     }
 
     private void loadRegisterView() throws IOException {
