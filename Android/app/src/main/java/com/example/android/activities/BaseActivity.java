@@ -52,6 +52,9 @@ public class BaseActivity extends AppCompatActivity {
         if (isCartAction(itemId)) {
             handleCartAction();
             return true;
+        } else if (isBoardAction(itemId)) {
+            handleBoardAction();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -61,14 +64,28 @@ public class BaseActivity extends AppCompatActivity {
         return itemId == R.id.action_cart;
     }
 
+    private boolean isBoardAction(int itemId) {
+        return itemId == R.id.action_board;
+    }
+
     private void handleCartAction() {
         if (!(this instanceof BasketActivity)) {
             openBasketActivity();
         }
     }
 
+    private void handleBoardAction() {
+        if (!(this instanceof OrderBoardActivity)) {
+            openBoardActivity();
+        }
+    }
+
     private void openBasketActivity() {
         Intent intent = new Intent(this, BasketActivity.class);
+        startActivity(intent);
+    }
+    private void openBoardActivity() {
+        Intent intent = new Intent(this, OrderBoardActivity.class);
         startActivity(intent);
     }
 

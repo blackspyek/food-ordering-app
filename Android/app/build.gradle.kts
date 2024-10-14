@@ -47,8 +47,11 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.converter.gson)
     implementation(libs.glide)
+    implementation(libs.okhttp)
+    implementation(libs.rxjava)
+    implementation(libs.rxandroid)
 
-    compileOnly ("org.projectlombok:lombok:1.18.24")
-    annotationProcessor ("org.projectlombok:lombok:1.18.24")
+    compileOnly ("org.projectlombok:lombok:1.18.34")
+    annotationProcessor ("org.projectlombok:lombok:1.18.34")
 
 }

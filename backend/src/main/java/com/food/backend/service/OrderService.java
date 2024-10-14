@@ -17,9 +17,8 @@ import com.food.backend.exception.OrderItemNotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +36,7 @@ public class OrderService {
     private final EmailService emailService;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, MenuItemService menuItemService, LiveOrderBoard liveOrderBoard, EmailService emailService) {
+    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, MenuItemService menuItemService, @Lazy LiveOrderBoard liveOrderBoard, EmailService emailService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.menuItemService = menuItemService;
@@ -46,7 +45,7 @@ public class OrderService {
     }
 
     @Transactional
-    public Order createOrder(CreateOrderDto createOrderDto) throws BadRequestException {
+    public Order createOrder(CreateOrderDto createOrderDto)  {
         Order order = initializeOrder(createOrderDto.getOrderType(), createOrderDto.getEmail());
         Order savedOrder = orderRepository.save(order);
         List<OrderItem> orderItemsList = createOrderItemsList(savedOrder, createOrderDto.getOrderItems());
