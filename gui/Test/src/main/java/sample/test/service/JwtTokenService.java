@@ -1,8 +1,11 @@
 package sample.test.service;
 
+import java.util.List;
+
 public class JwtTokenService {
     private static JwtTokenService instance;
     private String jwtToken;
+    private List<String> userRoles;
 
     private JwtTokenService() {
     }
@@ -21,4 +24,13 @@ public class JwtTokenService {
     public String getJwtToken() {
         return jwtToken;
     }
+
+    public void setUserRoles(List<String> roles) {
+        this.userRoles = roles;
+    }
+
+    public List<String> getUserRoles() {
+        return userRoles;
+    }
+
 }

@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -79,8 +80,12 @@ public class RegisterViewController implements Initializable {
             String jwtToken = JwtTokenService.getInstance().getJwtToken();
 
             if (jwtToken != null && !jwtToken.isBlank()) {
-                HttpResponse<String> response = sendRegistrationRequest(registerUserDto, jwtToken);
-                handleRegistrationResponse(response);
+                if (isUserManager()) {
+                    HttpResponse<String> response = sendRegistrationRequest(registerUserDto, jwtToken);
+                    handleRegistrationResponse(response);
+                } else {
+                    registrationMessageLabel.setText("Only managers can register a new user.");
+                }
             } else {
                 registrationMessageLabel.setText("You must be logged in to register a new user.");
             }
@@ -88,6 +93,11 @@ public class RegisterViewController implements Initializable {
             e.printStackTrace();
             registrationMessageLabel.setText("Error occurred during registration.");
         }
+    }
+
+    private boolean isUserManager() {
+        List<String> userRoles = JwtTokenService.getInstance().getUserRoles();
+        return userRoles != null && userRoles.contains("ROLE_MANAGER");
     }
 
     private RegisterUserDto collectUserInput() {
