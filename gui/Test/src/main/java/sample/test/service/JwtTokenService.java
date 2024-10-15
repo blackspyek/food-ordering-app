@@ -1,14 +1,16 @@
 package sample.test.service;
 
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtTokenService {
     private static JwtTokenService instance;
     private String jwtToken;
-    private List<String> userRoles;
-
-    private JwtTokenService() {
-    }
 
     public static JwtTokenService getInstance() {
         if (instance == null) {
@@ -16,21 +18,4 @@ public class JwtTokenService {
         }
         return instance;
     }
-
-    public void setJwtToken(String token) {
-        this.jwtToken = token;
-    }
-
-    public String getJwtToken() {
-        return jwtToken;
-    }
-
-    public void setUserRoles(List<String> roles) {
-        this.userRoles = roles;
-    }
-
-    public List<String> getUserRoles() {
-        return userRoles;
-    }
-
 }

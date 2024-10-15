@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
@@ -10,121 +9,145 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1059.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.test.EmployeeViewController">
-   <children>
-      <BorderPane layoutX="214.0" layoutY="182.0" prefHeight="670.0" prefWidth="1059.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <top>
-            <AnchorPane prefHeight="32.0" prefWidth="1059.0" BorderPane.alignment="CENTER">
-               <children>
-                  <AnchorPane layoutY="11.0" prefHeight="39.0" prefWidth="1059.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Button layoutX="1017.0" layoutY="5.0" mnemonicParsing="false">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="CLOSE" />
-                           </graphic>
-                        </Button>
-                        <Button layoutX="977.0" layoutY="5.0" mnemonicParsing="false">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="MINUS" wrappingWidth="9.428571701049805" />
-                           </graphic>
-                        </Button>
-                        <Label layoutX="42.0" layoutY="10.0" text="Slurp" />
-                     </children>
-                  </AnchorPane>
-               </children>
-            </AnchorPane>
-         </top>
-         <left>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                  <FontAwesomeIconView glyphName="USER" layoutX="53.0" layoutY="149.0" size="10em" />
-                  <Label layoutX="72.0" layoutY="168.0" text="Welcome" />
-                  <Label layoutX="68.0" layoutY="195.0" text="Username" />
-                  <Button layoutX="13.0" layoutY="595.0" mnemonicParsing="false" text="Sign Out">
-                     <graphic>
-                        <FontAwesomeIconView glyphName="SIGN_OUT" />
-                     </graphic>
-                  </Button>
-                  <Button layoutX="1.0" layoutY="253.0" mnemonicParsing="false" prefWidth="200.0" text="Menu" />
-                  <Button layoutX="1.0" layoutY="281.0" mnemonicParsing="false" prefWidth="200.0" text="Orders" />
-               </children></AnchorPane>
-         </left>
-         <center>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                  <AnchorPane layoutX="238.0" layoutY="233.0" prefHeight="637.0" prefWidth="859.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <AnchorPane layoutX="15.0" layoutY="12.0" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <children>
-                              <AnchorPane layoutX="14.0" layoutY="22.0" prefHeight="576.0" prefWidth="369.0">
-                                 <children>
-                                    <TextField alignment="CENTER" layoutX="120.0" layoutY="14.0" prefHeight="88.0" prefWidth="136.0" text="Order Number" />
-                                    <Label layoutX="24.0" layoutY="399.0" prefHeight="18.0" prefWidth="42.0" text="Type:" />
-                                    <TextField layoutX="79.0" layoutY="394.0" text="Type of order" />
-                                    <TableView layoutX="24.0" layoutY="112.0" prefHeight="242.0" prefWidth="327.0">
-                                      <columns>
-                                        <TableColumn prefWidth="75.0" text="Product" />
-                                        <TableColumn prefWidth="75.0" text="Quantity" />
-                                          <TableColumn prefWidth="75.0" text="Price" />
-                                          <TableColumn prefWidth="112.0" text="Total" />
-                                      </columns>
-                                    </TableView>
-                                    <Label layoutX="24.0" layoutY="422.0" text="Notes:" />
-                                    <TextField layoutX="24.0" layoutY="442.0" prefHeight="80.0" prefWidth="327.0" />
-                                    <Label layoutX="24.0" layoutY="367.0" text="Total: " />
-                                    <TextField layoutX="79.0" layoutY="362.0" text="Total amount" />
-                                    <Button layoutX="24.0" layoutY="534.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="327.0" text="Change Status" />
-                                 </children></AnchorPane>
-                              <AnchorPane layoutX="403.0" layoutY="12.0" prefHeight="576.0" prefWidth="369.0">
-                                 <children>
-                                    <TableView layoutX="3.0" layoutY="19.0" prefHeight="553.0" prefWidth="388.0">
-                                      <columns>
-                                        <TableColumn prefWidth="43.0" text="Id" />
-                                        <TableColumn prefWidth="65.0" text="Number" />
-                                          <TableColumn minWidth="9.0" prefWidth="147.0" text="Date" />
-                                          <TableColumn prefWidth="156.0" text="Status" />
-                                      </columns>
-                                    </TableView>
-                                 </children>
-                              </AnchorPane>
-                           </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1059.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.test.controllers.EmployeeViewController">
+    <children>
+        <BorderPane layoutX="214.0" layoutY="182.0" prefHeight="670.0" prefWidth="1059.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <top>
+                <AnchorPane prefHeight="32.0" prefWidth="1059.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <AnchorPane layoutY="11.0" prefHeight="39.0" prefWidth="1059.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                                <Button fx:id="closeButton" layoutX="1017.0" layoutY="5.0" mnemonicParsing="false">
+                                </Button>
+                                <Button fx:id="minimizeButton" layoutX="977.0" layoutY="5.0" mnemonicParsing="false">
+                                </Button>
+                                <Label layoutX="42.0" layoutY="10.0" text="Slurp" />
+                            </children>
                         </AnchorPane>
-                        <AnchorPane prefHeight="637.0" prefWidth="858.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <children>
-                              <AnchorPane layoutX="446.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
-                                 <children>
-                                    <TableView layoutX="14.0" layoutY="52.0" prefHeight="511.0" prefWidth="341.0">
-                                      <columns>
-                                        <TableColumn prefWidth="40.0" text="Id" />
-                                        <TableColumn prefWidth="167.0" text="Dish name" />
-                                          <TableColumn prefWidth="132.0" text="Stauts" />
-                                      </columns>
-                                    </TableView>
-                                    <TextField layoutX="14.0" layoutY="14.0" text="Search" />
-                                    <Button layoutX="185.0" layoutY="14.0" mnemonicParsing="false">
-                                       <graphic>
-                                          <FontAwesomeIconView glyphName="SEARCH" />
-                                       </graphic>
-                                    </Button>
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane layoutX="34.0" layoutY="31.0" prefHeight="348.0" prefWidth="369.0">
-                                 <children>
-                                    <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="85.0" layoutY="34.0" pickOnBounds="true" preserveRatio="true" />
-                                    <Label layoutX="14.0" layoutY="221.0" text="Dish name" />
-                                    <Button layoutX="232.0" layoutY="300.0" mnemonicParsing="false" text="Change Status" />
-                                    <Label layoutX="14.0" layoutY="258.0" text="Status" />
-                                    <TextField layoutX="178.0" layoutY="216.0" />
-                                    <TextField layoutX="178.0" layoutY="253.0" />
-                                 </children>
-                              </AnchorPane>
-                           </children>
+                    </children>
+                </AnchorPane>
+            </top>
+            <left>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #fda403;" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label fx:id="welcomeLabel" layoutX="72.0" layoutY="168.0" text="Welcome" />
+                        <Label fx:id="userNameLabel" layoutX="68.0" layoutY="195.0" text="Username" />
+                        <Button fx:id="signOutButton" layoutX="13.0" layoutY="595.0" mnemonicParsing="false" text="Sign Out">
+                        </Button>
+                        <Button fx:id="dashboardButton" layoutY="347.0" mnemonicParsing="false" onAction="#switchPane" prefHeight="28.0" prefWidth="200.0" text="Dashboard" />
+                        <Button fx:id="menuButton" layoutY="263.0" mnemonicParsing="false" onAction="#switchPane" prefHeight="28.0" prefWidth="200.0" text="Menu" />
+                        <Button fx:id="staffButton" layoutY="319.0" mnemonicParsing="false" onAction="#switchPane" prefHeight="28.0" prefWidth="200.0" text="Staff" />
+                        <Button fx:id="ordersButton" layoutY="291.0" mnemonicParsing="false" onAction="#switchPane" prefHeight="28.0" prefWidth="200.0" text="Orders" />
+                    </children></AnchorPane>
+            </left>
+            <center>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <children>
+                        <AnchorPane layoutX="238.0" layoutY="233.0" prefHeight="637.0" prefWidth="859.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                                <AnchorPane fx:id="staffPane" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <AnchorPane fx:id="employeePane" layoutX="30.0" layoutY="27.0" prefHeight="340.0" prefWidth="369.0">
+                                            <children>
+                                                <Label fx:id="usernameLabel" layoutX="20.0" layoutY="194.0" text="Username:" />
+                                                <Label fx:id="roleLabel" layoutX="20.0" layoutY="239.0" text="Roles:" />
+                                                <Button fx:id="userEditButton" layoutX="231.0" layoutY="293.0" mnemonicParsing="false" text="Edit" />
+                                                <TextField fx:id="usernameTextField" layoutX="184.0" layoutY="189.0" />
+                                                <TextField fx:id="roleTextField" layoutX="184.0" layoutY="234.0" />
+                                                <Button fx:id="userDeleteButton" layoutX="288.0" layoutY="293.0" mnemonicParsing="false" text="Delete" />
+                                            </children>
+                                        </AnchorPane>
+                                        <AnchorPane layoutX="438.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                            <children>
+                                                <TableView fx:id="userTableView" layoutX="9.0" layoutY="48.0" prefHeight="528.0" prefWidth="351.0">
+                                                    <columns>
+                                                        <TableColumn fx:id="idColumn" prefWidth="30.0" text="Id" />
+                                                        <TableColumn fx:id="usernameColumn" prefWidth="155.0" text="Username" />
+                                                        <TableColumn fx:id="rolesColumn" prefWidth="165.0" text="Roles" />
+                                                    </columns>
+                                                </TableView>
+                                                <TextField fx:id="userSearchTextField" layoutX="9.0" layoutY="14.0" text="Search" />
+                                                <Button fx:id="userSearchButton" layoutX="185.0" layoutY="14.0" mnemonicParsing="false">
+                                                </Button>
+                                            </children>
+                                        </AnchorPane>
+                                        <Button fx:id="userAddButton" layoutX="30.0" layoutY="579.0" mnemonicParsing="false" onAction="#userAddButtonOnAction" text="Register new employee" />
+                                    </children>
+                                </AnchorPane>
+                                <AnchorPane fx:id="ordersPane" layoutX="15.0" layoutY="12.0" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <AnchorPane fx:id="orderPane" layoutX="29.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                            <children>
+                                                <TextField fx:id="orderNumberTextField" alignment="CENTER" layoutX="120.0" layoutY="14.0" prefHeight="88.0" prefWidth="136.0" text="Order Number" />
+                                                <Label fx:id="typeLabel" layoutX="24.0" layoutY="399.0" prefHeight="18.0" prefWidth="42.0" text="Type:" />
+                                                <TextField fx:id="typeTextField" layoutX="79.0" layoutY="394.0" text="Type of order" />
+                                                <TableView layoutX="24.0" layoutY="112.0" prefHeight="242.0" prefWidth="327.0">
+                                                    <columns>
+                                                        <TableColumn prefWidth="75.0" text="Product" />
+                                                        <TableColumn prefWidth="75.0" text="Quantity" />
+                                                        <TableColumn prefWidth="75.0" text="Price" />
+                                                        <TableColumn prefWidth="112.0" text="Total" />
+                                                    </columns>
+                                                </TableView>
+                                                <Label fx:id="notesLabel" layoutX="24.0" layoutY="422.0" text="Notes:" />
+                                                <TextField fx:id="notesTextField" layoutX="24.0" layoutY="442.0" prefHeight="80.0" prefWidth="327.0" />
+                                                <Label fx:id="totalAmountLabel" layoutX="24.0" layoutY="367.0" text="Total: " />
+                                                <TextField fx:id="totalAmountTextField" layoutX="79.0" layoutY="362.0" text="Total amount" />
+                                                <Button fx:id="changeStatusButton" layoutX="24.0" layoutY="534.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="327.0" text="Change Status" />
+                                            </children></AnchorPane>
+                                        <AnchorPane layoutX="430.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                            <children>
+                                                <TableView layoutX="3.0" layoutY="19.0" prefHeight="553.0" prefWidth="388.0">
+                                                    <columns>
+                                                        <TableColumn prefWidth="43.0" text="Id" />
+                                                        <TableColumn prefWidth="65.0" text="Number" />
+                                                        <TableColumn minWidth="9.0" prefWidth="147.0" text="Date" />
+                                                        <TableColumn prefWidth="156.0" text="Status" />
+                                                    </columns>
+                                                </TableView>
+                                            </children>
+                                        </AnchorPane>
+                                    </children>
+                                </AnchorPane>
+                                <AnchorPane fx:id="menuPane" prefHeight="637.0" prefWidth="859.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <AnchorPane layoutX="444.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
+                                            <children>
+                                                <TableView layoutX="5.0" layoutY="48.0" prefHeight="519.0" prefWidth="356.0">
+                                                    <columns>
+                                                        <TableColumn prefWidth="46.0" text="Id" />
+                                                        <TableColumn prefWidth="309.0" text="Dish Name" />
+                                                    </columns>
+                                                </TableView>
+                                                <TextField fx:id="dishSearchTextField" layoutX="5.0" layoutY="14.0" prefHeight="28.0" prefWidth="182.0" text="Search" />
+                                                <Button fx:id="dishSearchButton" layoutX="199.0" layoutY="14.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="31.0">
+                                                </Button>
+                                            </children>
+                                        </AnchorPane>
+                                        <AnchorPane layoutX="34.0" layoutY="31.0" prefHeight="292.0" prefWidth="369.0">
+                                            <children>
+                                                <AnchorPane fx:id="dishPane" layoutX="15.0" layoutY="14.0" prefHeight="303.0" prefWidth="343.0">
+                                                    <children>
+                                                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="72.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
+                                                        <Label fx:id="dishNameLabel" layoutX="22.0" layoutY="181.0" text="Name" />
+                                                        <Label fx:id="dishPriceLabel" layoutX="25.0" layoutY="217.0" text="Price" />
+                                                        <Button fx:id="dishEditButton" layoutX="20.0" layoutY="263.0" mnemonicParsing="false" text="Edit" />
+                                                        <Button fx:id="dishDeleteButton" layoutX="72.0" layoutY="263.0" mnemonicParsing="false" text="Delete" />
+                                                        <TextField fx:id="dishNameTextField" layoutX="72.0" layoutY="176.0" />
+                                                        <TextField fx:id="dishPriceTextField" layoutX="72.0" layoutY="212.0" />
+                                                    </children>
+                                                </AnchorPane>
+                                            </children>
+                                        </AnchorPane>
+                                        <Button fx:id="addDishButton" layoutX="34.0" layoutY="581.0" mnemonicParsing="false" text="Add new dish" />
+                                    </children>
+                                </AnchorPane>
+                                <AnchorPane fx:id="dashboardPane" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                            </children>
                         </AnchorPane>
-                     </children>
-                  </AnchorPane>
-               </children>
-            </AnchorPane>
-         </center>
-      </BorderPane>
-   </children>
+                    </children>
+                </AnchorPane>
+            </center>
+        </BorderPane>
+    </children>
 </AnchorPane>

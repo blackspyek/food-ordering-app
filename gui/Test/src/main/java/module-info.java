@@ -17,7 +17,11 @@ module sample.test {
     exports sample.test;
     exports sample.test.controllers;
     exports sample.test.service;
-    opens sample.test.controllers to javafx.fxml;
+    exports sample.test.model;
+    exports sample.test.dto;
+    exports sample.test.utils;
+    opens sample.test.controllers to javafx.fxml, com.google.gson;
     opens sample.test.dto to com.google.gson;
+    opens sample.test.model to com.google.gson;
 
 }
