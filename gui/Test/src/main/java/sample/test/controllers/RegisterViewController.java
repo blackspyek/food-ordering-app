@@ -1,4 +1,4 @@
-package sample.test;
+package sample.test.controllers;
 
 import com.google.gson.Gson;
 import javafx.application.Platform;
@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import sample.test.dto.RegisterUserDto;
 import sample.test.service.JwtTokenService;
+import sample.test.service.UserService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,8 +31,6 @@ public class RegisterViewController implements Initializable {
     @FXML
     private Button closeButton;
     @FXML
-    private Button registerButton;
-    @FXML
     private Label registrationMessageLabel;
     @FXML
     private Label confirmPasswordLabel;
@@ -42,8 +41,6 @@ public class RegisterViewController implements Initializable {
     @FXML
     private TextField usernameTextField;
 
-    private String jwtToken;
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         Image pencilImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/padlock.png")).toString());
@@ -53,7 +50,6 @@ public class RegisterViewController implements Initializable {
     public void closeButtonOnAction(ActionEvent event) {
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
-        Platform.exit();
     }
 
     public void registerButtonOnAction(ActionEvent event) {
@@ -90,13 +86,12 @@ public class RegisterViewController implements Initializable {
                 registrationMessageLabel.setText("You must be logged in to register a new user.");
             }
         } catch (Exception e) {
-            e.printStackTrace();
             registrationMessageLabel.setText("Error occurred during registration.");
         }
     }
 
     private boolean isUserManager() {
-        List<String> userRoles = JwtTokenService.getInstance().getUserRoles();
+        List<String> userRoles = UserService.getInstance().getUserRoles();
         return userRoles != null && userRoles.contains("ROLE_MANAGER");
     }
 
@@ -120,7 +115,6 @@ public class RegisterViewController implements Initializable {
 
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
-
 
     private void handleRegistrationResponse(HttpResponse<String> response) {
         if (isRegistrationSuccessful(response)) {

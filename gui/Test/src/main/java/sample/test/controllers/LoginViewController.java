@@ -18,6 +18,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import sample.test.Main;
 import sample.test.service.JwtTokenService;
+import sample.test.service.UserService;
+import sample.test.utils.HttpUtils;
+import sample.test.utils.WindowUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -44,8 +47,6 @@ public class LoginViewController implements Initializable {
     private TextField usernameTextField;
     @FXML
     private PasswordField enterPasswordField;
-
-    private String jwtToken;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -77,22 +78,12 @@ public class LoginViewController implements Initializable {
         String loginUrl = "http://localhost:8080/auth/login";
 
         try {
-            HttpClient client = HttpClient.newHttpClient();
-
             String jsonInputString = String.format("{\"username\":\"%s\", \"password\":\"%s\"}", username, password);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(loginUrl))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonInputString))
-                    .build();
-
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+            HttpResponse<String> response = HttpUtils.sendHttpRequest(loginUrl, "POST", null, jsonInputString);
             handleLoginResponse(response);
 
         } catch (Exception e) {
-            e.printStackTrace();
             loginMessageLabel.setText("Error occurred. Check your connection.");
         }
     }
@@ -123,15 +114,16 @@ public class LoginViewController implements Initializable {
         List<String> roles = extractRolesFromResponse(data.get("roles").getAsJsonArray());
 
         JwtTokenService.getInstance().setJwtToken(jwtToken);
-        JwtTokenService.getInstance().setUserRoles(roles);
+        UserService.getInstance().setUsername(usernameTextField.getText());
+        UserService.getInstance().setUserRoles(roles);
 
         loginMessageLabel.setText("Login successful! JWT token and roles stored.");
 
         try {
-            loadRegisterView();
+            WindowUtils.loadView("employee-view.fxml", "Employee View", false, null, false);
             closeCurrentStage();
         } catch (Exception e) {
-            loginMessageLabel.setText("Error occurred while loading register view.");
+            loginMessageLabel.setText("Error occurred while loading view.");
         }
     }
 
@@ -140,17 +132,6 @@ public class LoginViewController implements Initializable {
         rolesArray.forEach(roleElement -> roles.add(roleElement.getAsString()));
         return roles;
     }
-
-    private void loadRegisterView() throws IOException {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("register-view.fxml"));
-        Parent registerViewRoot = loader.load();
-
-        Stage registerStage = new Stage();
-        registerStage.setTitle("Register Page");
-        registerStage.setScene(new Scene(registerViewRoot));
-        registerStage.show();
-    }
-
     private void closeCurrentStage() {
         Stage loginStage = (Stage) loginMessageLabel.getScene().getWindow();
         loginStage.close();
@@ -162,11 +143,6 @@ public class LoginViewController implements Initializable {
 
     private void handleUnexpectedError() {
         loginMessageLabel.setText("Unexpected error. Try again.");
-    }
-
-    private String extractTokenFromResponse(String responseBody) {
-        JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
-        return jsonObject.get("token").getAsString();
     }
 
 }
