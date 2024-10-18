@@ -9,6 +9,7 @@ import javafx.stage.Window;
 import sample.test.Main;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class WindowUtils {
 
@@ -25,6 +26,32 @@ public class WindowUtils {
     public static void loadView(String viewName, String title, boolean isModal, Window owner, boolean blockCaller) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource(viewName));
         Parent viewRoot = loader.load();
+
+        Stage viewStage = new Stage();
+        viewStage.setTitle(title);
+        viewStage.setScene(new Scene(viewRoot));
+
+        if (isModal) {
+            viewStage.initModality(Modality.WINDOW_MODAL);
+            if (owner != null) {
+                viewStage.initOwner(owner);
+            }
+        }
+
+        if (blockCaller) {
+            viewStage.showAndWait();
+        } else {
+            viewStage.show();
+        }
+    }
+
+    public static <T> void loadViewWithControllerAndData(String viewName, String title, boolean isModal, Window owner, boolean blockCaller, Consumer<T> controllerConsumer) throws IOException {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource(viewName));
+        Parent viewRoot = loader.load();
+
+        T controller = loader.getController();
+
+        controllerConsumer.accept(controller);
 
         Stage viewStage = new Stage();
         viewStage.setTitle(title);
