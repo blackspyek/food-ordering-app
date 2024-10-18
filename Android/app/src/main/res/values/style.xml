@@ -1,0 +1,5 @@
+<resources>
+    <style name="MenuActivityTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">#FDA403</item>
+    </style>
+</resources>
