@@ -1,10 +1,17 @@
 package com.example.android.models;
 
-public class MenuItem {
+import java.io.Serializable;
+
+public class MenuItem implements Serializable {
     private String photoUrl;
     private String name;
     private Double price;
     private boolean available;
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
 
     public String getPhotoUrl() {
         return photoUrl;
@@ -20,5 +27,13 @@ public class MenuItem {
 
     public boolean isAvailable() {
         return available;
+    }
+
+    public MenuItem(String photoUrl, String name, Double price, boolean available, String description) {
+        this.photoUrl = photoUrl;
+        this.name = name;
+        this.price = price;
+        this.available = available;
+        this.description = description;
     }
 }

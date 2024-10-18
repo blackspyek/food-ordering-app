@@ -9,6 +9,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import java.util.ArrayList;
 import java.util.List;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import androidx.activity.OnBackPressedCallback;
@@ -27,7 +28,6 @@ public class MenuActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         configureActivityLayout();
         initializeButtons();
         setupToolbar();
@@ -39,8 +39,19 @@ public class MenuActivity extends AppCompatActivity {
     private void initializeRecyclerView() {
         recyclerView = findViewById(R.id.recyclerViewMenuItems);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        menuItemAdapter = new MenuItemAdapter(null, "");
+        menuItemAdapter = new MenuItemAdapter(null, "", new MenuItemAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(MenuItem item) {
+                navigateToMenuItemDetails(item);
+            }
+        });
         recyclerView.setAdapter(menuItemAdapter);
+    }
+
+    private void navigateToMenuItemDetails(MenuItem item) {
+        Intent intent = new Intent(MenuActivity.this, MenuItemDetailActivity.class);
+        intent.putExtra("MENU_ITEM", item);
+        startActivity(intent);
     }
 
     private void setupBackButtonHandler() {
@@ -142,8 +153,11 @@ public class MenuActivity extends AppCompatActivity {
     private void handleMenuItemsResponse(Call<List<MenuItem>> call, Response<List<MenuItem>> response, String category) {
         if (response.isSuccessful() && response.body() != null) {
             List<MenuItem> menuItems = response.body();
+
             List<MenuItem> availableMenuItems = filterAvailableItems(menuItems);
+
             String headerTitle = getHeaderTitleForCategory(category);
+
             menuItemAdapter.updateMenuItems(availableMenuItems, headerTitle);
         } else {
             Log.e("MenuActivity", "Response was not successful");
