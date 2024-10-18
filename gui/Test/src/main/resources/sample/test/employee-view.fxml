@@ -5,6 +5,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -45,30 +46,24 @@
                     <children>
                         <AnchorPane layoutX="238.0" layoutY="233.0" prefHeight="637.0" prefWidth="859.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
-                                <AnchorPane fx:id="staffPane" prefHeight="637.0" prefWidth="859.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <AnchorPane fx:id="staffPane" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
                                         <AnchorPane fx:id="employeePane" layoutX="30.0" layoutY="27.0" prefHeight="340.0" prefWidth="369.0">
                                             <children>
-                                                <Label fx:id="usernameLabel" layoutX="20.0" layoutY="194.0" text="Username:" />
-                                                <Label fx:id="roleLabel" layoutX="20.0" layoutY="239.0" text="Role:" />
-                                                <Button fx:id="userEditButton" layoutX="231.0" layoutY="293.0" mnemonicParsing="false" onAction="#userEditButtonOnAction" text="Edit" />
-                                                <Button fx:id="userDeleteButton" layoutX="288.0" layoutY="293.0" mnemonicParsing="false" onAction="#userDeleteButtonOnAction" text="Delete" />
-                                    <Label fx:id="usernameLabel2" layoutX="198.0" layoutY="194.0" />
-                                    <Label fx:id="roleLabel2" layoutX="198.0" layoutY="239.0" />
+                                                <Label layoutX="20.0" layoutY="194.0" text="Username:" />
+                                                <Label layoutX="20.0" layoutY="239.0" text="Role:" />
+                                                <Button fx:id="userEditButton" layoutX="231.0" layoutY="293.0" mnemonicParsing="false" onAction="#handleUserActions" text="Edit" />
+                                                <Button fx:id="userDeleteButton" layoutX="288.0" layoutY="293.0" mnemonicParsing="false" onAction="#handleUserActions" text="Delete" />
+                                    <Label fx:id="usernameLabel" layoutX="198.0" layoutY="194.0" />
+                                    <Label fx:id="roleLabel" layoutX="198.0" layoutY="239.0" />
                                             </children>
                                         </AnchorPane>
                                         <AnchorPane layoutX="438.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
                                             <children>
-                                                <TableView fx:id="userTableView" layoutX="9.0" layoutY="48.0" prefHeight="528.0" prefWidth="351.0">
-                                                    <columns>
-                                                        <TableColumn fx:id="idColumn" prefWidth="30.0" text="Id" />
-                                                        <TableColumn fx:id="usernameColumn" prefWidth="155.0" text="Username" />
-                                                        <TableColumn fx:id="rolesColumn" prefWidth="165.0" text="Role" />
-                                                    </columns>
-                                                </TableView>
+                                                <TableView fx:id="userTableView" layoutX="9.0" layoutY="48.0" prefHeight="528.0" prefWidth="351.0" />
                                             </children>
                                         </AnchorPane>
-                                        <Button fx:id="userAddButton" layoutX="30.0" layoutY="579.0" mnemonicParsing="false" onAction="#userAddButtonOnAction" text="Register new employee" />
+                                        <Button fx:id="userAddButton" layoutX="30.0" layoutY="579.0" mnemonicParsing="false" onAction="#handleUserActions" text="Register new employee" />
                                     </children>
                                 </AnchorPane>
                                 <AnchorPane fx:id="ordersPane" layoutX="15.0" layoutY="12.0" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -106,19 +101,11 @@
                                         </AnchorPane>
                                     </children>
                                 </AnchorPane>
-                                <AnchorPane fx:id="menuPane" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <AnchorPane fx:id="menuPane" prefHeight="637.0" prefWidth="859.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
                                         <AnchorPane layoutX="444.0" layoutY="31.0" prefHeight="576.0" prefWidth="369.0">
                                             <children>
-                                                <TableView layoutX="5.0" layoutY="48.0" prefHeight="519.0" prefWidth="356.0">
-                                                    <columns>
-                                                        <TableColumn prefWidth="46.0" text="Id" />
-                                                        <TableColumn prefWidth="309.0" text="Dish Name" />
-                                                    </columns>
-                                                </TableView>
-                                                <TextField fx:id="dishSearchTextField" layoutX="5.0" layoutY="14.0" prefHeight="28.0" prefWidth="182.0" text="Search" />
-                                                <Button fx:id="dishSearchButton" layoutX="199.0" layoutY="14.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="31.0">
-                                                </Button>
+                                                <TableView fx:id="menuTableView" layoutX="5.0" layoutY="48.0" prefHeight="519.0" prefWidth="356.0" />
                                             </children>
                                         </AnchorPane>
                                         <AnchorPane layoutX="34.0" layoutY="31.0" prefHeight="292.0" prefWidth="369.0">
@@ -126,17 +113,18 @@
                                                 <AnchorPane fx:id="dishPane" layoutX="15.0" layoutY="14.0" prefHeight="303.0" prefWidth="343.0">
                                                     <children>
                                                         <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="72.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
-                                                        <Label fx:id="dishNameLabel" layoutX="22.0" layoutY="181.0" text="Name" />
-                                                        <Label fx:id="dishPriceLabel" layoutX="25.0" layoutY="217.0" text="Price" />
-                                                        <Button fx:id="dishEditButton" layoutX="20.0" layoutY="263.0" mnemonicParsing="false" text="Edit" />
-                                                        <Button fx:id="dishDeleteButton" layoutX="72.0" layoutY="263.0" mnemonicParsing="false" text="Delete" />
-                                                        <TextField fx:id="dishNameTextField" layoutX="72.0" layoutY="176.0" />
-                                                        <TextField fx:id="dishPriceTextField" layoutX="72.0" layoutY="212.0" />
+                                                        <Label layoutX="22.0" layoutY="181.0" text="Name:" />
+                                                        <Label layoutX="22.0" layoutY="217.0" text="Price:" />
+                                                        <Button fx:id="menuItemEditButton" layoutX="213.0" layoutY="263.0" mnemonicParsing="false" onAction="#handleMenuItemActions" text="Edit" />
+                                                        <Button fx:id="menuItemDeleteButton" layoutX="268.0" layoutY="263.0" mnemonicParsing="false" onAction="#handleMenuItemActions" text="Delete" />
+                                          <Label fx:id="menuItemPriceLabel" layoutX="213.0" layoutY="217.0" />
+                                          <Label fx:id="menuItemNameLabel" layoutX="210.0" layoutY="181.0" />
+                                          <ToggleButton fx:id="availabilityToggleButton" layoutX="21.0" layoutY="263.0" mnemonicParsing="false" onAction="#handleMenuItemActions" />
                                                     </children>
                                                 </AnchorPane>
                                             </children>
                                         </AnchorPane>
-                                        <Button fx:id="addDishButton" layoutX="34.0" layoutY="581.0" mnemonicParsing="false" text="Add new dish" />
+                                        <Button fx:id="menuItemAddButton" layoutX="34.0" layoutY="581.0" mnemonicParsing="false" onAction="#handleMenuItemActions" text="Add new item" />
                                     </children>
                                 </AnchorPane>
                                 <AnchorPane fx:id="dashboardPane" prefHeight="637.0" prefWidth="859.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
