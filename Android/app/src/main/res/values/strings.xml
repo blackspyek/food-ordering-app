@@ -7,4 +7,8 @@
     <string name="take_out">TAKE OUT</string>
     <string name="choose_how_you_d_like_to_enjoy_your_meal">Choose how you\'d like to enjoy your meal</string>
     <string name="main_vector">Figure on the main screen</string>
+    <string name="ramen">Ramen</string>
+    <string name="rice">Rice</string>
+    <string name="udon">Udon</string>
+    <string name="menu_item_image">image</string>
 </resources>
