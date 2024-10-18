@@ -12,6 +12,7 @@ module sample.test {
     requires java.net.http;
     requires com.google.gson;
     requires static lombok;
+    requires java.management;
 
     opens sample.test to javafx.fxml;
     exports sample.test;
@@ -23,5 +24,6 @@ module sample.test {
     opens sample.test.controllers to javafx.fxml, com.google.gson;
     opens sample.test.dto to com.google.gson;
     opens sample.test.model to com.google.gson;
+    opens sample.test.service to com.google.gson;
 
 }
