@@ -7,14 +7,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import sample.test.model.MenuItem;
 import sample.test.model.User;
+import sample.test.service.MenuItemService;
 import sample.test.service.UserService;
 import sample.test.utils.WindowUtils;
 
@@ -66,6 +65,14 @@ public class EmployeeViewController implements Initializable {
     private TableColumn<User, String> usernameColumn;
     @FXML
     private TableColumn<User, String> rolesColumn;
+
+
+    @FXML
+    private TableView<MenuItem> menuTableView;
+    @FXML
+    private TableColumn<MenuItem, Integer> menuItemIdColumn;
+    @FXML
+    private TableColumn<MenuItem, String> menuItemNameColumn;
     private Integer selectedUserId;
 
     public void initialize(URL url, ResourceBundle rb) {
@@ -73,6 +80,7 @@ public class EmployeeViewController implements Initializable {
         showDashboardPane();
         hideButtons();
         initUserTable();
+        initMenuTable();
         setUserPane(UserService.getInstance().getUsername(), UserService.getInstance().getUserRoles().toString());
     }
 
@@ -97,13 +105,49 @@ public class EmployeeViewController implements Initializable {
     }
 
     private void initUserTable() {
-        setColumns();
+        setUserTableColumns();
         loadUserData();
-        setTableListener();
+        setUserTableListener();
 
     }
 
-    private void setTableListener() {
+    private void initMenuTable() {
+        setMenuTableColumns();
+        loadMenuData();
+        setMenuTableListener();
+    }
+
+    private void setMenuTableListener() {
+        menuTableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<MenuItem>() {
+            @Override
+            public void changed(ObservableValue<? extends MenuItem> observable, MenuItem oldValue, MenuItem newValue) {
+                if (newValue != null) {
+                    System.out.println("Selected menu item: " + newValue.getName());
+                }
+            }
+        });
+    }
+
+    private void loadMenuData() {
+        List<MenuItem> menuItems = MenuItemService.getMenuItems();
+        populateMenuTableView(menuItems);
+    }
+
+    private void populateMenuTableView(List<MenuItem> menuItems) {
+        if (menuItems != null) {
+            ObservableList<MenuItem> menuItemList = FXCollections.observableArrayList(menuItems);
+            menuTableView.setItems(menuItemList);
+        } else {
+            System.out.println("No menu items found or failed to load menu data.");
+        }
+    }
+
+    private void setMenuTableColumns() {
+        menuItemIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        menuItemNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+    }
+
+    private void setUserTableListener() {
         userTableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<User>() {
             @Override
             public void changed(ObservableValue<? extends User> observable, User oldValue, User newValue) {
@@ -115,7 +159,7 @@ public class EmployeeViewController implements Initializable {
         });
     }
 
-    private void setColumns() {
+    private void setUserTableColumns() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         rolesColumn.setCellValueFactory(new PropertyValueFactory<>("roles"));

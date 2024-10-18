@@ -47,8 +47,9 @@ public class UserService {
 
             HttpResponse<String> response = HttpUtils.sendHttpRequest(url, "GET", token, null);
             String responseBody = response.body();
-            List<User> users = parseJsonResponse(responseBody);
-            return users;
+
+            UserResponse userResponse = HttpUtils.parseJsonResponse(responseBody, UserResponse.class);
+            return userResponse.getData();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -62,8 +63,9 @@ public class UserService {
 
             HttpResponse<String> response = HttpUtils.sendHttpRequest(url, "GET", token, null);
             String responseBody = response.body();
-            User user = parseSingleUserResponse(responseBody);
-            return user;
+
+            UserResponseForSingleUser userResponse = HttpUtils.parseJsonResponse(responseBody, UserResponseForSingleUser.class);
+            return userResponse.getData();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -103,11 +105,6 @@ public class UserService {
         }
     }
 
-    private List<User> parseJsonResponse(String jsonResponse) {
-        Gson gson = new Gson();
-        UserResponse userResponse = gson.fromJson(jsonResponse, UserResponse.class);
-        return userResponse.getData();
-    }
 
     private static class UserResponse {
         private List<User> data;
@@ -121,11 +118,6 @@ public class UserService {
         }
     }
 
-    private User parseSingleUserResponse(String jsonResponse) {
-        Gson gson = new Gson();
-        UserResponseForSingleUser response = gson.fromJson(jsonResponse, UserResponseForSingleUser.class);
-        return response.getData();
-    }
 
     private static class UserResponseForSingleUser {
         private User data;

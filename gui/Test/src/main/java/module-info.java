@@ -25,5 +25,6 @@ module sample.test {
     opens sample.test.dto to com.google.gson;
     opens sample.test.model to com.google.gson;
     opens sample.test.service to com.google.gson;
+    opens sample.test.utils to com.google.gson;
 
 }

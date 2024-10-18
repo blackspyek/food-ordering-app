@@ -1,5 +1,7 @@
 package sample.test.utils;
 
+import com.google.gson.Gson;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -34,4 +36,10 @@ public class HttpUtils {
         HttpRequest request = requestBuilder.build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
+
+    public static <T> T parseJsonResponse(String jsonResponse, Class<T> clazz) {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonResponse, clazz);
+    }
+
 }
