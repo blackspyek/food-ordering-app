@@ -21,9 +21,16 @@ public class MenuItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<MenuItem> menuItems;
     private String headerTitle;
 
-    public MenuItemAdapter(List<MenuItem> menuItems, String headerTitle) {
+    private OnItemClickListener onItemClickListener;
+
+    public MenuItemAdapter(List<MenuItem> menuItems, String headerTitle, OnItemClickListener listener) {
         this.menuItems = menuItems != null ? menuItems : new ArrayList<>();
         this.headerTitle = headerTitle;
+        this.onItemClickListener = listener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(MenuItem menuItem);
     }
 
     @Override
@@ -50,11 +57,14 @@ public class MenuItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         } else {
             MenuItem menuItem = menuItems.get(position - 1);
             MenuItemViewHolder menuHolder = getMenuItemViewHolder((MenuItemViewHolder) holder);
-
             formatDishDetails(menuItem, menuHolder);
-
             loadImage(menuHolder, menuItem);
+            handleMenuItemClick(menuHolder, menuItem);
         }
+    }
+
+    private void handleMenuItemClick(MenuItemViewHolder menuHolder, MenuItem menuItem) {
+        menuHolder.bind(menuItem, onItemClickListener);
     }
 
     private static MenuItemViewHolder getMenuItemViewHolder(MenuItemViewHolder holder) {
@@ -107,6 +117,10 @@ public class MenuItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             imageViewMenuItem = itemView.findViewById(R.id.imageViewMenuItem);
             textViewMenuItemName = itemView.findViewById(R.id.textViewMenuItemName);
             textViewMenuItemPrice = itemView.findViewById(R.id.textViewMenuItemPrice);
+        }
+
+        public void bind(final MenuItem menuItem, final OnItemClickListener listener) {
+            itemView.setOnClickListener(v -> listener.onItemClick(menuItem));
         }
     }
 }
