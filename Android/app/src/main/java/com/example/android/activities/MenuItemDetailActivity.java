@@ -1,18 +1,17 @@
 package com.example.android.activities;
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.android.R;
+import com.example.android.managers.CartManager;
 import com.example.android.models.MenuItem;
 
-public class MenuItemDetailActivity extends AppCompatActivity {
+public class MenuItemDetailActivity extends BaseActivity {
 
     private ImageView itemImage;
     private TextView itemName;
@@ -30,6 +29,14 @@ public class MenuItemDetailActivity extends AppCompatActivity {
         deserializeMenuItem();
     }
 
+    private void deserializeMenuItem() {
+        MenuItem menuItem = (MenuItem) getIntent().getSerializableExtra("MENU_ITEM");
+        if (menuItem != null) {
+            addToBasketButton.setTag(menuItem);
+            displayMenuItemDetails(menuItem);
+        }
+    }
+
     private void initializeMenuItemDetailsViews() {
         itemImage = findViewById(R.id.itemImage);
         itemName = findViewById(R.id.itemName);
@@ -39,50 +46,8 @@ public class MenuItemDetailActivity extends AppCompatActivity {
         handleAddToBasketButtonClick(addToBasketButton);
     }
 
-    private void deserializeMenuItem() {
-        MenuItem menuItem = (MenuItem) getIntent().getSerializableExtra("MENU_ITEM");
-        if (menuItem != null) {
-            displayMenuItemDetails(menuItem);
-        }
-    }
-
     private void configureLayout() {
         setContentView(R.layout.activity_menu_item_detail);
-    }
-
-    private void setupBackButtonHandler() {
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                finish();
-            }
-        };
-        getOnBackPressedDispatcher().addCallback(this, callback);
-    }
-
-    private void configureActionBar() {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle("");
-        }
-    }
-
-    private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
     }
 
     private void displayMenuItemDetails(MenuItem menuItem) {
@@ -102,6 +67,25 @@ public class MenuItemDetailActivity extends AppCompatActivity {
     }
 
     private static void handleAddToBasketButtonClick(Button addToBasketButton) {
-        addToBasketButton.setOnClickListener(v -> Log.d("MenuItemDetailActivity", "Add to basket clicked"));
+        addToBasketButton.setOnClickListener(v -> {
+            MenuItem menuItem = getMenuItemFromButton(v);
+            if (menuItem != null) {
+                addToCart(menuItem, v.getContext());
+            }
+        });
     }
+
+    private static MenuItem getMenuItemFromButton(View view) {
+        return (MenuItem) view.getTag();
+    }
+
+    private static void addToCart(MenuItem menuItem, Context context) {
+        CartManager.getInstance().addToCart(menuItem);
+        showAddToCartSuccessToast(context);
+    }
+
+    private static void showAddToCartSuccessToast(Context context) {
+        Toast.makeText(context, R.string.successfullyAddedToCart, Toast.LENGTH_SHORT).show();
+    }
+
 }

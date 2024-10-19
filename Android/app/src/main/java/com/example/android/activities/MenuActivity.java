@@ -1,60 +1,45 @@
 package com.example.android.activities;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.widget.Button;
-
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.android.R;
 import com.example.android.adapters.MenuItemAdapter;
 import com.example.android.api.ApiService;
 import com.example.android.api.RetrofitClient;
 import com.example.android.models.MenuItem;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MenuActivity extends AppCompatActivity {
-    private RecyclerView recyclerView;
+public class MenuActivity extends BaseActivity {
     private MenuItemAdapter menuItemAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         configureActivityLayout();
-        initializeButtons();
         setupToolbar();
         configureActionBar();
         setupBackButtonHandler();
+        initializeButtons();
         initializeRecyclerView();
     }
 
     private void initializeRecyclerView() {
-        recyclerView = findViewById(R.id.recyclerViewMenuItems);
+        RecyclerView recyclerView = findViewById(R.id.recyclerViewMenuItems);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         createMenuItemAdapter();
         recyclerView.setAdapter(menuItemAdapter);
     }
 
     private void createMenuItemAdapter() {
-        menuItemAdapter = new MenuItemAdapter(null, "", new MenuItemAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(MenuItem item) {
-                navigateToMenuItemDetails(item);
-            }
-        });
+        menuItemAdapter = new MenuItemAdapter(null, "", this::navigateToMenuItemDetails);
     }
 
     private void navigateToMenuItemDetails(MenuItem item) {
@@ -63,31 +48,8 @@ public class MenuActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void setupBackButtonHandler() {
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                finish();
-            }
-        };
-        getOnBackPressedDispatcher().addCallback(this, callback);
-    }
-
     private void configureActivityLayout() {
         setContentView(R.layout.activity_menu);
-    }
-
-    private void configureActionBar() {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle("");
-        }
-    }
-
-    private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
     }
 
     private void initializeButtons() {
@@ -117,8 +79,8 @@ public class MenuActivity extends AppCompatActivity {
         });
     }
 
-    private static boolean triggerDefaultButtonClick(Button buttonRamen) {
-        return buttonRamen.performClick();
+    private static void triggerDefaultButtonClick(Button buttonRamen) {
+        buttonRamen.performClick();
     }
 
     private void updateButtonSelection(Button selectedButton, Button... otherButtons) {
@@ -148,18 +110,18 @@ public class MenuActivity extends AppCompatActivity {
 
         call.enqueue(new Callback<List<MenuItem>>() {
             @Override
-            public void onResponse(Call<List<MenuItem>> call, Response<List<MenuItem>> response) {
-                handleMenuItemsResponse(call, response, category);
+            public void onResponse(@NonNull Call<List<MenuItem>> call, @NonNull Response<List<MenuItem>> response) {
+                handleMenuItemsResponse(response, category);
             }
 
             @Override
-            public void onFailure(Call<List<MenuItem>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<MenuItem>> call, @NonNull Throwable t) {
                 Log.e("MenuActivity", "Failed to fetch items: " + t.getMessage());
             }
         });
     }
 
-    private void handleMenuItemsResponse(Call<List<MenuItem>> call, Response<List<MenuItem>> response, String category) {
+    private void handleMenuItemsResponse(Response<List<MenuItem>> response, String category) {
         if (response.isSuccessful() && response.body() != null) {
             List<MenuItem> menuItems = response.body();
 
@@ -194,17 +156,5 @@ public class MenuActivity extends AppCompatActivity {
             default:
                 return "";
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
     }
 }

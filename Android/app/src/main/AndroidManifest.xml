@@ -18,6 +18,10 @@
             android:theme="@style/MenuActivityTheme"
         android:exported="false" />
         <activity
+            android:name=".activities.BasketActivity"
+            android:theme="@style/MenuActivityTheme"
+            android:exported="false" />
+        <activity
             android:name=".activities.MenuItemDetailActivity"
             android:theme="@style/MenuActivityTheme"
         android:exported="false" />

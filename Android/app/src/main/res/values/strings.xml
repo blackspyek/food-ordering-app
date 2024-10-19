@@ -12,4 +12,11 @@
     <string name="udon">Udon</string>
     <string name="menu_item_image">image</string>
     <string name="add_to_basket_button">Add to basket</string>
+    <string name="successfullyAddedToCart">The product has been added to the cart</string>
+    <string name="action_cart">Basket</string>
+    <string name="basket_header">Basket</string>
+    <string name="quantityInputError">Quantity must be a number greater than 0</string>
+    <string name="check_out">Check Out</string>
+    <string name="default_total_value">Total: $0.00</string>
+    <string name="empty_basket_message">Your basket is empty</string>
 </resources>
