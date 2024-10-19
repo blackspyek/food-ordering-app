@@ -104,4 +104,15 @@ public class MenuItemService {
     public Optional<MenuItem> findById(Long id) {
         return menuItemsRepository.findById(id);
     }
+    private MenuItem findByIdOrThrow(Long id) {
+        return menuItemsRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Menu item with id " + id + " not found"));
+    }
+
+    public MenuItem changeAvailability(Long id){
+        MenuItem menuItem = findByIdOrThrow(id);
+        menuItem.setAvailable(!menuItem.getAvailable());
+        return menuItemsRepository.save(menuItem);
+    }
+
 }
