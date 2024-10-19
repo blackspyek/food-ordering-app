@@ -4,6 +4,7 @@ import com.food.backend.dto.MenuItemDto;
 import com.food.backend.model.Enums.Category;
 import com.food.backend.model.MenuItem;
 import com.food.backend.service.MenuItemService;
+import com.food.backend.utils.classes.ResponseUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,21 @@ public class MenuItemController {
     @GetMapping("/")
     public ResponseEntity<List<MenuItem>> getMenuItems() {
         return ResponseEntity.ok(menuItemService.findAll());
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getMenuItems(
+            @PathVariable("id") Long id
+    ) {
+        try{
+            MenuItem menuItem = menuItemService.findById(id).orElseThrow(() -> new EntityNotFoundException("Menu item with id " + id + " not found"));
+            return ResponseUtil.successResponse(menuItem, "Menu item retrieved successfully");
+        }
+        catch (EntityNotFoundException e){
+            return ResponseUtil.notFoundResponse(e.getMessage());
+        }
+        catch (Exception e){
+            return ResponseUtil.badRequestResponse("Error retrieving menu item: " + e.getMessage());
+        }
     }
 
     @GetMapping("/available")
