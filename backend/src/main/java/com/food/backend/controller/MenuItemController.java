@@ -94,6 +94,23 @@ public class MenuItemController {
         }
     }
 
+    @PatchMapping("/availability/{id}")
+    public ResponseEntity<?> updateMenuItemAvailability(
+            @PathVariable("id") Long id
+    ) {
+        try {
+            MenuItem patchedMenuItem = menuItemService.changeAvailability(id);
+            return ResponseUtil.successResponse(patchedMenuItem, "Menu item availability updated successfully");
+
+        }
+        catch (EntityNotFoundException e){
+            return ResponseUtil.notFoundResponse(e.getMessage());
+        }
+        catch (Exception e){
+            return ResponseUtil.badRequestResponse("Failed to update menu item availability: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/")
     public ResponseEntity<?> createMenuItem(
             @Valid
