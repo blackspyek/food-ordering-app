@@ -1,23 +1,56 @@
 package com.food.backend.service;
 
+import com.food.backend.model.Enums.OrderStatus;
+import com.food.backend.model.Order;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.logging.Logger;
+
 
 @Getter
 @Service
 public class LiveOrderBoard {
     private final SortedSet<String> liveOrderBoardCodes;
-    private final Set<String> liveOrderBoardReadyCodes;
+    private final Set<String> readyOrderBoardCodes;
+    private final OrderService orderService;
     private static Integer LAST_NUMBER = -1;
 
-    public LiveOrderBoard() {
-        liveOrderBoardCodes = new TreeSet<>();
-        liveOrderBoardReadyCodes = new HashSet<>();
+    private final SimpMessagingTemplate messagingTemplate;
+    private final Logger logger = Logger.getLogger(LiveOrderBoard.class.getName());
+
+    @Autowired
+    public LiveOrderBoard(@Lazy OrderService orderService, SimpMessagingTemplate messagingTemplate) {
+        this.orderService = orderService;
+        this.messagingTemplate = messagingTemplate;
+        this.liveOrderBoardCodes = new TreeSet<>();
+        this.readyOrderBoardCodes = new HashSet<>();
+        initializeOrderSets();
+    }
+
+    private void initializeOrderSets() {
+        clearOrderSets();
+        loadOrdersIntoSets();
+        sendUpdatedOrderBoard();
+
+    }
+
+    private void clearOrderSets() {
+        liveOrderBoardCodes.clear();
+        readyOrderBoardCodes.clear();
+    }
+
+    private void loadOrdersIntoSets() {
+        addOrdersToSet(orderService.getOrdersByStatus(OrderStatus.IN_PREPARATION), liveOrderBoardCodes);
+        addOrdersToSet(orderService.getOrdersByStatus(OrderStatus.READY_FOR_PICKUP), readyOrderBoardCodes);
+    }
+
+    private void addOrdersToSet(List<Order> orders, Set<String> targetSet) {
+        orders.forEach(order -> targetSet.add(order.getBoardCode()));
     }
 
     public String generateOrderBoardCode() {
@@ -28,13 +61,28 @@ public class LiveOrderBoard {
     }
     private void addNewOrderCode(String orderCode) {
         liveOrderBoardCodes.add(orderCode);
+        sendUpdatedOrderBoard();
     }
     public void moveOrderCodeToReady(String orderCode) {
         liveOrderBoardCodes.remove(orderCode);
-        liveOrderBoardReadyCodes.add(orderCode);
+        readyOrderBoardCodes.add(orderCode);
+        sendUpdatedOrderBoard();
     }
     public void removeOrderCode(String orderCode) {
         liveOrderBoardCodes.remove(orderCode);
-        liveOrderBoardReadyCodes.remove(orderCode);
+        readyOrderBoardCodes.remove(orderCode);
+        sendUpdatedOrderBoard();
+    }
+    public void sendUpdatedOrderBoard() {
+        this.logger.info("Sending updated order board state");
+        Map<String, Set<String>> orderBoardState = getOrderBoardState();
+        messagingTemplate.convertAndSend("/topic/orderBoard", orderBoardState);
+    }
+
+    public Map<String, Set<String>> getOrderBoardState() {
+        return Map.of(
+                "liveOrderBoardCodes", liveOrderBoardCodes,
+                "liveOrderBoardReadyCodes", readyOrderBoardCodes
+        );
     }
 }

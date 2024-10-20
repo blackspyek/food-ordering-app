@@ -7,6 +7,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FDA403">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        tools:ignore="MissingConstraints" />
     <ImageView
         android:id="@+id/logoImage"
         android:layout_width="200dp"
