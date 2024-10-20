@@ -108,6 +108,10 @@ public class OrderService {
         OrderStatus.valueOf(orderStatus);
     }
 
+    private static void checkIfTypeIsValid(String orderType) throws IllegalArgumentException {
+        OrderType.valueOf(orderType);
+    }
+
     @Transactional
     public void deleteOrder(Long orderId) {
         orderRepository.deleteById(orderId);
@@ -127,7 +131,7 @@ public class OrderService {
 
 
     private Order initializeOrder(OrderType orderType, String email) throws IllegalArgumentException {
-        checkIfStatusIsValid(orderType.toString());
+        checkIfTypeIsValid(orderType.toString());
         Order order = new Order();
         order.setEmail(email);
         order.setOrderType(orderType);
