@@ -1,43 +1,31 @@
 package sample.test.service;
 
 import com.google.gson.Gson;
-import sample.test.controllers.EmployeeViewController;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import sample.test.dto.UpdateUserDto;
 import sample.test.model.User;
 import sample.test.utils.HttpUtils;
+import sample.test.helpers.UsersResponse;
+import sample.test.helpers.UserResponse;
 
 import java.net.http.HttpResponse;
 import java.util.List;
 
+@Setter
+@Getter
+@NoArgsConstructor
 public class UserService {
     private static UserService instance;
     private String username;
     private List<String> userRoles;
-
-    private UserService() {
-    }
 
     public static UserService getInstance() {
         if (instance == null) {
             instance = new UserService();
         }
         return instance;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUserRoles(List<String> roles) {
-        this.userRoles = roles;
-    }
-
-    public List<String> getUserRoles() {
-        return userRoles;
     }
 
     public List<User> getUsers() {
@@ -47,8 +35,9 @@ public class UserService {
 
             HttpResponse<String> response = HttpUtils.sendHttpRequest(url, "GET", token, null);
             String responseBody = response.body();
-            List<User> users = parseJsonResponse(responseBody);
-            return users;
+
+            UsersResponse usersResponse = HttpUtils.parseJsonResponse(responseBody, UsersResponse.class);
+            return usersResponse.getData();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -62,8 +51,9 @@ public class UserService {
 
             HttpResponse<String> response = HttpUtils.sendHttpRequest(url, "GET", token, null);
             String responseBody = response.body();
-            User user = parseSingleUserResponse(responseBody);
-            return user;
+
+            UserResponse userResponse = HttpUtils.parseJsonResponse(responseBody, UserResponse.class);
+            return userResponse.getData();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -90,7 +80,7 @@ public class UserService {
         }
     }
 
-    public boolean deleteUser(Integer userId) {
+    public static boolean deleteUser(Integer userId) {
         try {
             String url = "http://localhost:8080/users/" + userId;
             String token = JwtTokenService.getInstance().getJwtToken();
@@ -103,40 +93,5 @@ public class UserService {
         }
     }
 
-    private List<User> parseJsonResponse(String jsonResponse) {
-        Gson gson = new Gson();
-        UserResponse userResponse = gson.fromJson(jsonResponse, UserResponse.class);
-        return userResponse.getData();
-    }
-
-    private static class UserResponse {
-        private List<User> data;
-
-        public List<User> getData() {
-            return data;
-        }
-
-        public void setData(List<User> data) {
-            this.data = data;
-        }
-    }
-
-    private User parseSingleUserResponse(String jsonResponse) {
-        Gson gson = new Gson();
-        UserResponseForSingleUser response = gson.fromJson(jsonResponse, UserResponseForSingleUser.class);
-        return response.getData();
-    }
-
-    private static class UserResponseForSingleUser {
-        private User data;
-
-        public User getData() {
-            return data;
-        }
-
-        public void setData(User data) {
-            this.data = data;
-        }
-    }
 }
 

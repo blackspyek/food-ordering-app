@@ -7,222 +7,219 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import sample.test.helpers.ColumnDefinition;
+import sample.test.model.MenuItem;
 import sample.test.model.User;
+import sample.test.service.MenuItemService;
 import sample.test.service.UserService;
+import sample.test.utils.TableUtils;
 import sample.test.utils.WindowUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class EmployeeViewController implements Initializable {
 
     @FXML
-    private AnchorPane dashboardPane;
+    private AnchorPane dashboardPane, menuPane, staffPane, ordersPane, employeePane, dishPane;
     @FXML
-    private AnchorPane menuPane;
+    private Button closeButton, signOutButton, dashboardButton, menuButton, staffButton, ordersButton;
     @FXML
-    private AnchorPane staffPane;
+    private Button userEditButton, userDeleteButton, userAddButton;
     @FXML
-    private AnchorPane ordersPane;
+    private Button menuItemEditButton, menuItemDeleteButton, menuItemAddButton;
     @FXML
-    private Button closeButton;
+    private ToggleButton availabilityToggleButton;
     @FXML
-    private Button signOutButton;
-    @FXML
-    private Button dashboardButton;
-    @FXML
-    private Button menuButton;
-    @FXML
-    private Button staffButton;
-    @FXML
-    private Button ordersButton;
-    @FXML
-    private Button userAddButton;
-    @FXML
-    private Button userEditButton;
-    @FXML
-    private Button userDeleteButton;
-    @FXML
-    private Label userNameLabel;
-    @FXML
-    private Label usernameLabel2;
-    @FXML
-    private Label roleLabel2;
+    private Label userNameLabel, usernameLabel, roleLabel, menuItemNameLabel, menuItemPriceLabel;
     @FXML
     private TableView<User> userTableView;
     @FXML
-    private TableColumn<User, Integer> idColumn;
-    @FXML
-    private TableColumn<User, String> usernameColumn;
-    @FXML
-    private TableColumn<User, String> rolesColumn;
-    private Integer selectedUserId;
+    private TableView<MenuItem> menuTableView;
 
+    private Integer selectedUserId;
+    private Long selectedMenuItemId;
+
+    @Override
     public void initialize(URL url, ResourceBundle rb) {
         userNameLabel.setText(UserService.getInstance().getUsername());
-        showDashboardPane();
-        hideButtons();
-        initUserTable();
-        setUserPane(UserService.getInstance().getUsername(), UserService.getInstance().getUserRoles().toString());
+        hideButtonsIfNotManager();
+        showPane(dashboardPane);
+
+        initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
+                Arrays.asList(new ColumnDefinition<>("ID", "id"),
+                        new ColumnDefinition<>("Username", "username"),
+                        new ColumnDefinition<>("Roles", "roles")));
+
+        initTable(menuTableView, MenuItemService.getMenuItems(), this::setMenuItemPane,
+                Arrays.asList(new ColumnDefinition<>("ID", "id"),
+                        new ColumnDefinition<>("Name", "name"),
+                        new ColumnDefinition<>("Price", "price")));
+
+
+        employeePane.setVisible(false);
+        dishPane.setVisible(false);
     }
 
-    public void setUserPane(String username, String roles) {
-        usernameLabel2.setText(username);
-        roleLabel2.setText(roles);
-        if (Objects.equals(UserService.getInstance().getUsername(), username)) {
-            userDeleteButton.setVisible(false);
-            userEditButton.setVisible(false);
-        } else {
-            userDeleteButton.setVisible(true);
-            userEditButton.setVisible(true);
-        }
-
+    private void hideButtonsIfNotManager() {
+        boolean isManager = UserService.getInstance().getUserRoles().contains("ROLE_MANAGER");
+        staffButton.setVisible(isManager);
+        dashboardButton.setVisible(isManager);
     }
 
-    public void hideButtons() {
-        if (!UserService.getInstance().getUserRoles().contains("ROLE_MANAGER")) {
-            staffButton.setVisible(false);
-            dashboardButton.setVisible(false);
-        }
+    public void switchPane(ActionEvent event) {
+        if (event.getSource() == menuButton) showPane(menuPane);
+        else if (event.getSource() == staffButton) showPane(staffPane);
+        else if (event.getSource() == ordersButton) showPane(ordersPane);
+        else showPane(dashboardPane);
     }
 
-    private void initUserTable() {
-        setColumns();
-        loadUserData();
-        setTableListener();
-
+    private void showPane(AnchorPane paneToShow) {
+        List<AnchorPane> allPanes = Arrays.asList(dashboardPane, menuPane, staffPane, ordersPane);
+        allPanes.forEach(pane -> pane.setVisible(pane == paneToShow));
     }
 
-    private void setTableListener() {
-        userTableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<User>() {
-            @Override
-            public void changed(ObservableValue<? extends User> observable, User oldValue, User newValue) {
-                if (newValue != null) {
-                    setUserPane(newValue.getUsername(), newValue.getRoles().toString());
-                    selectedUserId = newValue.getId();
-                }
+    private <T> void initTable(TableView<T> tableView, List<T> data, Consumer<T> consumer, List<ColumnDefinition<T, ?>> columnDefinitions) {
+        setColumns(tableView, columnDefinitions);
+        populateTable(tableView, data);
+        setListener(tableView, consumer);
+    }
+
+    private static <T> void setListener(TableView<T> tableView, Consumer<T> consumer) {
+        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                consumer.accept(newSelection);
             }
         });
     }
 
-    private void setColumns() {
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        rolesColumn.setCellValueFactory(new PropertyValueFactory<>("roles"));
+    private static <T> void populateTable(TableView<T> tableView, List<T> data) {
+        ObservableList<T> observableList = FXCollections.observableArrayList(data);
+        tableView.setItems(observableList);
     }
 
-    private void loadUserData() {
-        List<User> users = UserService.getInstance().getUsers();
-        populateTableView(users);
-    }
-
-    private void populateTableView(List<User> users) {
-        if (users != null) {
-            ObservableList<User> userList = FXCollections.observableArrayList(users);
-            userTableView.setItems(userList);
-        } else {
-            System.out.println("No users found or failed to load user data.");
+    private static <T> void setColumns(TableView<T> tableView, List<ColumnDefinition<T, ?>> columnDefinitions) {
+        for (ColumnDefinition<T, ?> columnDefinition : columnDefinitions) {
+            TableColumn<T, Object> tableColumn = new TableColumn<>(columnDefinition.getTitle());
+            tableColumn.setCellValueFactory(new PropertyValueFactory<>(columnDefinition.getProperty()));
+            tableView.getColumns().add(tableColumn);
         }
+    }
+
+    private void setUserPane(User selectedUser) {
+        if (selectedUser != null) {
+            usernameLabel.setText(selectedUser.getUsername());
+            roleLabel.setText(selectedUser.getRoles().toString());
+            selectedUserId = selectedUser.getId();
+            toggleUserEditDeleteButtons(!Objects.equals(UserService.getInstance().getUsername(), selectedUser.getUsername()));
+        }
+        employeePane.setVisible(true);
+    }
+
+    private void toggleUserEditDeleteButtons(boolean isVisible) {
+        userEditButton.setVisible(isVisible);
+        userDeleteButton.setVisible(isVisible);
+    }
+
+    private void setMenuItemPane(MenuItem selectedMenuItem) {
+        if (selectedMenuItem != null) {
+            menuItemNameLabel.setText(selectedMenuItem.getName());
+            menuItemPriceLabel.setText(selectedMenuItem.getPrice().toString());
+            availabilityToggleButton.setSelected(selectedMenuItem.getAvailable());
+            selectedMenuItemId = selectedMenuItem.getId();
+            setAvailabilityButtonText(selectedMenuItem.getAvailable());
+        }
+        dishPane.setVisible(true);
+    }
+
+    public void handleUserActions(ActionEvent event) throws IOException {
+        if (event.getSource() == userDeleteButton) {
+            deleteEntity(selectedUserId, UserService::deleteUser);
+        } else if (event.getSource() == userEditButton) {
+            loadEditForm("edit-user-view.fxml", selectedUserId);
+        } else if (event.getSource() == userAddButton) {
+            loadAddForm("register-view.fxml");
+        }
+    }
+
+    public void handleMenuItemActions(ActionEvent event) throws IOException {
+        if (event.getSource() == availabilityToggleButton) {
+            toggleMenuItemAvailability();
+        } else if (event.getSource() == menuItemDeleteButton) {
+            deleteEntity(selectedMenuItemId, MenuItemService::deleteMenuItem);
+        } else if (event.getSource() == menuItemEditButton) {
+            loadEditForm("menu-item-form-view.fxml", selectedMenuItemId);
+        } else if (event.getSource() == menuItemAddButton) {
+            loadAddForm("menu-item-form-view.fxml");
+        }
+    }
+
+    private <T> void loadEditForm(String fxml, T id) throws IOException {
+        if (id != null) {
+            loadViewAndPassData(fxml, id);
+            refreshView();
+        } else {
+            System.out.println("No entity selected.");
+        }
+    }
+
+    private <T> void loadViewAndPassData(String fxml, T id) throws IOException {
+        WindowUtils.loadViewWithControllerAndData(fxml, "Edit " + (id instanceof Integer ? "User" : "Menu Item"), true,
+                staffPane.getScene().getWindow(), true, controller -> {
+                    if (controller instanceof EditUserViewController) {
+                        ((EditUserViewController) controller).setUser((Integer) id);
+                    } else if (controller instanceof MenuItemFormViewController) {
+                        ((MenuItemFormViewController) controller).setMenuItem((Long) id);
+                    }
+                });
+    }
+
+    private void loadAddForm(String fxml) throws IOException {
+        WindowUtils.loadView(fxml, "Add " + (fxml.contains("user") ? "User" : "Menu Item"), true,
+                staffPane.getScene().getWindow(), true);
+        refreshView();
+    }
+
+    private <T> void deleteEntity(T id, java.util.function.Predicate<T> deleteFunction) {
+        if (id != null && deleteFunction.test(id)) {
+            refreshView();
+        } else {
+            System.out.println("Failed to delete entity or no entity selected.");
+        }
+    }
+
+    private void toggleMenuItemAvailability() {
+        if (selectedMenuItemId != null) {
+            boolean success =  MenuItemService.setMenuItemAvailability(selectedMenuItemId);
+            if (success) System.out.println("Menu item availability updated successfully.");
+            refreshView();
+        } else {
+            System.out.println("No menu item selected.");
+        }
+    }
+
+    private void refreshView() {
+        TableUtils.populateTableView(userTableView, UserService.getInstance().getUsers());
+        TableUtils.populateTableView(menuTableView, MenuItemService.getMenuItems());
+        employeePane.setVisible(false);
+        dishPane.setVisible(false);
     }
 
     public void closeButtonOnAction(ActionEvent event) {
-        Stage stage = (Stage) closeButton.getScene().getWindow();
-        stage.close();
+        ((Stage) closeButton.getScene().getWindow()).close();
     }
 
-    public void switchPane(ActionEvent event) {
-        if (event.getSource() == menuButton) {
-            showMenuPane();
-        } else if (event.getSource() == staffButton) {
-            showStaffPane();
-        } else if (event.getSource() == ordersButton) {
-            showOrdersPane();
-        } else {
-            showDashboardPane();
-        }
-    }
-
-    private void showMenuPane() {
-        menuPane.setVisible(true);
-        dashboardPane.setVisible(false);
-        staffPane.setVisible(false);
-        ordersPane.setVisible(false);
-    }
-
-    private void showStaffPane() {
-        menuPane.setVisible(false);
-        dashboardPane.setVisible(false);
-        staffPane.setVisible(true);
-        ordersPane.setVisible(false);
-    }
-
-    private void showOrdersPane() {
-        menuPane.setVisible(false);
-        dashboardPane.setVisible(false);
-        staffPane.setVisible(false);
-        ordersPane.setVisible(true);
-    }
-
-    private void showDashboardPane() {
-        menuPane.setVisible(false);
-        dashboardPane.setVisible(true);
-        staffPane.setVisible(false);
-        ordersPane.setVisible(false);
-    }
-
-    public void userAddButtonOnAction(ActionEvent event) {
-        try {
-            WindowUtils.loadView("register-view.fxml", "Register User", true, staffPane.getScene().getWindow(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void userEditButtonOnAction(ActionEvent event) {
-        if (selectedUserId != null) {
-            try {
-                WindowUtils.loadViewWithControllerAndData(
-                        "edit-user-view.fxml",
-                        "Edit User",
-                        true,
-                        staffPane.getScene().getWindow(),
-                        true,
-                        (EditUserViewController controller) -> {
-                            controller.setUser(selectedUserId);
-                        }
-                );
-                loadUserData();
-                setUserPane(UserService.getInstance().getUsername(), UserService.getInstance().getUserRoles().toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("No user selected");
-        }
-    }
-
-    public void userDeleteButtonOnAction(ActionEvent event) {
-        if (selectedUserId != null) {
-            boolean isDeleted = UserService.getInstance().deleteUser(selectedUserId);
-            if (isDeleted) {
-                loadUserData();
-                setUserPane(UserService.getInstance().getUsername(), UserService.getInstance().getUserRoles().toString());
-            } else {
-                System.out.println("Failed to delete user.");
-            }
-        } else {
-            System.out.println("No user selected");
-        }
+    private void setAvailabilityButtonText(boolean available) {
+        availabilityToggleButton.setText(available ? "Available" : "Unavailable");
     }
 
 }
