@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import sample.test.dto.UpdateOrderStatusDto;
@@ -18,6 +19,7 @@ import sample.test.model.MenuItem;
 import sample.test.service.MenuItemService;
 import sample.test.service.OrderService;
 import sample.test.service.UserService;
+import sample.test.utils.ReportDownloader;
 import sample.test.utils.TableUtils;
 import sample.test.utils.WindowUtils;
 
@@ -30,6 +32,10 @@ import java.util.ResourceBundle;
 
 public class EmployeeViewController implements Initializable {
 
+    @FXML
+    private Pane reportPane;
+    @FXML
+    private Button dailyButton, weeklyButton;
     @FXML
     private AnchorPane dashboardPane, menuPane, staffPane, ordersPane, employeePane, dishPane, orderPane;
     @FXML
@@ -59,6 +65,7 @@ public class EmployeeViewController implements Initializable {
 
     private Integer selectedUserId;
     private Long selectedMenuItemId;
+    private ReportDownloader reportDownloader;
     private Long selectedOrderId;
     private Timeline pollingTimeline;
 
@@ -69,6 +76,9 @@ public class EmployeeViewController implements Initializable {
         hideButtonsIfNotManager();
         showPane(dashboardPane);
 
+        reportDownloader = new ReportDownloader(reportPane);
+
+        initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
         TableUtils.initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
                 Arrays.asList(new ColumnDefinition<>("ID", "id"),
                         new ColumnDefinition<>("Username", "username"),
@@ -102,6 +112,8 @@ public class EmployeeViewController implements Initializable {
         boolean isManager = UserService.getInstance().getUserRoles().contains("ROLE_MANAGER");
         staffButton.setVisible(isManager);
         dashboardButton.setVisible(isManager);
+        dailyButton.setVisible(isManager);
+        weeklyButton.setVisible(isManager);
     }
 
     public void switchPane(ActionEvent event) {
@@ -202,6 +214,11 @@ public class EmployeeViewController implements Initializable {
         }
     }
 
+    public void downloadReport(ActionEvent event) {
+        reportDownloader.downloadReport(event);
+    }
+
+
     private <T, V> void loadEditForm(String fxml, T id, TableView<V> tableView, AnchorPane pane, List<V> items) throws IOException {
         if (id != null) {
             loadViewAndPassData(fxml, id);
@@ -215,8 +232,10 @@ public class EmployeeViewController implements Initializable {
         WindowUtils.loadViewWithControllerAndData(fxml, "Edit " + (id instanceof Integer ? "User" : "Menu Item"), true,
                 staffPane.getScene().getWindow(), true, controller -> {
                     if (controller instanceof EditUserViewController) {
+                        assert id instanceof Integer;
                         ((EditUserViewController) controller).setUser((Integer) id);
                     } else if (controller instanceof MenuItemFormViewController) {
+                        assert id instanceof Long;
                         ((MenuItemFormViewController) controller).setMenuItem((Long) id);
                     }
                 });
@@ -251,7 +270,7 @@ public class EmployeeViewController implements Initializable {
         pane.setVisible(true);
     }
 
-    public void closeButtonOnAction(ActionEvent event) {
+    public void closeButtonOnAction() {
         if (pollingTimeline != null) {
             pollingTimeline.stop();
         }

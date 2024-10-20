@@ -2,17 +2,17 @@ module sample.test {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
-    requires mysql.connector.j;
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
-    requires fontawesomefx;
     requires java.desktop;
     requires java.net.http;
+    requires java.management;
+    requires fontawesomefx;
     requires com.google.gson;
     requires static lombok;
-    requires java.management;
+    requires java.logging;
 
     opens sample.test to javafx.fxml;
     exports sample.test;
