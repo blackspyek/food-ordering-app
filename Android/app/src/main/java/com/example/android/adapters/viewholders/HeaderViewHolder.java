@@ -2,7 +2,7 @@ package com.example.android.adapters.viewholders;
 
 import android.view.View;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.R;
@@ -10,12 +10,12 @@ import com.example.android.R;
 public class HeaderViewHolder extends RecyclerView.ViewHolder {
     public TextView textViewHeader;
 
-    public HeaderViewHolder(View itemView) {
+    public HeaderViewHolder(@NonNull View itemView) {
         super(itemView);
-        bindViews(itemView);
+        textViewHeader = itemView.findViewById(R.id.textViewHeader);
     }
 
-    private void bindViews(View itemView) {
-        textViewHeader = itemView.findViewById(R.id.textViewMenuHeader);
+    public void bind(String headerTitle) {
+        textViewHeader.setText(headerTitle);
     }
 }
