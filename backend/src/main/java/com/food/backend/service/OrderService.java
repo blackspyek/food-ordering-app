@@ -53,7 +53,8 @@ public class OrderService {
         List<OrderItem> orderItemsList = createOrderItemsList(savedOrder, createOrderDto.getOrderItems());
         calculateAndSetTotalPrice(order, orderItemsList);
         saveOrder(order, orderItemsList);
-        return order;
+        savedOrder.setOrderItems(orderItemsList);
+        return savedOrder;
     }
 
     private void saveOrder(Order order, List<OrderItem> orderItemsList) {
