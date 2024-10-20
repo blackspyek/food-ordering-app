@@ -1,4 +1,5 @@
 package com.example.android.models;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartItem {
+public class CartItem implements Serializable {
     private MenuItem menuItem;
     private int quantity;
 }

@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.android.R;
 import com.example.android.models.CartItem;
+import com.example.android.adapters.viewholders.HeaderViewHolder;
 
 import java.util.List;
 
@@ -86,17 +87,6 @@ public class CartAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return cartItems.get(position - 1);
     }
 
-    static class HeaderViewHolder extends RecyclerView.ViewHolder {
-        private final TextView textViewHeader;
 
-        public HeaderViewHolder(@NonNull View itemView) {
-            super(itemView);
-            textViewHeader = itemView.findViewById(R.id.textViewCartHeader);
-        }
-
-        public void bind(String headerTitle) {
-            textViewHeader.setText(headerTitle);
-        }
-    }
 
 }

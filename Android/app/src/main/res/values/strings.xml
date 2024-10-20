@@ -19,4 +19,11 @@
     <string name="check_out">Check Out</string>
     <string name="default_total_value">Total: $0.00</string>
     <string name="empty_basket_message">Your basket is empty</string>
+    <string name="checkout_header">Finalize the order</string>
+    <string name="no_items_in_cart">No items in cart</string>
+    <string name="name">Name</string>
+    <string name="e_mail">E-mail</string>
+    <string name="email_hint">Enter your e-mail</string>
+    <string name="name_hint">Enter your name</string>
+    <string name="payment">Payment</string>
 </resources>
