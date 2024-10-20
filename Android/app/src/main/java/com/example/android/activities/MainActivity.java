@@ -25,12 +25,12 @@ public class MainActivity extends BaseActivity {
         LinearLayout takeOutButton = findViewById(R.id.takeOutButton);
 
         eatInButton.setOnClickListener(view -> {
-            saveChoice("Eat In");
+            saveChoice("DINE_IN");
             navigateToMenu();
         });
 
         takeOutButton.setOnClickListener(view -> {
-            saveChoice("Take Out");
+            saveChoice("TAKE_OUT");
             navigateToMenu();
         });
     }

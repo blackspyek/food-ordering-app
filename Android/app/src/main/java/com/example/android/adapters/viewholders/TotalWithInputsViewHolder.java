@@ -11,9 +11,11 @@ import com.example.android.R;
 
 public class TotalWithInputsViewHolder extends RecyclerView.ViewHolder {
     public TextView totalTextView;
-    EditText editTextName;
-    EditText editTextEmail;
+    public EditText editTextName;
+    public EditText editTextEmail;
     public Button buttonPayment;
+    public TextView errorTextView;
+    public TextView textViewPleaseWait;
 
     public TotalWithInputsViewHolder(View itemView) {
         super(itemView);
@@ -25,5 +27,9 @@ public class TotalWithInputsViewHolder extends RecyclerView.ViewHolder {
         editTextName = itemView.findViewById(R.id.editTextName);
         editTextEmail = itemView.findViewById(R.id.editTextEmail);
         buttonPayment = itemView.findViewById(R.id.buttonPayment);
+        editTextName = itemView.findViewById(R.id.editTextName);
+        editTextEmail = itemView.findViewById(R.id.editTextEmail);
+        errorTextView = itemView.findViewById(R.id.errorTextView);
+        textViewPleaseWait = itemView.findViewById(R.id.textViewPleaseWait);
     }
 }

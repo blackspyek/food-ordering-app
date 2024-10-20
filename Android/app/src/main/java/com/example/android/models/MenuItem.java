@@ -10,10 +10,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuItem implements Serializable {
-    private String photoUrl;
     private String name;
-    private Double price;
-    private boolean available;
     private String description;
-
+    private double price;
+    private boolean available;
+    private String category;
+    private String photoUrl;
+    private long id;
 }

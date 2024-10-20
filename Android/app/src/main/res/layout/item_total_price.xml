@@ -56,6 +56,27 @@
         android:fontFamily="@font/roboto"
         android:layout_marginBottom="15dp"/>
 
+    <TextView
+        android:id="@+id/errorTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        />
+
+    <TextView
+        android:id="@+id/textViewPleaseWait"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/please_wait"
+        android:textSize="16sp"
+        android:textColor="#FDA403"
+        android:visibility="gone"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"/>
+
     <Button
         android:id="@+id/buttonPayment"
         android:layout_width="300dp"

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.CheckoutActivity"
+    tools:context=".activities.OrderDetailsActivity"
     android:background="#FDA403">
 
     <androidx.appcompat.widget.Toolbar
@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewCheckout"
+        android:id="@+id/recyclerViewOrderDetails"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/rounded_recycler_background"

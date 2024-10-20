@@ -23,6 +23,7 @@
         android:layout_marginTop="4dp"
         android:contentDescription="@string/logo"
         android:src="@drawable/logo"
+        android:clickable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.2"
         app:layout_constraintHorizontal_bias="0.498"

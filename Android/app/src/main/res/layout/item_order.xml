@@ -1,0 +1,61 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/text_view_order_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="16sp"
+        android:textColor="@android:color/black"/>
+
+    <TextView
+        android:id="@+id/text_view_board_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="100sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"/>
+
+    <TextView
+        android:id="@+id/text_view_board_code_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/board_code_label"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="20dp" />
+
+    <Button
+        android:id="@+id/buttonWaitingBoard"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="@string/waiting_board"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:background="@drawable/button_add_to_basket"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="30dp" />
+
+    <TextView
+        android:id="@+id/text_view_order_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/roboto"/>
+</LinearLayout>
