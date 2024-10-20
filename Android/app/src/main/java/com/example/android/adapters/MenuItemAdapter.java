@@ -1,9 +1,11 @@
 package com.example.android.adapters;
+import com.example.android.adapters.viewholders.MenuItemViewHolder;
+import com.example.android.adapters.viewholders.HeaderViewHolder;
+
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
@@ -21,7 +23,7 @@ public class MenuItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private List<MenuItem> menuItems;
     private String headerTitle;
 
-    private OnItemClickListener onItemClickListener;
+    private final OnItemClickListener onItemClickListener;
 
     public MenuItemAdapter(List<MenuItem> menuItems, String headerTitle, OnItemClickListener listener) {
         this.menuItems = menuItems != null ? menuItems : new ArrayList<>();
@@ -38,8 +40,9 @@ public class MenuItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return position == 0 ? VIEW_TYPE_HEADER : VIEW_TYPE_ITEM;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_HEADER) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_menu_header, parent, false);
             return new HeaderViewHolder(view);
@@ -68,10 +71,10 @@ public class MenuItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private static MenuItemViewHolder getMenuItemViewHolder(MenuItemViewHolder holder) {
-        MenuItemViewHolder menuHolder = holder;
-        return menuHolder;
+        return holder;
     }
 
+    @SuppressLint("DefaultLocale")
     private static void formatDishDetails(MenuItem menuItem, MenuItemViewHolder menuHolder) {
         String formattedName = menuItem.getName().replace(" ", "\n");
         menuHolder.textViewMenuItemName.setText(formattedName);
@@ -91,37 +94,12 @@ public class MenuItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return menuItems.size() + 1;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void updateMenuItems(List<MenuItem> newMenuItems, String headerTitle) {
         this.menuItems = newMenuItems;
         this.headerTitle = headerTitle;
         notifyDataSetChanged();
     }
 
-
-    static class HeaderViewHolder extends RecyclerView.ViewHolder {
-        public TextView textViewHeader;
-
-        public HeaderViewHolder(View itemView) {
-            super(itemView);
-            textViewHeader = itemView.findViewById(R.id.textViewMenuHeader);
-        }
-    }
-
-    static class MenuItemViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageViewMenuItem;
-        public TextView textViewMenuItemName;
-        public TextView textViewMenuItemPrice;
-
-        public MenuItemViewHolder(View itemView) {
-            super(itemView);
-            imageViewMenuItem = itemView.findViewById(R.id.imageViewMenuItem);
-            textViewMenuItemName = itemView.findViewById(R.id.textViewMenuItemName);
-            textViewMenuItemPrice = itemView.findViewById(R.id.textViewMenuItemPrice);
-        }
-
-        public void bind(final MenuItem menuItem, final OnItemClickListener listener) {
-            itemView.setOnClickListener(v -> listener.onItemClick(menuItem));
-        }
-    }
 }
 
