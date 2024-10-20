@@ -56,7 +56,7 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<?> getAllOrders() {
-        List<Order> orders = orderService.getAllOrders();
+        List<Order> orders = orderService.getAllOrdersWithItems();
         return ResponseUtil.successResponse(orders, "Orders retrieved successfully");
     }
 

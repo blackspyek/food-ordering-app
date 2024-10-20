@@ -119,6 +119,10 @@ public class OrderService {
         return orderRepository.getOrdersByPreparedBy(preparedBy);
     }
 
+    public List<Order> getAllOrdersWithItems() {
+        return orderRepository.findAllWithItems();
+    }
+
 
     private Order initializeOrder(OrderType orderType, String email) throws IllegalArgumentException {
         checkIfStatusIsValid(orderType.toString());
