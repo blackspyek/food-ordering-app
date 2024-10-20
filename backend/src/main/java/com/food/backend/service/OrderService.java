@@ -34,14 +34,16 @@ public class OrderService {
     private final MenuItemService menuItemService;
     private final LiveOrderBoard liveOrderBoard;
     private final EmailService emailService;
+    private final UserService userService;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, MenuItemService menuItemService, @Lazy LiveOrderBoard liveOrderBoard, EmailService emailService) {
+    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, MenuItemService menuItemService, @Lazy LiveOrderBoard liveOrderBoard, EmailService emailService, UserService userService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.menuItemService = menuItemService;
         this.liveOrderBoard = liveOrderBoard;
         this.emailService = emailService;
+        this.userService = userService;
     }
 
     @Transactional
@@ -153,10 +155,7 @@ public class OrderService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
-    private OrderItem findOrderItemOrThrow(Long orderItemId) {
-        return orderItemRepository.findById(orderItemId)
-                .orElseThrow(() -> new OrderItemNotFoundException(orderItemId));
-    }
+
 
     private OrderItem createOrderItem(Order order, MenuItem menuItem, int quantity) {
         OrderItem orderItem = new OrderItem();
@@ -167,10 +166,6 @@ public class OrderService {
         return orderItem;
     }
 
-    private void updateOrderTotalPrice(Order order, double priceChange) {
-        order.setTotalPrice(order.getTotalPrice() + priceChange);
-        orderRepository.save(order);
-    }
 
     private void calculateAndSetTotalPrice(Order order, List<OrderItem> orderItems) {
         double totalPrice = calculateTotalPrice(orderItems);
@@ -182,6 +177,20 @@ public class OrderService {
             emailService.sendOrderConfirmationEmail(to, order);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send order confirmation email", e);
+        }
+    }
+
+    public Order updateOrderPreparedBy(Long orderId, String userName) {
+        validateParameters(orderId, userName);
+        Order order = findOrderOrThrow(orderId);
+        User user = userService.findUserByUsername(userName);
+
+        order.setPreparedBy(user);
+        return orderRepository.save(order);
+    }
+    private void validateParameters(Long orderId, String userName) {
+        if (orderId == null || userName == null || userName.isEmpty()) {
+            throw new IllegalArgumentException("Invalid orderId or userName");
         }
     }
 
