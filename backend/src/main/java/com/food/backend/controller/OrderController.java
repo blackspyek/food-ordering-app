@@ -2,6 +2,7 @@ package com.food.backend.controller;
 
 import com.food.backend.dto.orderdtos.CreateOrderDto;
 import com.food.backend.dto.orderdtos.UpdateOrderStatusDto;
+import com.food.backend.dto.orderdtos.UpdatePreparedByDto;
 import com.food.backend.model.Order;
 import com.food.backend.model.User;
 import com.food.backend.model.Enums.OrderStatus;
@@ -9,7 +10,11 @@ import com.food.backend.service.OrderService;
 import com.food.backend.exception.OrderNotFoundException;
 import com.food.backend.service.UserService;
 import com.food.backend.utils.classes.ResponseUtil;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -99,6 +105,22 @@ public class OrderController {
         List<Order> orders = orderService.getOrdersByPreparedBy(preparedBy);
         return ResponseUtil.successResponse(orders, "Orders retrieved successfully");
     }
+
+    @PatchMapping("/{orderId}/preparedBy")
+    public ResponseEntity<?> updateOrderPreparedBy(
+            @PathVariable Long orderId,
+            @RequestBody UpdatePreparedByDto dto) {
+        try {
+            Order updatedOrder = orderService.updateOrderPreparedBy(orderId, dto.getUserName());
+            return ResponseUtil.successResponse(updatedOrder, "Order preparedBy updated successfully");
+        } catch (OrderNotFoundException | EntityNotFoundException e) {
+            return ResponseUtil.notFoundResponse(e.getMessage());
+        }
+        catch (Exception e) {
+            return ResponseUtil.badRequestResponse("Error updating order preparedBy: " + e.getMessage());
+        }
+    }
+
 
 
 }

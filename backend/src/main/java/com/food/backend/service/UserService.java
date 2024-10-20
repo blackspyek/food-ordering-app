@@ -28,6 +28,9 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
+    }
     public Optional<User> deleteUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
         userRepository.deleteById(id);
