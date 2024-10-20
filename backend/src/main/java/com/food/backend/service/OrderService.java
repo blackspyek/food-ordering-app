@@ -13,10 +13,8 @@ import com.food.backend.model.Enums.OrderType;
 import com.food.backend.repository.OrderRepository;
 import com.food.backend.repository.OrderItemRepository;
 import com.food.backend.exception.OrderNotFoundException;
-import com.food.backend.exception.OrderItemNotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -91,9 +89,6 @@ public class OrderService {
         return orderRepository.findById(orderId);
     }
 
-    public List<Order> getAllOrders() {
-        return (List<Order>) orderRepository.findAll();
-    }
 
     @Transactional
     public Order updateOrderStatus(Long orderId, OrderStatus newStatus) throws IllegalArgumentException {
@@ -198,6 +193,5 @@ public class OrderService {
             throw new IllegalArgumentException("Invalid orderId or userName");
         }
     }
-
 
 }
