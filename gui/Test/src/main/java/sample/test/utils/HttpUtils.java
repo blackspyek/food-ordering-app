@@ -2,6 +2,8 @@ package sample.test.utils;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -62,6 +64,11 @@ public class HttpUtils {
     public static <T> T parseJsonResponse(String jsonResponse, Class<T> clazz) {
         Gson gson = new Gson();
         return gson.fromJson(jsonResponse, clazz);
+    }
+
+    public static boolean checkIfResponseWasGood(HttpResponse<String> response) throws IOException {
+        int responseCode = response.statusCode();
+        return responseCode == HttpURLConnection.HTTP_OK;
     }
 
 }
