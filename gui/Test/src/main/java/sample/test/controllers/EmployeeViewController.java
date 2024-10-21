@@ -33,13 +33,11 @@ import java.util.ResourceBundle;
 public class EmployeeViewController implements Initializable {
 
     @FXML
-    private Pane reportPane;
-    @FXML
     private Button dailyButton, weeklyButton;
     @FXML
-    private AnchorPane dashboardPane, menuPane, staffPane, ordersPane, employeePane, dishPane, orderPane;
+    private AnchorPane dashboardPane, menuPane, staffPane, ordersPane, employeePane, dishPane, orderPane, navPane;
     @FXML
-    private Button closeButton, signOutButton, dashboardButton, menuButton, staffButton, ordersButton;
+    private Button closeButton, dashboardButton, menuButton, staffButton, ordersButton;
     @FXML
     private Button userEditButton, userDeleteButton, userAddButton;
     @FXML
@@ -76,9 +74,8 @@ public class EmployeeViewController implements Initializable {
         hideButtonsIfNotManager();
         showPane(dashboardPane);
 
-        reportDownloader = new ReportDownloader(reportPane);
+        reportDownloader = new ReportDownloader(navPane);
 
-//        TableUtils.initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
         TableUtils.initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
                 Arrays.asList(new ColumnDefinition<>("ID", "id"),
                         new ColumnDefinition<>("Username", "username"),

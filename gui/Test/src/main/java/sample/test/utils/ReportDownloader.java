@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.scene.layout.Pane;
 import sample.test.service.JwtTokenService;
@@ -15,9 +16,9 @@ import java.net.http.HttpResponse;
 
 public class ReportDownloader {
     private static final String BASE_URL = "http://localhost:8080/api/reports";
-    private final Pane parentPane;
+    private final AnchorPane parentPane;
 
-    public ReportDownloader(Pane parentPane) {
+    public ReportDownloader(AnchorPane parentPane) {
         this.parentPane = parentPane;
     }
 
