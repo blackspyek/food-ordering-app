@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 
 @Getter
@@ -30,13 +31,26 @@ public class LiveOrderBoard {
         this.liveOrderBoardCodes = new TreeSet<>();
         this.readyOrderBoardCodes = new HashSet<>();
         initializeOrderSets();
+
     }
 
     private void initializeOrderSets() {
         clearOrderSets();
         loadOrdersIntoSets();
         sendUpdatedOrderBoard();
+        getLastOrderNumber();
+    }
+    private void getLastOrderNumber() {
+        Number maxOrderNumber = getMaxOrderNumberFromLiveOrderBoardCodesList(liveOrderBoardCodes.stream());
+        Number maxReadyOrderNumber = getMaxOrderNumberFromLiveOrderBoardCodesList(readyOrderBoardCodes.stream());
+        LAST_NUMBER = Math.max(maxOrderNumber.intValue(), maxReadyOrderNumber.intValue());
+    }
 
+    private Number getMaxOrderNumberFromLiveOrderBoardCodesList(Stream<String> liveOrderBoardCodes) {
+        return liveOrderBoardCodes
+                .map(Integer::parseInt)
+                .max(Integer::compareTo)
+                .orElse(-1);
     }
 
     private void clearOrderSets() {
