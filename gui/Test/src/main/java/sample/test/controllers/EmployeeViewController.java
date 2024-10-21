@@ -1,22 +1,20 @@
 package sample.test.controllers;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-import sample.test.dto.UpdateOrderStatusDto;
 import sample.test.helpers.ColumnDefinition;
-import sample.test.model.*;
 import sample.test.model.MenuItem;
+import sample.test.model.User;
 import sample.test.service.MenuItemService;
-import sample.test.service.OrderService;
 import sample.test.service.UserService;
 import sample.test.utils.TableUtils;
 import sample.test.utils.WindowUtils;
@@ -27,11 +25,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class EmployeeViewController implements Initializable {
 
     @FXML
-    private AnchorPane dashboardPane, menuPane, staffPane, ordersPane, employeePane, dishPane, orderPane;
+    private AnchorPane dashboardPane, menuPane, staffPane, ordersPane, employeePane, dishPane;
     @FXML
     private Button closeButton, signOutButton, dashboardButton, menuButton, staffButton, ordersButton;
     @FXML
@@ -39,63 +38,36 @@ public class EmployeeViewController implements Initializable {
     @FXML
     private Button menuItemEditButton, menuItemDeleteButton, menuItemAddButton;
     @FXML
-    private ChoiceBox<OrderStatus> orderStatusChoiceBox;
-    @FXML
     private ToggleButton availabilityToggleButton;
     @FXML
-    private Label userNameLabel, usernameLabel, roleLabel;
-    @FXML
-    private Label menuItemNameLabel, menuItemPriceLabel;
-    @FXML
-    private TextField orderBoardCodeTextField, totalAmountTextField, orderTypeTextField;
+    private Label userNameLabel, usernameLabel, roleLabel, menuItemNameLabel, menuItemPriceLabel;
     @FXML
     private TableView<User> userTableView;
     @FXML
     private TableView<MenuItem> menuTableView;
-    @FXML
-    private TableView<Order> ordersTableView;
-    @FXML
-    private TableView<OrderItem> orderItemsTableView;
 
     private Integer selectedUserId;
     private Long selectedMenuItemId;
-    private Long selectedOrderId;
-    private Timeline pollingTimeline;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        setupPolling();
         userNameLabel.setText(UserService.getInstance().getUsername());
         hideButtonsIfNotManager();
         showPane(dashboardPane);
 
-        TableUtils.initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
+        initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
                 Arrays.asList(new ColumnDefinition<>("ID", "id"),
                         new ColumnDefinition<>("Username", "username"),
-                        new ColumnDefinition<>("Roles", "roles")), null);
+                        new ColumnDefinition<>("Roles", "roles")));
 
-        TableUtils.initTable(menuTableView, MenuItemService.getMenuItems(), this::setMenuItemPane,
+        initTable(menuTableView, MenuItemService.getMenuItems(), this::setMenuItemPane,
                 Arrays.asList(new ColumnDefinition<>("ID", "id"),
                         new ColumnDefinition<>("Name", "name"),
-                        new ColumnDefinition<>("Price", "price")), null);
+                        new ColumnDefinition<>("Price", "price")));
 
-        TableUtils.initTable(ordersTableView, OrderService.getOrders(), this::setOrderPane,
-                Arrays.asList(new ColumnDefinition<>("ID", "orderId"),
-                        new ColumnDefinition<>("Board Code", "boardCode"),
-                        new ColumnDefinition<>("Order Time", "orderTime"),
-                        new ColumnDefinition<>("Status", "status")), null);
 
         employeePane.setVisible(false);
         dishPane.setVisible(false);
-        orderPane.setVisible(false);
-    }
-
-    private void setupPolling() {
-        pollingTimeline = new Timeline(
-                new KeyFrame(Duration.millis(2000), event -> refreshView(ordersTableView, orderPane, OrderService.getOrders()))
-        );
-        pollingTimeline.setCycleCount(Timeline.INDEFINITE);
-        pollingTimeline.play();
     }
 
     private void hideButtonsIfNotManager() {
@@ -114,6 +86,33 @@ public class EmployeeViewController implements Initializable {
     private void showPane(AnchorPane paneToShow) {
         List<AnchorPane> allPanes = Arrays.asList(dashboardPane, menuPane, staffPane, ordersPane);
         allPanes.forEach(pane -> pane.setVisible(pane == paneToShow));
+    }
+
+    private <T> void initTable(TableView<T> tableView, List<T> data, Consumer<T> consumer, List<ColumnDefinition<T, ?>> columnDefinitions) {
+        setColumns(tableView, columnDefinitions);
+        populateTable(tableView, data);
+        setListener(tableView, consumer);
+    }
+
+    private static <T> void setListener(TableView<T> tableView, Consumer<T> consumer) {
+        tableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                consumer.accept(newSelection);
+            }
+        });
+    }
+
+    private static <T> void populateTable(TableView<T> tableView, List<T> data) {
+        ObservableList<T> observableList = FXCollections.observableArrayList(data);
+        tableView.setItems(observableList);
+    }
+
+    private static <T> void setColumns(TableView<T> tableView, List<ColumnDefinition<T, ?>> columnDefinitions) {
+        for (ColumnDefinition<T, ?> columnDefinition : columnDefinitions) {
+            TableColumn<T, Object> tableColumn = new TableColumn<>(columnDefinition.getTitle());
+            tableColumn.setCellValueFactory(new PropertyValueFactory<>(columnDefinition.getProperty()));
+            tableView.getColumns().add(tableColumn);
+        }
     }
 
     private void setUserPane(User selectedUser) {
@@ -142,51 +141,13 @@ public class EmployeeViewController implements Initializable {
         dishPane.setVisible(true);
     }
 
-    private void setOrderPane(Order selectedOrder) {
-        if (selectedOrder != null) {
-            orderBoardCodeTextField.setText(selectedOrder.getBoardCode());
-            orderTypeTextField.setText(selectedOrder.getOrderType());
-            totalAmountTextField.setText(selectedOrder.getTotalPrice().toString());
-            orderStatusChoiceBox.setItems(FXCollections.observableArrayList(OrderStatus.values()));
-            orderStatusChoiceBox.setValue(OrderService.convertOrderStatus(selectedOrder.getStatus()));
-            selectedOrderId = selectedOrder.getOrderId();
-
-            orderItemsTableView.getColumns().clear();
-
-            TableUtils.initTable(orderItemsTableView, OrderService.getOrderItems(selectedOrderId), null,
-                    Arrays.asList(new ColumnDefinition<>("Item", "item.name"),
-                            new ColumnDefinition<>("Quantity", "quantity"),
-                            new ColumnDefinition<>("Total Price", "totalPrice")),
-                    (tableView, data) -> {
-                        TableColumn<OrderItem, String> itemNameColumn = (TableColumn<OrderItem, String>) tableView.getColumns().get(0);
-                        itemNameColumn.setCellValueFactory(cellData -> {
-                            MenuItem menuItem = cellData.getValue().getItem();
-                            return new SimpleStringProperty(menuItem != null ? menuItem.getName() : "Unknown Item");
-                        });
-                    });
-        }
-        orderPane.setVisible(true);
-    }
-
     public void handleUserActions(ActionEvent event) throws IOException {
         if (event.getSource() == userDeleteButton) {
-            deleteEntity(selectedUserId, UserService::deleteUser, userTableView, employeePane, UserService.getInstance().getUsers());
+            deleteEntity(selectedUserId, UserService::deleteUser);
         } else if (event.getSource() == userEditButton) {
-            loadEditForm("edit-user-view.fxml", selectedUserId, userTableView, employeePane, UserService.getInstance().getUsers());
+            loadEditForm("edit-user-view.fxml", selectedUserId);
         } else if (event.getSource() == userAddButton) {
-            loadAddForm("register-view.fxml", userTableView, employeePane, UserService.getInstance().getUsers());
-        }
-    }
-
-    public void changeOrderStatusButtonOnAction(ActionEvent event) {
-        if (orderStatusChoiceBox.getValue() != null) {
-            OrderStatus newStatus = orderStatusChoiceBox.getValue();
-            UpdateOrderStatusDto updateOrderStatusDto = new UpdateOrderStatusDto(OrderService.convertOrderStatus(newStatus.toString()));
-            boolean success = OrderService.changeOrderStatus(selectedOrderId, updateOrderStatusDto);
-            if (success) System.out.println("Order status updated successfully.");
-            refreshView(ordersTableView, orderPane, OrderService.getOrders());
-        } else {
-            System.out.println("No order status selected.");
+            loadAddForm("register-view.fxml");
         }
     }
 
@@ -194,18 +155,18 @@ public class EmployeeViewController implements Initializable {
         if (event.getSource() == availabilityToggleButton) {
             toggleMenuItemAvailability();
         } else if (event.getSource() == menuItemDeleteButton) {
-            deleteEntity(selectedMenuItemId, MenuItemService::deleteMenuItem, menuTableView, dishPane, MenuItemService.getMenuItems());
+            deleteEntity(selectedMenuItemId, MenuItemService::deleteMenuItem);
         } else if (event.getSource() == menuItemEditButton) {
-            loadEditForm("menu-item-form-view.fxml", selectedMenuItemId, menuTableView, dishPane, MenuItemService.getMenuItems());
+            loadEditForm("menu-item-form-view.fxml", selectedMenuItemId);
         } else if (event.getSource() == menuItemAddButton) {
-            loadAddForm("menu-item-form-view.fxml", menuTableView, dishPane, MenuItemService.getMenuItems());
+            loadAddForm("menu-item-form-view.fxml");
         }
     }
 
-    private <T, V> void loadEditForm(String fxml, T id, TableView<V> tableView, AnchorPane pane, List<V> items) throws IOException {
+    private <T> void loadEditForm(String fxml, T id) throws IOException {
         if (id != null) {
             loadViewAndPassData(fxml, id);
-            refreshView(tableView, pane, items);
+            refreshView();
         } else {
             System.out.println("No entity selected.");
         }
@@ -222,15 +183,15 @@ public class EmployeeViewController implements Initializable {
                 });
     }
 
-    private <T> void loadAddForm(String fxml, TableView<T> tableView, AnchorPane pane, List<T> items) throws IOException {
+    private void loadAddForm(String fxml) throws IOException {
         WindowUtils.loadView(fxml, "Add " + (fxml.contains("user") ? "User" : "Menu Item"), true,
                 staffPane.getScene().getWindow(), true);
-        refreshView(tableView, pane, items);
+        refreshView();
     }
 
-    private <T, V> void deleteEntity(T id, java.util.function.Predicate<T> deleteFunction, TableView<V> tableView, AnchorPane pane, List<V> items) {
+    private <T> void deleteEntity(T id, java.util.function.Predicate<T> deleteFunction) {
         if (id != null && deleteFunction.test(id)) {
-            refreshView(tableView, pane, items);
+            refreshView();
         } else {
             System.out.println("Failed to delete entity or no entity selected.");
         }
@@ -240,21 +201,20 @@ public class EmployeeViewController implements Initializable {
         if (selectedMenuItemId != null) {
             boolean success =  MenuItemService.setMenuItemAvailability(selectedMenuItemId);
             if (success) System.out.println("Menu item availability updated successfully.");
-            refreshView(menuTableView, dishPane, MenuItemService.getMenuItems());
+            refreshView();
         } else {
             System.out.println("No menu item selected.");
         }
     }
 
-    private <T> void refreshView(TableView<T> tableView, AnchorPane pane, List<T> items) {
-        TableUtils.populateTable(tableView, items);
-        pane.setVisible(true);
+    private void refreshView() {
+        TableUtils.populateTableView(userTableView, UserService.getInstance().getUsers());
+        TableUtils.populateTableView(menuTableView, MenuItemService.getMenuItems());
+        employeePane.setVisible(false);
+        dishPane.setVisible(false);
     }
 
     public void closeButtonOnAction(ActionEvent event) {
-        if (pollingTimeline != null) {
-            pollingTimeline.stop();
-        }
         ((Stage) closeButton.getScene().getWindow()).close();
     }
 
