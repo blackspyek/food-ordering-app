@@ -78,7 +78,7 @@ public class EmployeeViewController implements Initializable {
 
         reportDownloader = new ReportDownloader(reportPane);
 
-        initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
+//        TableUtils.initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
         TableUtils.initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
                 Arrays.asList(new ColumnDefinition<>("ID", "id"),
                         new ColumnDefinition<>("Username", "username"),

@@ -50,7 +50,7 @@ public class LoginViewController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        Image brandingImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/_1c91bbc2-7932-4482-b967-78a06a1a5e12.jpeg")).toString());
+        Image brandingImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/logo.png")).toString());
         brandingImageView.setImage(brandingImage);
 
         Image lockImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/padlock.png")).toString());
