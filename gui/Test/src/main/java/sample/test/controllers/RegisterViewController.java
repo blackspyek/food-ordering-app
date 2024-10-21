@@ -1,7 +1,6 @@
 package sample.test.controllers;
 
 import com.google.gson.Gson;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -13,6 +12,7 @@ import javafx.event.ActionEvent;
 import sample.test.dto.RegisterUserDto;
 import sample.test.service.JwtTokenService;
 import sample.test.service.UserService;
+import sample.test.utils.HttpUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -78,6 +78,7 @@ public class RegisterViewController implements Initializable {
             if (jwtToken != null && !jwtToken.isBlank()) {
                 if (isUserManager()) {
                     HttpResponse<String> response = sendRegistrationRequest(registerUserDto, jwtToken);
+                    HttpUtils.checkIfResponseWasUnauthorized(response);
                     handleRegistrationResponse(response);
                 } else {
                     registrationMessageLabel.setText("Only managers can register a new user.");

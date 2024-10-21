@@ -28,6 +28,10 @@ public class UserService {
         return instance;
     }
 
+    public static void resetInstance() {
+        instance = null;
+    }
+
     public List<User> getUsers() {
         try {
             String url = "http://localhost:8080/users/";
@@ -35,6 +39,8 @@ public class UserService {
 
             HttpResponse<String> response = HttpUtils.sendHttpRequest(url, "GET", token, null);
             String responseBody = response.body();
+
+            HttpUtils.checkIfResponseWasUnauthorized(response);
 
             UsersResponse usersResponse = HttpUtils.parseJsonResponse(responseBody, UsersResponse.class);
             return usersResponse.getData();
@@ -51,6 +57,7 @@ public class UserService {
 
             HttpResponse<String> response = HttpUtils.sendHttpRequest(url, "GET", token, null);
             String responseBody = response.body();
+            HttpUtils.checkIfResponseWasUnauthorized(response);
 
             UserResponse userResponse = HttpUtils.parseJsonResponse(responseBody, UserResponse.class);
             return userResponse.getData();
@@ -70,6 +77,8 @@ public class UserService {
 
             HttpResponse<String> response = HttpUtils.sendHttpRequest(url, "PUT", token, requestBody);
 
+            HttpUtils.checkIfResponseWasUnauthorized(response);
+
             int statusCode = response.statusCode();
 
             return response.statusCode() == 200;
@@ -86,6 +95,7 @@ public class UserService {
             String token = JwtTokenService.getInstance().getJwtToken();
 
             HttpResponse<String> response = HttpUtils.sendHttpRequest(url, "DELETE", token, null);
+            HttpUtils.checkIfResponseWasUnauthorized(response);
             return response.statusCode() == 200;
         } catch (Exception e) {
             e.printStackTrace();

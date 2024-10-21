@@ -7,6 +7,7 @@ import sample.test.model.Category;
 import sample.test.model.MenuItem;
 import sample.test.utils.HttpUtils;
 
+import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;
@@ -27,26 +28,28 @@ public class MenuItemService {
         }
     }
 
-    private static boolean handleResponse(HttpResponse<String> response, int successCode) {
-        if (response != null && response.statusCode() == successCode) {
+    private static boolean handleResponse(HttpResponse<String> response, int successCode) throws IOException {
+        HttpUtils.checkIfResponseWasUnauthorized(response);
+        if (response.statusCode() == successCode) {
             return true;
         } else {
-            System.out.println("Error: " + (response != null ? response.statusCode() : "No response") +
+            System.out.println("Error: " + response.statusCode() +
                     " for request.");
             return false;
         }
     }
 
-    private static <T> T handleGetResponse(HttpResponse<String> response, Function<String, T> converter) {
-        if (response != null && response.statusCode() == 200) {
+    private static <T> T handleGetResponse(HttpResponse<String> response, Function<String, T> converter) throws IOException {
+        HttpUtils.checkIfResponseWasUnauthorized(response);
+        if (response.statusCode() == 200) {
             return converter.apply(response.body());
         } else {
-            System.out.println("Error: " + (response != null ? response.statusCode() : "No response") + " for GET request.");
+            System.out.println("Error: " + response.statusCode() + " for GET request.");
             return null;
         }
     }
 
-    public static List<MenuItem> getMenuItems() {
+    public static List<MenuItem> getMenuItems() throws IOException {
         HttpResponse<String> response = sendHttpRequest(BASE_URL, "GET", null);
         return handleGetResponse(response, body -> {
             MenuItem[] menuItemsArray = gson.fromJson(body, MenuItem[].class);
@@ -54,7 +57,7 @@ public class MenuItemService {
         });
     }
 
-    public static MenuItem getMenuItemById(Long id) {
+    public static MenuItem getMenuItemById(Long id) throws IOException {
         HttpResponse<String> response = sendHttpRequest(BASE_URL + id, "GET", null);
         return handleGetResponse(response, body -> {
             MenuItemResponse menuItemResponse = gson.fromJson(body, MenuItemResponse.class);
@@ -62,24 +65,24 @@ public class MenuItemService {
         });
     }
 
-    public static boolean addMenuItem(MenuItemDto menuItemDto) {
+    public static boolean addMenuItem(MenuItemDto menuItemDto) throws IOException {
         String requestBody = gson.toJson(menuItemDto);
         HttpResponse<String> response = sendHttpRequest(BASE_URL, "POST", requestBody);
         return handleResponse(response, 201);
     }
 
-    public static boolean updateMenuItem(MenuItemDto menuItemDto, Long id) {
+    public static boolean updateMenuItem(MenuItemDto menuItemDto, Long id) throws IOException {
         String requestBody = gson.toJson(menuItemDto);
         HttpResponse<String> response = sendHttpRequest(BASE_URL + id, "PUT", requestBody);
         return handleResponse(response, 200);
     }
 
-    public static boolean setMenuItemAvailability(Long id) {
+    public static boolean setMenuItemAvailability(Long id) throws IOException {
         HttpResponse<String> response = sendHttpRequest(BASE_URL + "availability/" + id, "PATCH", null);
         return handleResponse(response, 200);
     }
 
-    public static boolean deleteMenuItem(Long id) {
+    public static boolean deleteMenuItem(Long id) throws IOException {
         HttpResponse<String> response = sendHttpRequest(BASE_URL + id, "DELETE", null);
         return handleResponse(response, 204);
     }
