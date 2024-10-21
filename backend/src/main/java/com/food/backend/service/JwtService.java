@@ -2,25 +2,23 @@ package com.food.backend.service;
 
 import com.food.backend.model.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SecureDigestAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
+@Slf4j
 @Service
 public class JwtService {
     @Value("${security.jwt.secret-key}")
@@ -35,13 +33,29 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public Boolean hasTokenExpired(String token) {
+
+        try{
+            final Date expiration = extractExpiration(token);
+            return expiration.before(new Date());
+        }
+        catch (ExpiredJwtException e){
+            return true;
+        }
+
+    }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
 
         try{
             final Claims claims = extractAllClaims(token);
             return claimsResolver.apply(claims);
         }
+        catch (ExpiredJwtException e){
+           throw new ExpiredJwtException(null, null, "Token has expired");
+        }
         catch (Exception e) {
+            logger.info("Error while extracting claims from token");
             return null;
         }
     }
@@ -83,8 +97,7 @@ public class JwtService {
     }
     private SecretKey getSignInKey() {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
-            return key;
+            return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         } catch (Exception e) {
             throw new RuntimeException("Error while getting secret key");
         }

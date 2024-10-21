@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class OrderDto {
     @NotNull(message = "orderId cannot be empty")
     private Long orderId;

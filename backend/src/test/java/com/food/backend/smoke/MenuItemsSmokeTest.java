@@ -1,4 +1,4 @@
-package com.food.backend;
+package com.food.backend.smoke;
 
 import com.food.backend.controller.MenuItemController;
 import org.junit.jupiter.api.Test;
