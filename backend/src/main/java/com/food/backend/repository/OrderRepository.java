@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -41,5 +42,8 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
             "WHERE o.status = :status " +
             "GROUP BY mi.category")
     List<Object[]> countItemsSoldByCategory(@Param("status") OrderStatus status);
+
+    @Query("SELECT o.status FROM Order o WHERE o.orderId = :orderId")
+    Optional<OrderStatus> findStatusById(@Param("orderId") Long orderId);
 
 }

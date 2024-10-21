@@ -88,6 +88,10 @@ public class OrderService {
     public Optional<Order> getOrderById(Long orderId) {
         return orderRepository.findById(orderId);
     }
+    public OrderStatus getOrderStatus(Long orderId) {
+        return orderRepository.findStatusById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+    }
 
 
     @Transactional
