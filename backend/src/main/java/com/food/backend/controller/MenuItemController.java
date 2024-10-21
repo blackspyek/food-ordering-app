@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,6 +65,7 @@ public class MenuItemController {
 
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<String> deleteMenuItem(
             @PathVariable("id") int id
     ) {
@@ -77,6 +79,7 @@ public class MenuItemController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<?> updateMenuItem(
             @PathVariable("id") int id,
             @Valid
@@ -112,6 +115,7 @@ public class MenuItemController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<?> createMenuItem(
             @Valid
             @RequestBody MenuItemDto menuItemDto
