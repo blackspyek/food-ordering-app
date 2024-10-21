@@ -121,15 +121,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws IOException, ServletException {
+        if (jwtService.hasTokenExpired(jwt) ) {
+            sendErrorResponse(response, "Token has expired");
+            return;
+        }
+
         String username = jwtService.extractUsername(jwt);
         if (!isValidAuthenticationContext(username)) {
-            sendErrorResponse(response, "Invalid Token");
+            sendErrorResponse(response, "Invalid Username");
             return;
         }
 
         User user = (User) userDetailsService.loadUserByUsername(username);
         if (!jwtService.isTokenValid(jwt, user)) {
-            sendErrorResponse(response, "Token has expired");
+            sendErrorResponse(response, "Token is not valid");
             return;
         }
 

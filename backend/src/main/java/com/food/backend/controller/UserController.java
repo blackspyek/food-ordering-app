@@ -9,6 +9,7 @@ import com.food.backend.utils.classes.MessageUtil;
 import com.food.backend.utils.classes.ResponseUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +38,11 @@ public class UserController {
     public ResponseEntity<ApiResponse<User>> findUserById(@PathVariable Long id) {
         return userService.findUserById(id)
                 .map(user -> ResponseUtil.successResponse(user, "User found"))
-                .orElseGet(() -> ResponseUtil.notFoundResponse(MessageUtil.userFoundMessage(id)));
+                .orElseGet(() -> ResponseUtil.notFoundResponse(MessageUtil.userNotFoundMessage(id)));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<User>> deleteUserById(@PathVariable Long id) {
         return userService.deleteUserById(id)
                 .map(user -> ResponseUtil.successResponse(user, MessageUtil.userDeletedMessage(id)))
@@ -48,6 +50,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<User>> updateUserById(@PathVariable Long id,
                                                             @Valid
                                                             @RequestBody UserDto userDto){
@@ -58,6 +61,7 @@ public class UserController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<ApiResponse<List<User>>> allUsers() {
         List<User> users = userService.allUsers();
         return ResponseUtil.successResponse(users, "All users retrieved");
