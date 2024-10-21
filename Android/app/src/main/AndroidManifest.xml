@@ -28,6 +28,10 @@
             android:theme="@style/MenuActivityTheme"
             android:exported="false" />
         <activity
+            android:name=".activities.OrderDetailsActivity"
+            android:theme="@style/MenuActivityTheme"
+            android:exported="false" />
+        <activity
             android:name=".activities.CheckoutActivity"
             android:theme="@style/MenuActivityTheme"
             android:exported="false" />

@@ -131,7 +131,11 @@ public class OrderService {
 
 
     private Order initializeOrder(OrderType orderType, String email) throws IllegalArgumentException {
+<<<<<<< HEAD
         checkIfTypeIsValid(orderType.toString());
+=======
+        //checkIfStatusIsValid(orderType.toString());
+>>>>>>> c6baa06 (Feat/added navigation to order details view)
         Order order = new Order();
         order.setEmail(email);
         order.setOrderType(orderType);

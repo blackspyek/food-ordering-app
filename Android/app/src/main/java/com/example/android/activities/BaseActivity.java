@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -93,5 +95,15 @@ public class BaseActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+    void setupLogoClick() {
+        ImageView logoImage = findViewById(R.id.logoImage);
+        logoImage.setOnClickListener(v -> openMenuActivity());
+    }
+
+    private void openMenuActivity() {
+        Intent intent = new Intent(this, MenuActivity.class);
+        startActivity(intent);
     }
 }

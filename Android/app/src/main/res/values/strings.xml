@@ -32,4 +32,10 @@
     <string name="name_hint">Enter your name</string>
     <string name="payment">Payment</string>
     <string name="WS_Server_URL">ws://10.0.2.2:8080/ws</string>
+    <string name="please_enter_a_valid_name">Please enter a valid name</string>
+    <string name="please_enter_a_valid_email">Please enter a valid e-mail</string>
+    <string name="order_header">Order</string>
+    <string name="please_wait">Please wait</string>
+    <string name="board_code_label">NUMBER</string>
+    <string name="waiting_board">Waiting Board</string>
 </resources>

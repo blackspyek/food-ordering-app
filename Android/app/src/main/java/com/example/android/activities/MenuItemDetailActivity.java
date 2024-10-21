@@ -27,6 +27,7 @@ public class MenuItemDetailActivity extends BaseActivity {
         setupBackButtonHandler();
         initializeMenuItemDetailsViews();
         deserializeMenuItem();
+        setupLogoClick();
     }
 
     private void deserializeMenuItem() {

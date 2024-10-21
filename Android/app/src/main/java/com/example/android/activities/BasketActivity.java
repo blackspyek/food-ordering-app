@@ -38,6 +38,11 @@ public class BasketActivity extends BaseActivity implements CartAdapter.OnCartUp
         initializeViews();
         setupRecyclerView();
         updateTotalAmount();
+        setupLogoClick();
+        hideEmptyBaskeyMessage();
+    }
+
+    private void hideEmptyBaskeyMessage() {
         cartAdapter.updateEmptyMessageVisibility(emptyBasketMessage);
     }
 

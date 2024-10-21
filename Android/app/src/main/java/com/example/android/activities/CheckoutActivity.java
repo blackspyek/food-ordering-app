@@ -24,6 +24,7 @@ public class CheckoutActivity extends BaseActivity {
         configureActionBar();
         setupBackButtonHandler();
         ArrayList<CartItem> cartItems = retrieveCartItems();
+        setupLogoClick();
         initializeRecyclerView(cartItems);
     }
 

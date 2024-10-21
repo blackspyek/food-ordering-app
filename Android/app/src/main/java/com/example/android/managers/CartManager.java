@@ -46,4 +46,8 @@ public class CartManager {
     private void addNewCartItem(MenuItem menuItem) {
         cartItems.add(new CartItem(menuItem, 1));
     }
+
+    public void clearCart() {
+        cartItems.clear();
+    }
 }
