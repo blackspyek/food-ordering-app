@@ -12,8 +12,6 @@ import com.food.backend.service.UserService;
 import com.food.backend.utils.classes.ResponseUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +64,19 @@ public class OrderController {
         return ResponseUtil.successResponse(orders, "Orders retrieved successfully");
     }
 
+
+    @GetMapping("/{orderId}/status")
+    public ResponseEntity<?> getOrderStatus(@PathVariable Long orderId) {
+        try {
+            OrderStatus orderStatus = orderService.getOrderStatus(orderId);
+            return ResponseUtil.successResponse(orderStatus, "Order status retrieved successfully");
+        } catch (OrderNotFoundException e) {
+            return ResponseUtil.notFoundResponse(e.getMessage());
+        }
+        catch (Exception e) {
+            return ResponseUtil.badRequestResponse("Error retrieving order status: " + e.getMessage());
+        }
+    }
     @PutMapping("/{orderId}/status")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId,
                                                @RequestBody
@@ -120,6 +131,8 @@ public class OrderController {
             return ResponseUtil.badRequestResponse("Error updating order preparedBy: " + e.getMessage());
         }
     }
+
+
 
 
 
