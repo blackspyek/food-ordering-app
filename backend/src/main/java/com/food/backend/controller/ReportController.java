@@ -43,6 +43,7 @@ public class ReportController {
             @ApiResponse(responseCode = "403", description = "Insufficient permissions"),
             @ApiResponse(responseCode = "500", description = "Error generating report")
     })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<byte[]> generateDailyReport() {
         return reportService.generateDailyReport();
     }
@@ -60,6 +61,7 @@ public class ReportController {
             @ApiResponse(responseCode = "403", description = "Insufficient permissions"),
             @ApiResponse(responseCode = "400", description = "Error generating report")
     })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<byte[]> generateWeeklyReport() {
         return reportService.generateWeeklyReport();
     }

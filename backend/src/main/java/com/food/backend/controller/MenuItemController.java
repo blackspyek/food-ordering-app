@@ -5,6 +5,11 @@ import com.food.backend.model.Enums.Category;
 import com.food.backend.model.MenuItem;
 import com.food.backend.service.MenuItemService;
 import com.food.backend.utils.classes.ResponseUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -16,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/menu")
+@Tag(name = "Menu Items", description = "Menu Item Management APIs")
 public class MenuItemController {
     private final MenuItemService menuItemService;
 
@@ -24,10 +30,25 @@ public class MenuItemController {
     }
 
     @GetMapping("/")
+    @Operation(
+            summary = "Get all menu items",
+            description = "Retrieves a list of all menu items in the system"
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved menu items")
     public ResponseEntity<List<MenuItem>> getMenuItems() {
         return ResponseEntity.ok(menuItemService.findAll());
     }
+
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Get menu item by ID",
+            description = "Retrieves a specific menu item by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Menu item found"),
+            @ApiResponse(responseCode = "404", description = "Menu item not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid request")
+    })
     public ResponseEntity<?> getMenuItems(
             @PathVariable("id") Long id
     ) {
@@ -44,11 +65,21 @@ public class MenuItemController {
     }
 
     @GetMapping("/available")
+    @Operation(
+            summary = "Get available menu items",
+            description = "Retrieves all menu items that are currently available"
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved available menu items")
     public ResponseEntity<List<MenuItem>> getAvailableMenuItems() {
         return ResponseEntity.ok(menuItemService.findByAvailable(true));
     }
 
     @GetMapping("/category/{category}")
+    @Operation(
+            summary = "Get menu items by category",
+            description = "Retrieves all menu items in a specific category"
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved menu items for the category")
     public ResponseEntity<List<MenuItem>> getMenuItemsByCategory(
             @PathVariable("category") Category category
     ) {
@@ -56,6 +87,14 @@ public class MenuItemController {
     }
 
     @GetMapping("/name/{name}")
+    @Operation(
+            summary = "Get menu item by name",
+            description = "Retrieves a specific menu item by its name (case insensitive)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Menu item found"),
+            @ApiResponse(responseCode = "404", description = "Menu item not found")
+    })
     public ResponseEntity<MenuItem> getMenuItemByName(
             @PathVariable("name") String name
     ) {
@@ -66,6 +105,16 @@ public class MenuItemController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
+    @Operation(
+            summary = "Delete menu item",
+            description = "Deletes a menu item by its ID. Requires MANAGER role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Menu item successfully deleted"),
+            @ApiResponse(responseCode = "400", description = "Failed to delete menu item"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<String> deleteMenuItem(
             @PathVariable("id") int id
     ) {
@@ -80,6 +129,17 @@ public class MenuItemController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
+    @Operation(
+            summary = "Update menu item",
+            description = "Updates an existing menu item. Requires MANAGER role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Menu item successfully updated"),
+            @ApiResponse(responseCode = "404", description = "Menu item not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> updateMenuItem(
             @PathVariable("id") int id,
             @Valid
@@ -98,6 +158,16 @@ public class MenuItemController {
     }
 
     @PatchMapping("/availability/{id}")
+    @Operation(
+            summary = "Update menu item availability",
+            description = "Toggles the availability status of a menu item"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Menu item availability successfully updated"),
+            @ApiResponse(responseCode = "404", description = "Menu item not found"),
+            @ApiResponse(responseCode = "400", description = "Failed to update availability")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> updateMenuItemAvailability(
             @PathVariable("id") Long id
     ) {
@@ -116,6 +186,16 @@ public class MenuItemController {
 
     @PostMapping("/")
     @PreAuthorize("hasRole('MANAGER')")
+    @Operation(
+            summary = "Create new menu item",
+            description = "Creates a new menu item. Requires MANAGER role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Menu item successfully created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> createMenuItem(
             @Valid
             @RequestBody MenuItemDto menuItemDto
