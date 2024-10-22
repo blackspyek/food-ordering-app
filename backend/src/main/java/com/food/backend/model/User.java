@@ -1,6 +1,7 @@
 package com.food.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,25 +18,31 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @NoArgsConstructor
+@Schema(description = "User entity")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Schema(description = "Unique identifier for the user", example = "123e4567-e89b-12d3-a456-426614174000")
     private Long id;
 
     @Column(unique = true, nullable = false)
+    @Schema(description = "Username", example = "johndoe")
     private String username;
 
     @Column(nullable = false)
     @JsonIgnore
+    @Schema(description = "Password", example = "password")
     private String password;
 
     @Column(nullable = false)
+    @Schema(description = "Indicates if the user is enabled", example = "true")
     private boolean enabled;
 
     @ElementCollection(fetch = FetchType.EAGER) //
     @Enumerated(EnumType.STRING)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
+    @Schema(description = "User's roles")
     private Set<Role> roles;
 
     public User(String username, String password) {
