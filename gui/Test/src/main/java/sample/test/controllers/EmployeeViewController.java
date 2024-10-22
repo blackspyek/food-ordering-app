@@ -71,16 +71,15 @@ public class EmployeeViewController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         setupPolling();
         userNameLabel.setText(UserService.getInstance().getUsername());
-        hideButtonsIfNotManager();
         showPane(ordersPane);
-
         reportDownloader = new ReportDownloader(navPane);
 
-        TableUtils.initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
-                Arrays.asList(new ColumnDefinition<>("ID", "id"),
-                        new ColumnDefinition<>("Username", "username"),
-                        new ColumnDefinition<>("Roles", "roles")), null);
-
+        if (UserService.getInstance().getUserRoles().contains("ROLE_MANAGER")) {
+            setManagerView();
+            employeePane.setVisible(false);
+        } else {
+            hideButtonsIfNotManager();
+        }
         try {
             TableUtils.initTable(menuTableView, MenuItemService.getMenuItems(), this::setMenuItemPane,
                     Arrays.asList(new ColumnDefinition<>("ID", "id"),
@@ -99,10 +98,17 @@ public class EmployeeViewController implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        employeePane.setVisible(false);
         dishPane.setVisible(false);
         orderPane.setVisible(false);
+    }
+
+    private void setManagerView() {
+        TableUtils.initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
+                Arrays.asList(new ColumnDefinition<>("ID", "id"),
+                        new ColumnDefinition<>("Username", "username"),
+                        new ColumnDefinition<>("Roles", "roles")), null);
+
+
     }
 
     private void setupPolling() {

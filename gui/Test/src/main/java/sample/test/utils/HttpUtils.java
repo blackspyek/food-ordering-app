@@ -76,8 +76,8 @@ public class HttpUtils {
     }
 
     public static boolean checkIfResponseWasUnauthorized(HttpResponse<String> response) throws IOException {
-        int responseCode = response.statusCode();
-        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+        String responseBody = response.body();
+        if (responseBody.contains("\"message\": \"Token has expired\"")) {
             UserService.resetInstance();
             reloadApp();
             return true;
