@@ -1,28 +1,24 @@
 package com.example.android.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-
+import android.widget.Button;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.android.R;
 import com.example.android.adapters.OrderBoardAdapter;
 import com.example.android.api.OrderBoardCallback;
 import com.example.android.api.WebSocketClient;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderBoardActivity extends BaseActivity implements OrderBoardCallback {
+public class BoardActivity extends BaseActivity implements OrderBoardCallback {
 
     private RecyclerView preparingRecyclerView;
     private RecyclerView readyRecyclerView;
@@ -37,18 +33,16 @@ public class OrderBoardActivity extends BaseActivity implements OrderBoardCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeActivity();
-        initializeWebSocketClient();
-        connectWebSocket();
-    }
-
-    private void initializeActivity() {
-        setContentView(R.layout.activity_order_board);
+        configureActivityLayout();
         setupToolbar();
         configureActionBar();
         setupBackButtonHandler();
+        initializeButtons();
         initializeRecyclerViews();
+        setupLogoClick();
         initializeAdapters();
+        initializeWebSocketClient();
+        connectWebSocket();
     }
 
     private void initializeWebSocketClient() {
@@ -66,7 +60,7 @@ public class OrderBoardActivity extends BaseActivity implements OrderBoardCallba
     private void attemptWebSocketConnection() {
         try {
             webSocketClient.start();
-            Thread.sleep(1000); // Wait for STOMP connection
+            Thread.sleep(1000);
             onWebSocketConnected();
         } catch (Exception e) {
             onWebSocketConnectionFailed(e);
@@ -83,7 +77,7 @@ public class OrderBoardActivity extends BaseActivity implements OrderBoardCallba
     }
 
     private void initializeRecyclerViews() {
-        preparingRecyclerView = findViewById(R.id.inPrepareRecyclerView);
+        preparingRecyclerView = findViewById(R.id.preparingRecyclerView);
         readyRecyclerView = findViewById(R.id.readyRecyclerView);
     }
 
@@ -99,6 +93,55 @@ public class OrderBoardActivity extends BaseActivity implements OrderBoardCallba
         recyclerView.setAdapter(adapter);
     }
 
+    private void configureActivityLayout() {
+        setContentView(R.layout.activity_board);
+    }
+
+    private void initializeButtons() {
+        Button buttonBoard = findViewById(R.id.buttonBoard);
+        Button buttonOrders = findViewById(R.id.buttonOrders);
+
+        handleButtonsClick(buttonBoard, buttonOrders);
+
+        triggerDefaultButtonClick(buttonBoard);
+    }
+
+    private void handleButtonsClick(Button buttonBoard, Button buttonOrder) {
+        buttonBoard.setOnClickListener(v -> {
+            updateButtonSelection(buttonBoard, buttonOrder);
+        });
+
+        buttonOrder.setOnClickListener(v -> {
+            updateButtonSelection(buttonOrder, buttonBoard);
+            closeWebSocketClient();
+            Intent intent = new Intent(this, OrderHistoryActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private static void triggerDefaultButtonClick(Button buttonBoard) {
+        buttonBoard.performClick();
+    }
+
+    private void updateButtonSelection(Button selectedButton, Button... otherButtons) {
+        setEnableButtonApperance(selectedButton);
+        setDisableButtonsAppearance(otherButtons);
+    }
+
+    private static void setEnableButtonApperance(Button selectedButton) {
+        setButtonAppearance(selectedButton, R.drawable.button_background_selected, android.graphics.Typeface.BOLD);
+    }
+
+    private static void setDisableButtonsAppearance(Button[] otherButtons) {
+        for (Button button : otherButtons) {
+            setButtonAppearance(button, R.drawable.button_background_default, android.graphics.Typeface.NORMAL);
+        }
+    }
+
+    private static void setButtonAppearance(Button button, int backgroundResource, int typefaceStyle) {
+        button.setBackgroundResource(backgroundResource);
+        button.setTypeface(null, typefaceStyle);
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -148,17 +191,12 @@ public class OrderBoardActivity extends BaseActivity implements OrderBoardCallba
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        hideBoardMenuItem(menu);
+    public boolean onSupportNavigateUp() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
         return true;
-    }
-
-    private void hideBoardMenuItem(Menu menu) {
-        MenuItem boardItem = menu.findItem(R.id.action_board);
-        if (boardItem != null) {
-            boardItem.setVisible(false);
-        }
     }
 
 }

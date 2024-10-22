@@ -38,4 +38,10 @@
     <string name="please_wait">Please wait</string>
     <string name="board_code_label">NUMBER</string>
     <string name="waiting_board">Waiting Board</string>
+    <string name="board">BOARD</string>
+    <string name="orders">ORDERS</string>
+    <string name="lastTen">Showing last 10 orders</string>
+    <string name="failed_to_create_order">"Failed to create order: "</string>
+    <string name="network_error">"Network error: "</string>
+    <string name="no_orders_available">Empty order history</string>
 </resources>
