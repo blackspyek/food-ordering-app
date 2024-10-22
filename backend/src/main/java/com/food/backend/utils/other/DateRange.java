@@ -1,7 +1,6 @@
 package com.food.backend.utils.other;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
 
 public record DateRange(LocalDateTime start, LocalDateTime end) {
     /**
@@ -20,11 +19,10 @@ public record DateRange(LocalDateTime start, LocalDateTime end) {
      */
     public static DateRange forWeekly() {
         LocalDate today = LocalDate.now();
-        LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
-        LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(java.time.DayOfWeek.SUNDAY));
+        LocalDate startOfWeek = today.minusDays(7);
         return new DateRange(
                 startOfWeek.atStartOfDay(),
-                endOfWeek.atTime(23, 59, 59)
+                today.atTime(23, 59, 59)
         );
     }
 

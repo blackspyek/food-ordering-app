@@ -3,6 +3,7 @@ package com.food.backend.service;
 import com.food.backend.model.Enums.OrderStatus;
 import com.food.backend.model.Order;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,6 +14,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 
+@Slf4j
 @Getter
 @Service
 public class LiveOrderBoard {
@@ -78,9 +80,30 @@ public class LiveOrderBoard {
         sendUpdatedOrderBoard();
     }
     public void moveOrderCodeToReady(String orderCode) {
-        liveOrderBoardCodes.remove(orderCode);
-        readyOrderBoardCodes.add(orderCode);
-        sendUpdatedOrderBoard();
+        try{
+            liveOrderBoardCodes.remove(orderCode);
+        }
+        catch (Exception e) {
+            this.logger.info("Order code not found in live order board");
+        }
+        finally {
+            readyOrderBoardCodes.add(orderCode);
+            sendUpdatedOrderBoard();
+        }
+
+    }
+    public void moveOrderCodetoLive(String orderCode) {
+        try{
+            readyOrderBoardCodes.remove(orderCode);
+        }
+        catch (Exception e) {
+            this.logger.info("Order code not found in ready order board");
+        }
+        finally {
+            liveOrderBoardCodes.add(orderCode);
+            sendUpdatedOrderBoard();
+        }
+
     }
     public void removeOrderCode(String orderCode) {
         liveOrderBoardCodes.remove(orderCode);
