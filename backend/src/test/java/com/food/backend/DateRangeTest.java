@@ -26,11 +26,10 @@ class DateRangeTest {
         DateRange weeklyRange = DateRange.forWeekly();
 
         LocalDate today = LocalDate.now();
-        LocalDate startOfWeek = today.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
-        LocalDate endOfWeek = today.with(java.time.temporal.TemporalAdjusters.nextOrSame(java.time.DayOfWeek.SUNDAY));
+        LocalDate startOfWeek = today.minusDays(7);
 
         LocalDateTime expectedStart = startOfWeek.atStartOfDay();
-        LocalDateTime expectedEnd = endOfWeek.atTime(23, 59, 59);
+        LocalDateTime expectedEnd = today.atTime(23, 59, 59);
 
         assertEquals(expectedStart, weeklyRange.start());
         assertEquals(expectedEnd, weeklyRange.end());

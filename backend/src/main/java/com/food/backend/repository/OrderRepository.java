@@ -39,9 +39,13 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
             "FROM OrderItem oi " +
             "JOIN oi.item mi " +
             "JOIN oi.order o " +
-            "WHERE o.status = :status " +
+            "WHERE o.status = :status AND o.orderTime BETWEEN :start AND :end " +
             "GROUP BY mi.category")
-    List<Object[]> countItemsSoldByCategory(@Param("status") OrderStatus status);
+    List<Object[]> countItemsSoldByCategory(
+            @Param("status") OrderStatus status,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
 
     @Query("SELECT o.status FROM Order o WHERE o.orderId = :orderId")
     Optional<OrderStatus> findStatusById(@Param("orderId") Long orderId);

@@ -235,4 +235,15 @@ public class OrderController {
         }
     }
 
+
+    // For Presentation
+    @PostMapping("/presentation")
+    public ResponseEntity<?> createNewOrderNumberToTheBoard(){
+        try {
+            return ResponseUtil.successResponse(orderService.forceAddOrderNumberToTheBoard(), "Order created successfully");
+        } catch (Exception e) {
+            return ResponseUtil.badRequestResponse("Error creating order: " + e.getMessage());
+        }
+    }
+
 }

@@ -100,8 +100,19 @@ public class OrderService {
 
         Order order = findOrderOrThrow(orderId);
         order.setStatus(newStatus);
-        liveOrderBoard.moveOrderCodeToReady(order.getBoardCode());
+        moveOrderNumberOnTheBoardBasedOnStatus(newStatus, order);
         return orderRepository.save(order);
+    }
+
+    private void moveOrderNumberOnTheBoardBasedOnStatus(OrderStatus newStatus, Order order) {
+        if (newStatus == OrderStatus.READY_FOR_PICKUP) {
+            liveOrderBoard.moveOrderCodeToReady(order.getBoardCode());
+        } else if (newStatus == OrderStatus.IN_PREPARATION) {
+            liveOrderBoard.moveOrderCodetoLive(order.getBoardCode());
+        }
+        else {
+            liveOrderBoard.removeOrderCode(order.getBoardCode());
+        }
     }
 
     private static void checkIfStatusIsValid(String orderStatus) throws IllegalArgumentException {
@@ -114,6 +125,8 @@ public class OrderService {
 
     @Transactional
     public void deleteOrder(Long orderId) {
+        Order order = findOrderOrThrow(orderId);
+        liveOrderBoard.removeOrderCode(order.getBoardCode());
         orderRepository.deleteById(orderId);
     }
 
@@ -198,4 +211,7 @@ public class OrderService {
         }
     }
 
+    public String forceAddOrderNumberToTheBoard() {
+        return liveOrderBoard.generateOrderBoardCode();
+    }
 }

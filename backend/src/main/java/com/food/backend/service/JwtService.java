@@ -88,7 +88,6 @@ public class JwtService {
                 .compact();
     }
     private Claims extractAllClaims(String token) {
-        logger.info("extracting all claims from token");
         return  Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()
