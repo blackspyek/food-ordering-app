@@ -158,6 +158,18 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         submitOrder(createOrderDto, holder);
     }
 
+    /**
+     * Submits an order to the API and handles the response asynchronously.
+     *
+     * This method sends the order creation request to the server and manages the UI state
+     * during the submission process. It displays a loading indicator while the request
+     * is in progress and handles both successful and failed responses.
+     *
+     * @param createOrderDto The data transfer object containing the order details to be submitted
+     * @param holder The ViewHolder instance containing references to the UI elements that
+     *              need to be updated during and after the order submission process
+     *
+     */
     private void submitOrder(CreateOrderDto createOrderDto, TotalWithInputsViewHolder holder) {
         apiService.createOrder(createOrderDto).enqueue(new Callback<CreateOrderResponse>() {
             @Override
@@ -173,6 +185,22 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
         });
     }
+    /**
+     * Processes the API response after order submission.
+     *
+     * This method handles the server's response to an order creation request. On successful
+     * order creation, it:
+     * 1. Saves the order details to local preferences
+     * 2. Clears the shopping cart
+     * 3. Navigates to the order details screen
+     * If the response indicates a failure, it displays an error message to the user.
+     *
+     * @param response The Response object containing the server's response to the order
+     *                creation request, including the order details if successful
+     * @param holder The ViewHolder instance containing references to the UI elements needed
+     *              for displaying error messages and accessing the context
+     *
+     */
 
     private void handleOrderResponse(Response<CreateOrderResponse> response, TotalWithInputsViewHolder holder) {
         if (response.isSuccessful() && response.body() != null) {

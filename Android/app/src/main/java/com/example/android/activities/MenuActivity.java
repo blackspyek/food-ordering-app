@@ -107,8 +107,16 @@ public class MenuActivity extends BaseActivity {
         button.setTypeface(null, typefaceStyle);
     }
 
-
-    private void fetchMenuItems(String category) {
+/**
+ * Asynchronously fetches menu items for a specific category from the API.
+ *
+ * This method creates an API service instance and makes an asynchronous call to retrieve
+ * menu items. The response is handled by {@link #handleMenuItemsResponse}.
+ *
+ * @param category The category of menu items to fetch (e.g., "RAMEN", "UDON", etc.)
+ *
+ *  */
+private void fetchMenuItems(String category) {
         ApiService apiService = RetrofitClient.getInstance().create(ApiService.class);
         Call<List<MenuItem>> call = apiService.getMenuItemsByCategory(category);
 
@@ -124,7 +132,19 @@ public class MenuActivity extends BaseActivity {
             }
         });
     }
-
+    /**
+     * Processes the API response containing menu items and updates the UI accordingly.
+     *
+     * This method handles the menu items response by:
+     * 1. Checking for successful response
+     * 2. Filtering available items
+     * 3. Getting the appropriate header title
+     * 4. Updating the adapter with the processed data
+     *
+     * @param response The Response object containing the list of menu items
+     * @param category The category of menu items that was requested
+     *
+     */
     private void handleMenuItemsResponse(Response<List<MenuItem>> response, String category) {
         if (response.isSuccessful() && response.body() != null) {
             List<MenuItem> menuItems = response.body();

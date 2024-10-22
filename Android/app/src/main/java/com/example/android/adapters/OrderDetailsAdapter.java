@@ -64,6 +64,17 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return position == 0 ? VIEW_TYPE_HEADER : VIEW_TYPE_ORDER_DETAIL;
     }
 
+
+    /**
+     * Retrieves previously saved order details from SharedPreferences.
+     *
+     * This method loads stored orders from the device's SharedPreferences and
+     * deserializes them from JSON format using Gson. It then filters the orders
+     * to find matching ones based on the order ID.
+     *
+     * @return A List of CreateOrderResponse objects containing matching order details
+     *
+     */
     private List<CreateOrderResponse> fetchOrderDetails() {
         SharedPreferences preferences = context.getSharedPreferences("user_orders", Context.MODE_PRIVATE);
         String existingOrdersJson = preferences.getString("orders", "[]");
@@ -72,6 +83,16 @@ public class OrderDetailsAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return filterMatchingOrders(orders);
     }
 
+    /**
+     * Filters a list of orders to find those matching the current order ID.
+     *
+     * This method iterates through the provided list of orders and returns
+     * only those that match the orderId field of the current context.
+     *
+     * @param orders The complete list of orders to filter
+     * @return A List of CreateOrderResponse objects containing only the matching orders
+     *
+     */
     private List<CreateOrderResponse> filterMatchingOrders(List<CreateOrderResponse> orders) {
         List<CreateOrderResponse> matchingOrders = new ArrayList<>();
         for (CreateOrderResponse order : orders) {
