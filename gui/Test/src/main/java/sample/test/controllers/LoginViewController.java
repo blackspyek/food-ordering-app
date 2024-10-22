@@ -25,6 +25,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * Controller class for the Login View in a JavaFX application.
+ * Manages user login, authentication with a backend server, and handles navigation.
+ * Upon successful login, the user's JWT token and roles are stored, and the view is redirected.
+ * Implements Initializable to load images and initialize components.
+ */
+
 public class LoginViewController implements Initializable {
 
     @FXML
@@ -40,6 +47,11 @@ public class LoginViewController implements Initializable {
     @FXML
     private PasswordField enterPasswordField;
 
+    /**
+     * Initializes the Login View with branding and lock images.
+     * @param url URL location of the FXML file to load.
+     * @param rb  The resources used to localize the root object.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         Image brandingImage = new Image(Objects.requireNonNull(getClass().getResource("/sample/test/images/logo.png")).toString());
@@ -50,6 +62,12 @@ public class LoginViewController implements Initializable {
 
     }
 
+    /**
+     * Handles the login button action.
+     * Validates the entered username and password, and sends a login request to the backend server.
+     * Displays a message based on the response status code.
+     * @param event The event that triggers the action.
+     */
     public void loginButtonOnAction(ActionEvent event) {
         if (!usernameTextField.getText().isBlank() && !enterPasswordField.getText().isBlank()) {
             loginMessageLabel.setText("You try to login");
@@ -59,11 +77,20 @@ public class LoginViewController implements Initializable {
         }
     }
 
+    /**
+     * Handles the cancel button action.
+     * Closes the current stage.
+     * @param event The event that triggers the action.
+     */
     public void cancelButtonOnAction(ActionEvent event) {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }
 
+    /**
+     * Validates the entered username and password, and sends a login request to the backend server.
+     * Displays a message based on the response status code.
+     */
     public void validateLogin() {
         String username = usernameTextField.getText();
         String password = enterPasswordField.getText();
@@ -81,6 +108,12 @@ public class LoginViewController implements Initializable {
         }
     }
 
+    /**
+     * Handles the login response from the backend server.
+     * Displays a message based on the response status code.
+     * If the login is successful, stores the JWT token and roles, and redirects to the Employee View.
+     * @param response The HTTP response from the backend server.
+     */
     private void handleLoginResponse(HttpResponse<String> response) {
         if (isLoginSuccessful(response)) {
             handleSuccessfulLogin(response);
@@ -91,14 +124,29 @@ public class LoginViewController implements Initializable {
         }
     }
 
+    /**
+     * Checks if the login was successful based on the response status code.
+     * @param response The HTTP response from the backend server.
+     * @return True if the login was successful, false otherwise.
+     */
     private boolean isLoginSuccessful(HttpResponse<String> response) {
         return response.statusCode() == 200;
     }
 
+    /**
+     * Checks if the login was invalid based on the response status code.
+     * @param response The HTTP response from the backend server.
+     * @return True if the login was invalid, false otherwise.
+     */
     private boolean isInvalidLogin(HttpResponse<String> response) {
         return response.statusCode() == 400;
     }
 
+    /**
+     * Handles a successful login response from the backend server.
+     * Extracts the JWT token and roles from the response, stores them, and redirects to the Employee View.
+     * @param response The HTTP response from the backend server.
+     */
     private void handleSuccessfulLogin(HttpResponse<String> response) {
         JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
         JsonObject data = responseObject.getAsJsonObject("data");
@@ -120,20 +168,37 @@ public class LoginViewController implements Initializable {
         }
     }
 
+    /**
+     * Extracts the roles from the response JSON array.
+     * @param rolesArray The JSON array containing the roles.
+     * @return A list of roles extracted from the JSON array.
+     */
     private List<String> extractRolesFromResponse(JsonArray rolesArray) {
         List<String> roles = new ArrayList<>();
         rolesArray.forEach(roleElement -> roles.add(roleElement.getAsString()));
         return roles;
     }
+
+    /**
+     * Closes the current stage.
+     */
     private void closeCurrentStage() {
         Stage loginStage = (Stage) loginMessageLabel.getScene().getWindow();
         loginStage.close();
     }
 
+    /**
+     * Handles an invalid login response from the backend server.
+     * Displays a message indicating that the username or password is invalid.
+     */
     private void handleInvalidLogin() {
         loginMessageLabel.setText("Invalid username or password.");
     }
 
+    /**
+     * Handles an unexpected error response from the backend server.
+     * Displays a message indicating that an unexpected error occurred.
+     */
     private void handleUnexpectedError() {
         loginMessageLabel.setText("Unexpected error. Try again.");
     }

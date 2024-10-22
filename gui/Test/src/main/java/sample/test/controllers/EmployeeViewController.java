@@ -30,6 +30,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+/**
+ * Controller class for managing the employee view in the JavaFX application.
+ * <p>
+ * This controller handles user interactions with the employee management, menu items, and orders sections.
+ * It supports various functionalities such as switching views, editing user and menu item data,
+ * handling order status changes, and downloading reports.
+ * </p>
+ */
+
 public class EmployeeViewController implements Initializable {
 
     @FXML
@@ -69,6 +78,13 @@ public class EmployeeViewController implements Initializable {
     private Long selectedOrderId;
     private Timeline pollingTimeline;
 
+
+    /**
+     * Initializes the employee view by setting up the polling timeline, displaying the user name,
+     * and setting the manager view if the user has manager roles.
+     * It also hides buttons if the user does not have manager roles, initializes the menu and order tables,
+     * and hides the dish and order panes.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupPolling();
@@ -104,6 +120,10 @@ public class EmployeeViewController implements Initializable {
         orderPane.setVisible(false);
     }
 
+
+    /**
+     * Sets the manager view by initializing the user table with user data.
+     */
     private void setManagerView() {
         TableUtils.initTable(userTableView, UserService.getInstance().getUsers(), this::setUserPane,
                 Arrays.asList(new ColumnDefinition<>("ID", "id"),
@@ -113,6 +133,9 @@ public class EmployeeViewController implements Initializable {
 
     }
 
+    /**
+     * Sets up the polling timeline to refresh the orders table every 2 seconds.
+     */
     private void setupPolling() {
         pollingTimeline = new Timeline(
                 new KeyFrame(Duration.millis(2000), _ -> {
@@ -127,6 +150,9 @@ public class EmployeeViewController implements Initializable {
         pollingTimeline.play();
     }
 
+    /**
+     * Hides the buttons if the user does not have manager roles.
+     */
     private void hideButtonsIfNotManager() {
         boolean isManager = UserService.getInstance().getUserRoles().contains("ROLE_MANAGER");
         staffButton.setVisible(isManager);
@@ -138,17 +164,26 @@ public class EmployeeViewController implements Initializable {
 
     }
 
+    /**
+     * Switches the view to the menu, staff, or orders pane based on the button clicked.
+     */
     public void switchPane(ActionEvent event) {
         if (event.getSource() == menuButton) showPane(menuPane);
         else if (event.getSource() == staffButton) showPane(staffPane);
         else showPane(ordersPane);
     }
 
+    /**
+     * Shows the pane based on the pane to show.
+     */
     private void showPane(AnchorPane paneToShow) {
         List<AnchorPane> allPanes = Arrays.asList(menuPane, staffPane, ordersPane);
         allPanes.forEach(pane -> pane.setVisible(pane == paneToShow));
     }
 
+    /**
+     * Sets the user pane with the selected user data.
+     */
     private void setUserPane(User selectedUser) {
         if (selectedUser != null) {
             usernameLabel.setText(selectedUser.getUsername());
@@ -159,11 +194,17 @@ public class EmployeeViewController implements Initializable {
         employeePane.setVisible(true);
     }
 
+    /**
+     * Toggles the user edit and delete buttons based on the visibility.
+     */
     private void toggleUserEditDeleteButtons(boolean isVisible) {
         userEditButton.setVisible(isVisible);
         userDeleteButton.setVisible(isVisible);
     }
 
+    /**
+     * Sets the menu item pane with the selected menu item data.
+     */
     private void setMenuItemPane(MenuItem selectedMenuItem) {
         if (selectedMenuItem != null) {
             menuItemNameLabel.setText(selectedMenuItem.getName());
@@ -175,6 +216,9 @@ public class EmployeeViewController implements Initializable {
         dishPane.setVisible(true);
     }
 
+    /**
+     * Sets the order pane with the selected order data.
+     */
     private void setOrderPane(Order selectedOrder) {
         if (selectedOrder != null) {
             orderBoardCodeTextField.setText(selectedOrder.getBoardCode());
@@ -207,6 +251,9 @@ public class EmployeeViewController implements Initializable {
         orderPane.setVisible(true);
     }
 
+    /**
+     * Handles the user actions based on the button clicked.
+     */
     public void handleUserActions(ActionEvent event) throws IOException {
         if (event.getSource() == userDeleteButton) {
             deleteEntity(selectedUserId, UserService::deleteUser, userTableView, employeePane, UserService.getInstance().getUsers());
@@ -222,6 +269,9 @@ public class EmployeeViewController implements Initializable {
         }
     }
 
+    /**
+     * Handles the menu item actions based on the button clicked.
+     */
     public void changeOrderStatusButtonOnAction(ActionEvent event) throws IOException {
         if (orderStatusChoiceBox.getValue() != null) {
             OrderStatus newStatus = orderStatusChoiceBox.getValue();
@@ -235,6 +285,9 @@ public class EmployeeViewController implements Initializable {
         }
     }
 
+    /**
+     * Handles the menu item actions based on the button clicked.
+     */
     public void handleMenuItemActions(ActionEvent event) throws IOException {
         if (event.getSource() == availabilityToggleButton) {
             toggleMenuItemAvailability();
@@ -254,6 +307,9 @@ public class EmployeeViewController implements Initializable {
 
     }
 
+    /**
+     * Handles the order actions based on the button clicked.
+     */
     public void handleOrderActions(ActionEvent event) throws IOException {
         if (event.getSource() == deleteOrderButton) {
             deleteEntity(selectedOrderId, OrderService::deleteOrder, ordersTableView, orderPane, OrderService.getOrders());
@@ -265,11 +321,16 @@ public class EmployeeViewController implements Initializable {
         }
     }
 
+    /**
+     * Downloads the report based on the button clicked.
+     */
     public void downloadReport(ActionEvent event) {
         reportDownloader.downloadReport(event);
     }
 
-
+    /**
+     * Handles the daily and weekly report actions based on the button clicked.
+     */
     private <T, V> void loadEditForm(String fxml, T id, TableView<V> tableView, AnchorPane pane, List<V> items) throws IOException {
         if (id != null) {
             loadViewAndPassData(fxml, id);
@@ -279,6 +340,9 @@ public class EmployeeViewController implements Initializable {
         }
     }
 
+    /**
+     * Loads the view and passes the data based on the fxml and id.
+     */
     private <T> void loadViewAndPassData(String fxml, T id) throws IOException {
         WindowUtils.loadViewWithControllerAndData(fxml, "Edit " + (id instanceof Integer ? "User" : "Menu Item"), true,
                 staffPane.getScene().getWindow(), true, controller -> {
@@ -296,12 +360,18 @@ public class EmployeeViewController implements Initializable {
                 });
     }
 
+    /**
+     * Loads the add form based on the fxml, table view, pane, and items.
+     */
     private <T> void loadAddForm(String fxml, TableView<T> tableView, AnchorPane pane, List<T> items) throws IOException {
         WindowUtils.loadView(fxml, "Add " + (fxml.contains("user") ? "User" : "Menu Item"), true,
                 staffPane.getScene().getWindow(), true);
         refreshView(tableView, pane, items);
     }
 
+    /**
+     * Deletes the entity based on the id, delete function, table view, pane, and items.
+     */
     private <T, V> void deleteEntity(T id, PredicateWithIOException<T> deleteFunction, TableView<V> tableView, AnchorPane pane, List<V> items) throws IOException {
         if (id != null && deleteFunction.test(id)) {
             refreshView(tableView, pane, items);
@@ -310,6 +380,9 @@ public class EmployeeViewController implements Initializable {
         }
     }
 
+    /**
+     * Sets the menu item availability based on the selected menu item id.
+     */
     private void toggleMenuItemAvailability() throws IOException {
         if (selectedMenuItemId != null) {
             boolean success =  MenuItemService.setMenuItemAvailability(selectedMenuItemId);
@@ -320,11 +393,17 @@ public class EmployeeViewController implements Initializable {
         }
     }
 
+    /**
+     * Refreshes the view based on the table view, pane, and items.
+     */
     private <T> void refreshView(TableView<T> tableView, AnchorPane pane, List<T> items) {
         TableUtils.populateTable(tableView, items);
         pane.setVisible(true);
     }
 
+    /**
+     * Handles the daily and weekly report actions based on the button clicked.
+     */
     public void closeButtonOnAction() {
         if (pollingTimeline != null) {
             pollingTimeline.stop();
@@ -332,10 +411,16 @@ public class EmployeeViewController implements Initializable {
         ((Stage) closeButton.getScene().getWindow()).close();
     }
 
+    /**
+     * Handles the daily and weekly report actions based on the button clicked.
+     */
     private void setAvailabilityButtonText(boolean available) {
         availabilityToggleButton.setText(available ? "Available" : "Unavailable");
     }
 
+    /**
+     * Handles the daily and weekly report actions based on the button clicked.
+     */
     public void signOutButtonOnAction() throws IOException {
         HttpUtils.reloadApp();
     }
