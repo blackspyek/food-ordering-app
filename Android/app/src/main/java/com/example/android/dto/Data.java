@@ -20,4 +20,6 @@ public class Data {
     private String boardCode;
     private String email;
     private List<OrderItem> orderItems;
+
+
 }

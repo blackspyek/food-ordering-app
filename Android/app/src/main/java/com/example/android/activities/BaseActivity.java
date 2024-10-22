@@ -77,7 +77,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void handleBoardAction() {
-        if (!(this instanceof OrderBoardActivity)) {
+        if (!(this instanceof BoardActivity)) {
             openBoardActivity();
         }
     }
@@ -86,8 +86,9 @@ public class BaseActivity extends AppCompatActivity {
         Intent intent = new Intent(this, BasketActivity.class);
         startActivity(intent);
     }
+
     private void openBoardActivity() {
-        Intent intent = new Intent(this, OrderBoardActivity.class);
+        Intent intent = new Intent(this, BoardActivity.class);
         startActivity(intent);
     }
 

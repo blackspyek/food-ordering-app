@@ -71,7 +71,7 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
-        return cartItems.size() + 2;
+        return cartItems.size() + 2; // 2 for header and total with inputs
     }
 
     @Override
@@ -131,6 +131,7 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         hideKeyboard(holder.itemView.getContext(), holder.itemView);
 
         if (isValidInput(name, email, holder)) {
+            holder.errorTextView.setVisibility(View.GONE);
             holder.textViewPleaseWait.setVisibility(View.VISIBLE);
             createOrder(holder, email);
         }
@@ -168,7 +169,7 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             @Override
             public void onFailure(@NonNull Call<CreateOrderResponse> call, @NonNull Throwable t) {
                 holder.textViewPleaseWait.setVisibility(View.GONE);
-                displayError(holder.errorTextView, "Network error: " + t.getMessage());
+                displayError(holder.errorTextView, holder.itemView.getContext().getString(R.string.network_error) + t.getMessage());
             }
         });
     }
@@ -179,18 +180,29 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             clearCart();
             navigateToOrderDetails(holder.itemView.getContext(), response.body().getData().getOrderId());
         } else {
-            displayError(holder.errorTextView, "Failed to create order: " + response.message());
+            displayError(holder.errorTextView, holder.itemView.getContext().getString(R.string.failed_to_create_order) + response.message());
         }
     }
 
     private void saveOrderToPreferences(Context context, CreateOrderResponse orderResponse) {
         SharedPreferences preferences = context.getSharedPreferences("user_orders", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        List<CreateOrderResponse> orders = getExistingOrders(preferences);
 
+        List<CreateOrderResponse> orders = getExistingOrders(preferences);
+        deleteOldestOrderIfNecessary(orders);
         orders.add(orderResponse);
+        saveOrderHistoryList(editor, orders);
+    }
+
+    private void saveOrderHistoryList(SharedPreferences.Editor editor, List<CreateOrderResponse> orders) {
         editor.putString("orders", new Gson().toJson(orders));
         editor.apply();
+    }
+
+    private void deleteOldestOrderIfNecessary(List<CreateOrderResponse> orders) {
+        if (orders.size() >= 10) {
+            orders.remove(0);
+        }
     }
 
     private List<CreateOrderResponse> getExistingOrders(SharedPreferences preferences) {
@@ -249,13 +261,13 @@ public class CheckoutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private void navigateToOrderDetails(Context context, int orderId) {
         Intent intent = new Intent(context, OrderDetailsActivity.class);
-        intent.putExtra("orderId", (long)orderId);
+        intent.putExtra("orderId", (long) orderId);
         context.startActivity(intent);
     }
 
     @SuppressLint("DefaultLocale")
     private void bindItem(CheckoutItemViewHolder holder, int position) {
-        CartItem item = cartItems.get(position - 1);
+        CartItem item = cartItems.get(position - 1); // Adjust for header
         holder.itemTextView.setText(getCheckoutItemText(item));
         holder.itemPriceTextView.setText(String.format(" $%.2f", calculatePrice(item)));
     }
