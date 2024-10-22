@@ -2,18 +2,16 @@ package sample.test.service;
 
 import com.google.gson.Gson;
 import sample.test.dto.UpdateOrderStatusDto;
-import sample.test.dto.UpdateUserDto;
 import sample.test.helpers.OrderResponse;
 import sample.test.helpers.OrdersResponse;
-import sample.test.model.Category;
 import sample.test.model.Order;
 import sample.test.model.OrderItem;
 import sample.test.model.OrderStatus;
 import sample.test.utils.HttpUtils;
 
+import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -32,26 +30,28 @@ public class OrderService {
         }
     }
 
-    private static boolean handleResponse(HttpResponse<String> response, int successCode) {
-        if (response != null && response.statusCode() == successCode) {
+    private static boolean handleResponse(HttpResponse<String> response) throws IOException {
+        HttpUtils.checkIfResponseWasUnauthorized(response);
+        if (response.statusCode() == 200) {
             return true;
         } else {
-            System.out.println("Error: " + (response != null ? response.statusCode() : "No response") +
+            System.out.println("Error: " + response.statusCode() +
                     " for request.");
             return false;
         }
     }
 
-    private static <T> T handleGetResponse(HttpResponse<String> response, Function<String, T> converter) {
-        if (response != null && response.statusCode() == 200) {
+    private static <T> T handleGetResponse(HttpResponse<String> response, Function<String, T> converter) throws IOException {
+        HttpUtils.checkIfResponseWasUnauthorized(response);
+        if (response.statusCode() == 200) {
             return converter.apply(response.body());
         } else {
-            System.out.println("Error: " + (response != null ? response.statusCode() : "No response") + " for GET request.");
+            System.out.println("Error: " + response.statusCode() + " for GET request.");
             return null;
         }
     }
 
-    public static List<Order> getOrders() {
+    public static List<Order> getOrders() throws IOException {
         HttpResponse<String> response = sendHttpRequest(BASE_URL, "GET", null);
         return handleGetResponse(response, body -> HttpUtils.parseJsonResponse(body, OrdersResponse.class).getData());
     }
@@ -73,11 +73,11 @@ public class OrderService {
     }
 
 
-    public static boolean changeOrderStatus(Long orderId, UpdateOrderStatusDto updateOrderStatusDto) {
+    public static boolean changeOrderStatus(Long orderId, UpdateOrderStatusDto updateOrderStatusDto) throws IOException {
         String url = BASE_URL + "/" + orderId + "/status";
         String requestBody = gson.toJson(updateOrderStatusDto);
         HttpResponse<String> response = sendHttpRequest(url, "PUT", requestBody);
-        return handleResponse(response, 200);
+        return handleResponse(response);
     }
 
     public static OrderStatus  convertOrderStatus(String status) {

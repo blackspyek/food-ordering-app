@@ -30,6 +30,7 @@ public class WindowUtils {
         Stage viewStage = new Stage();
         viewStage.setTitle(title);
         viewStage.setScene(new Scene(viewRoot));
+        viewStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
 
         if (isModal) {
             viewStage.initModality(Modality.WINDOW_MODAL);

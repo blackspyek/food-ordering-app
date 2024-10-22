@@ -1,6 +1,9 @@
 package sample.test.utils;
 
 import com.google.gson.Gson;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import sample.test.service.UserService;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -8,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+
 
 public class HttpUtils {
 
@@ -70,5 +74,24 @@ public class HttpUtils {
         int responseCode = response.statusCode();
         return responseCode == HttpURLConnection.HTTP_OK;
     }
+
+    public static boolean checkIfResponseWasUnauthorized(HttpResponse<String> response) throws IOException {
+        int responseCode = response.statusCode();
+        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            UserService.resetInstance();
+            reloadApp();
+            return true;
+        }
+        return false;
+    }
+
+    public static void reloadApp() throws IOException {
+        Stage currentStage = (Stage) Stage.getWindows().stream().filter(Window::isShowing).findFirst().orElse(null);
+        if (currentStage != null) {
+            currentStage.close();
+        }
+        WindowUtils.loadView("login-view.fxml", "Login", false, null, false);
+    }
+
 
 }

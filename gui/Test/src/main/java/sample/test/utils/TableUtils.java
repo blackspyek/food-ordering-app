@@ -25,6 +25,10 @@ public class TableUtils {
             List<ColumnDefinition<T, ?>> columnDefinitions,
             BiConsumer<TableView<T>, List<T>> customInitializer) {
 
+        tableView.getColumns().clear();
+
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         setColumns(tableView, columnDefinitions);
         populateTable(tableView, data);
 
@@ -57,19 +61,6 @@ public class TableUtils {
             tableView.getColumns().add(tableColumn);
         }
     }
-//    public static void initOrderItemsTable(TableView<OrderItem> tableView, List<OrderItem> data) {
-//        List<ColumnDefinition<OrderItem, ?>> columnDefinitions = Arrays.asList(
-//                new ColumnDefinition<>("Item", "item.name"),
-//                new ColumnDefinition<>("Quantity", "quantity"),
-//                new ColumnDefinition<>("Total Price", "totalPrice")
-//        );
-//        setColumns(tableView, columnDefinitions);
-//        populateTable(tableView, data);
-//        TableColumn<OrderItem, String> itemNameColumn = (TableColumn<OrderItem, String>) tableView.getColumns().get(0);
-//        itemNameColumn.setCellValueFactory(cellData -> {
-//            MenuItem menuItem = cellData.getValue().getItem();
-//            return new SimpleStringProperty(menuItem != null ? menuItem.getName() : "Unknown Item");
-//        });
-//    }
+
 
 }

@@ -12,6 +12,7 @@ import sample.test.model.Category;
 import sample.test.model.MenuItem;
 import sample.test.service.MenuItemService;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -48,7 +49,7 @@ public class MenuItemFormViewController implements Initializable {
         pencilImageView.setImage(pencilImage);
     }
 
-    public void setMenuItem(Long menuItemId) {
+    public void setMenuItem(Long menuItemId) throws IOException {
         this.menuItemId = menuItemId;
         menuItem = MenuItemService.getMenuItemById(menuItemId);
         populateFields();
@@ -88,7 +89,7 @@ public class MenuItemFormViewController implements Initializable {
         stage.close();
     }
 
-    public void addItemButtonOnAction(ActionEvent event) {
+    public void addItemButtonOnAction(ActionEvent event) throws IOException {
         if (areFieldsValid()) {
             if (menuItemId == null) {
                 addMenuItem();
@@ -98,13 +99,13 @@ public class MenuItemFormViewController implements Initializable {
         }
     }
 
-    private void editMenuItem() {
+    private void editMenuItem() throws IOException {
         MenuItemDto menuItemDto = createMenuItemDto();
         boolean success = MenuItemService.updateMenuItem(menuItemDto, menuItemId);
         displayResultMessage(success, "updated");
     }
 
-    private void addMenuItem() {
+    private void addMenuItem() throws IOException {
         MenuItemDto menuItemDto = createMenuItemDto();
         boolean success = MenuItemService.addMenuItem(menuItemDto);
         displayResultMessage(success, "added");

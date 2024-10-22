@@ -30,12 +30,10 @@ public class EditUserViewController implements Initializable {
     private ChoiceBox<String> roleChoiceBox;
     @FXML
     private Button closeButton;
-    @FXML
-    private Button editButton;
 
     private Integer userId;
     private User user;
-    private String[] roles = {"ROLE_MANAGER", "ROLE_EMPLOYEE"};
+    private final String[] roles = {"ROLE_MANAGER", "ROLE_EMPLOYEE"};
 
 
     public void initialize(URL url, ResourceBundle rb) {
@@ -48,7 +46,7 @@ public class EditUserViewController implements Initializable {
     }
 
     private void setUserRole() {
-        roleChoiceBox.setValue(user.getRoles().get(0));
+        roleChoiceBox.setValue(user.getRoles().getFirst());
     }
 
     private void setImage() {
