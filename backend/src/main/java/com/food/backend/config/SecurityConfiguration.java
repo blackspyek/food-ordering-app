@@ -36,9 +36,13 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/api/menu/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/menu").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/menu/available").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/menu/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/menu/category/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/menu/name/{name}").permitAll()
                         .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/api/orders/{orderId}/status").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/{orderId}/status").permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -46,7 +50,7 @@ public class SecurityConfiguration {
                                 "/swagger-resources/configuration/ui",
                                 "/swagger-resources/configuration/security"
                         ).permitAll()
-                        .requestMatchers("/api/orders").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
