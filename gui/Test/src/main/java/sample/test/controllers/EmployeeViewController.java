@@ -41,6 +41,8 @@ public class EmployeeViewController implements Initializable {
     @FXML
     private Button userEditButton, userDeleteButton, userAddButton;
     @FXML
+    private Button deleteOrderButton, changeOrderStatusButton;
+    @FXML
     private Button menuItemEditButton, menuItemDeleteButton, menuItemAddButton;
     @FXML
     private ChoiceBox<OrderStatus> orderStatusChoiceBox;
@@ -195,6 +197,12 @@ public class EmployeeViewController implements Initializable {
                             return new SimpleStringProperty(menuItem != null ? menuItem.getName() : "Unknown Item");
                         });
                     });
+        } else {
+            orderBoardCodeTextField.setText("");
+            orderTypeTextField.setText("");
+            totalAmountTextField.setText("");
+            orderStatusChoiceBox.setValue(null);
+            orderItemsTableView.getItems().clear();
         }
         orderPane.setVisible(true);
     }
@@ -244,6 +252,17 @@ public class EmployeeViewController implements Initializable {
             refreshView(menuTableView, dishPane, MenuItemService.getMenuItems());
         }
 
+    }
+
+    public void handleOrderActions(ActionEvent event) throws IOException {
+        if (event.getSource() == deleteOrderButton) {
+            deleteEntity(selectedOrderId, OrderService::deleteOrder, ordersTableView, orderPane, OrderService.getOrders());
+            refreshView(ordersTableView, orderPane, OrderService.getOrders());
+            selectedOrderId = null;
+            setOrderPane(null);
+        } else if (event.getSource() == changeOrderStatusButton) {
+            changeOrderStatusButtonOnAction(event);
+        }
     }
 
     public void downloadReport(ActionEvent event) {

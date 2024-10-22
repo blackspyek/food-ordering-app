@@ -80,6 +80,12 @@ public class OrderService {
         return handleResponse(response);
     }
 
+    public static boolean deleteOrder(Long orderId) throws IOException {
+        String url = BASE_URL + "/" + orderId;
+        HttpResponse<String> response = sendHttpRequest(url, "DELETE", null);
+        return handleResponse(response);
+    }
+
     public static OrderStatus  convertOrderStatus(String status) {
         try {
             return OrderStatus.valueOf(status);

@@ -13,6 +13,28 @@ import java.util.function.Consumer;
 
 public class WindowUtils {
 
+    private static double xOffset = 0;
+    private static double yOffset = 0;
+
+    /**
+     * Makes the given viewRoot draggable.
+     *
+     * @param viewRoot The root node of the view.
+     * @param viewStage The stage that contains the view.
+     */
+    private static void makeWindowDraggable(Parent viewRoot, Stage viewStage) {
+        viewRoot.setOnMousePressed(event -> {
+            xOffset = event.getSceneX();
+            yOffset = event.getSceneY();
+        });
+
+        viewRoot.setOnMouseDragged(event -> {
+            viewStage.setX(event.getScreenX() - xOffset);
+            viewStage.setY(event.getScreenY() - yOffset);
+        });
+    }
+
+
     /**
      * Loads a view into a new Stage, with options for modals and owners.
      *
@@ -31,6 +53,8 @@ public class WindowUtils {
         viewStage.setTitle(title);
         viewStage.setScene(new Scene(viewRoot));
         viewStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+        makeWindowDraggable(viewRoot, viewStage);
 
         if (isModal) {
             viewStage.initModality(Modality.WINDOW_MODAL);
@@ -57,6 +81,8 @@ public class WindowUtils {
         Stage viewStage = new Stage();
         viewStage.setTitle(title);
         viewStage.setScene(new Scene(viewRoot));
+
+        makeWindowDraggable(viewRoot, viewStage);
 
         if (isModal) {
             viewStage.initModality(Modality.WINDOW_MODAL);
