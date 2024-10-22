@@ -13,6 +13,23 @@ import sample.test.helpers.UserResponse;
 import java.net.http.HttpResponse;
 import java.util.List;
 
+/**
+ * Singleton service class responsible for handling operations related to the user management in the application.
+ * This class provides functionality for fetching users, updating user details, and deleting users by interacting
+ * with the backend API. It also stores the current logged-in user's username and roles.
+ * <p>
+ * The class integrates with external services such as the JwtTokenService for authorization tokens
+ * and HttpUtils for sending HTTP requests to the backend API. JSON responses are parsed using Gson.
+ * <p>
+ * It includes methods to:
+ * - Get a list of users.
+ * - Fetch user details by user ID.
+ * - Update user information.
+ * - Delete a user by user ID.
+ * <p>
+ * It also follows the singleton design pattern, ensuring only one instance of UserService exists.
+ */
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -21,6 +38,9 @@ public class UserService {
     private String username;
     private List<String> userRoles;
 
+    /**
+     * Private constructor to prevent instantiation of the class from outside.
+     */
     public static UserService getInstance() {
         if (instance == null) {
             instance = new UserService();
@@ -28,10 +48,18 @@ public class UserService {
         return instance;
     }
 
+    /**
+     * Method to reset the instance of the UserService class.
+     */
     public static void resetInstance() {
         instance = null;
     }
 
+    /**
+     * Method to fetch the list of users from the backend API.
+     *
+     * @return List of User objects.
+     */
     public List<User> getUsers() {
         try {
             String url = "http://localhost:8080/users/";
@@ -50,6 +78,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Method to fetch user details by user ID from the backend API.
+     *
+     * @param userId - Integer value representing the user ID.
+     * @return User object.
+     */
     public User getUserById(Integer userId) {
         try {
             String url = "http://localhost:8080/users/" + userId;
@@ -67,6 +101,13 @@ public class UserService {
         }
     }
 
+    /**
+     * Method to update user details by user ID using the backend API.
+     *
+     * @param userId         - Integer value representing the user ID.
+     * @param updateUserDto - UpdateUserDto object containing the updated user details.
+     * @return boolean value indicating the success of the operation.
+     */
     public boolean updateUser(Integer userId, UpdateUserDto updateUserDto) {
         try {
             String url = "http://localhost:8080/users/" + userId;
@@ -89,6 +130,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Method to delete a user by user ID using the backend API.
+     *
+     * @param userId - Integer value representing the user ID.
+     * @return boolean value indicating the success of the operation.
+     */
     public static boolean deleteUser(Integer userId) {
         try {
             String url = "http://localhost:8080/users/" + userId;

@@ -15,6 +15,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Service class responsible for managing orders in the application.
+ * <p>
+ * This class interacts with the backend API to perform various operations related to orders, including
+ * retrieving orders, getting order items, changing order status, and deleting orders. It handles HTTP
+ * requests and responses using utility methods from the HttpUtils class, and utilizes Gson for JSON
+ * serialization and deserialization.
+ * <p>
+ * Key responsibilities include:
+ * - Sending HTTP requests to the backend API for order operations.
+ * - Handling API responses, including checking for unauthorized access and converting response bodies
+ *   to Java objects.
+ * - Providing methods to convert order status strings into enum values.
+ * <p>
+ * This class employs a singleton pattern for the JwtTokenService to ensure that the JWT token is sent with
+ * each request for authentication.
+ */
 public class OrderService {
 
     private static final String BASE_URL = "http://localhost:8080/api/orders";
