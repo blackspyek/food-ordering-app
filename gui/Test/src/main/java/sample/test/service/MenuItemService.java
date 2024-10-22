@@ -68,7 +68,7 @@ public class MenuItemService {
     public static boolean addMenuItem(MenuItemDto menuItemDto) throws IOException {
         String requestBody = gson.toJson(menuItemDto);
         HttpResponse<String> response = sendHttpRequest(BASE_URL, "POST", requestBody);
-        return handleResponse(response, 201);
+        return handleResponse(response, 200);
     }
 
     public static boolean updateMenuItem(MenuItemDto menuItemDto, Long id) throws IOException {
@@ -84,7 +84,7 @@ public class MenuItemService {
 
     public static boolean deleteMenuItem(Long id) throws IOException {
         HttpResponse<String> response = sendHttpRequest(BASE_URL + id, "DELETE", null);
-        return handleResponse(response, 204);
+        return handleResponse(response, 200);
     }
 
     public static Category convertCategory(String category) {

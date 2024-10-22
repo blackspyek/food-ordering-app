@@ -202,10 +202,15 @@ public class EmployeeViewController implements Initializable {
     public void handleUserActions(ActionEvent event) throws IOException {
         if (event.getSource() == userDeleteButton) {
             deleteEntity(selectedUserId, UserService::deleteUser, userTableView, employeePane, UserService.getInstance().getUsers());
+            refreshView(userTableView, employeePane, UserService.getInstance().getUsers());
+            employeePane.setVisible(false);
         } else if (event.getSource() == userEditButton) {
             loadEditForm("edit-user-view.fxml", selectedUserId, userTableView, employeePane, UserService.getInstance().getUsers());
+            refreshView(userTableView, employeePane, UserService.getInstance().getUsers());
+            employeePane.setVisible(false);
         } else if (event.getSource() == userAddButton) {
             loadAddForm("register-view.fxml", userTableView, employeePane, UserService.getInstance().getUsers());
+            refreshView(userTableView, employeePane, UserService.getInstance().getUsers());
         }
     }
 
@@ -216,6 +221,7 @@ public class EmployeeViewController implements Initializable {
             boolean success = OrderService.changeOrderStatus(selectedOrderId, updateOrderStatusDto);
             if (success) System.out.println("Order status updated successfully.");
             refreshView(ordersTableView, orderPane, OrderService.getOrders());
+            orderPane.setVisible(false);
         } else {
             System.out.println("No order status selected.");
         }
@@ -224,12 +230,18 @@ public class EmployeeViewController implements Initializable {
     public void handleMenuItemActions(ActionEvent event) throws IOException {
         if (event.getSource() == availabilityToggleButton) {
             toggleMenuItemAvailability();
+            dishPane.setVisible(false);
         } else if (event.getSource() == menuItemDeleteButton) {
             deleteEntity(selectedMenuItemId, MenuItemService::deleteMenuItem, menuTableView, dishPane, MenuItemService.getMenuItems());
+            refreshView(menuTableView, dishPane, MenuItemService.getMenuItems());
+            dishPane.setVisible(false);
         } else if (event.getSource() == menuItemEditButton) {
             loadEditForm("menu-item-form-view.fxml", selectedMenuItemId, menuTableView, dishPane, MenuItemService.getMenuItems());
+            refreshView(menuTableView, dishPane, MenuItemService.getMenuItems());
+            dishPane.setVisible(false);
         } else if (event.getSource() == menuItemAddButton) {
             loadAddForm("menu-item-form-view.fxml", menuTableView, dishPane, MenuItemService.getMenuItems());
+            refreshView(menuTableView, dishPane, MenuItemService.getMenuItems());
         }
 
     }
