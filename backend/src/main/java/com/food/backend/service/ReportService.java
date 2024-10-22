@@ -8,6 +8,7 @@ import com.food.backend.model.Enums.OrderStatus;
 import com.food.backend.repository.OrderRepository;
 import com.food.backend.utils.other.DateRange;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReportService {
@@ -42,11 +44,13 @@ public class ReportService {
     }
 
     private ReportDto generateReportData(DateRange dateRange) {
+        log.info("Generating report for date range: {}", dateRange);
+        log.info("Fetching report data from database" + getCompletedOrdersCount(dateRange).toString());
         return ReportDto.builder()
                 .totalOrders(getCompletedOrdersCount(dateRange))
                 .totalAmount(getTotalSalesAmount(dateRange))
                 .averageAmount(getAverageSalesAmount(dateRange))
-                .salesByCategory(getCategorySales())
+                .salesByCategory(getCategorySales(dateRange))
                 .build();
     }
 
@@ -74,8 +78,8 @@ public class ReportService {
         );
     }
 
-    private Map<String, Number> getCategorySales() {
-        List<Object[]> categorySalesData = orderRepository.countItemsSoldByCategory(OrderStatus.PICKED_UP);
+    private Map<String, Number> getCategorySales(DateRange dateRange) {
+        List<Object[]> categorySalesData = orderRepository.countItemsSoldByCategory(OrderStatus.PICKED_UP, dateRange.start(), dateRange.end());
         Map<String, Number> categorySalesMap = new HashMap<>();
 
         for (Object[] result : categorySalesData) {
