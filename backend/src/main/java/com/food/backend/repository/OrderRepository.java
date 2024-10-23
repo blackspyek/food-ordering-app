@@ -21,6 +21,10 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
     @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems")
     List<Order> findAllWithItems();
 
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems ORDER BY o.orderId DESC")
+    List<Order> findAllWithItemsOrderByOrderId();
+
+
     Number countOrderByOrderTimeBetweenAndStatus(LocalDateTime start, LocalDateTime end, OrderStatus status);
     @Query("SELECT AVG(o.totalPrice) FROM Order o WHERE o.orderTime BETWEEN :start AND :end AND o.status = :status")
     Double averageTotalPriceByOrderTimeBetweenAndStatus(

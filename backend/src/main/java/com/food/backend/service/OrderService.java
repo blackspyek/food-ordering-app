@@ -139,7 +139,7 @@ public class OrderService {
     }
 
     public List<Order> getAllOrdersWithItems() {
-        return orderRepository.findAllWithItems();
+        return orderRepository.findAllWithItemsOrderByOrderId();
     }
 
 
