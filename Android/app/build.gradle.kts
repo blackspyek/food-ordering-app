@@ -1,6 +1,7 @@
 plugins {
     //id("com.android.application") version "8.2.2"
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -40,6 +41,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.recyclerview)
     implementation(libs.cardview)
+    implementation(libs.firebase.messaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -50,6 +52,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.rxjava)
     implementation(libs.rxandroid)
+    implementation(libs.firebase.bom)
 
     compileOnly ("org.projectlombok:lombok:1.18.34")
     annotationProcessor ("org.projectlombok:lombok:1.18.34")

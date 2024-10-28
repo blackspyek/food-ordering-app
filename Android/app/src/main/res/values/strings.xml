@@ -44,4 +44,6 @@
     <string name="failed_to_create_order">"Failed to create order: "</string>
     <string name="network_error">"Network error: "</string>
     <string name="no_orders_available">Empty order history</string>
+    <string name="msg_subscribed">Succesfully subscribed to topic</string>
+    <string name="msg_subscribe_failed">Subscription failed</string>
 </resources>
