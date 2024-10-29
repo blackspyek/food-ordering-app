@@ -2,6 +2,7 @@ package sample.test.controllers;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -10,7 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.util.Duration;
+import sample.test.dto.NotificationRequestDto;
 import sample.test.dto.UpdateOrderStatusDto;
 import sample.test.helpers.ColumnDefinition;
 import sample.test.model.*;
@@ -29,6 +30,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static sample.test.utils.NotificationUtils.sendNotification;
 
 /**
  * Controller class for managing the employee view in the JavaFX application.
@@ -41,8 +47,9 @@ import java.util.ResourceBundle;
 
 public class EmployeeViewController implements Initializable {
 
+
     @FXML
-    private Button dailyButton, weeklyButton;
+    private Button dailyButton, weeklyButton, sendNotificationPaneButton;;
     @FXML
     private AnchorPane menuPane, staffPane, ordersPane, employeePane, dishPane, orderPane, navPane;
     @FXML
@@ -72,11 +79,24 @@ public class EmployeeViewController implements Initializable {
     @FXML
     private TableView<OrderItem> orderItemsTableView;
 
+    @FXML
+    private AnchorPane notificationPane;
+    @FXML
+    private TextField notificationTitleField;
+    @FXML
+    private TextField notificationBodyField;
+    @FXML
+    private TextField notificationImageField;
+    @FXML
+    private Label notificationResponseLabel;
+    @FXML
+    private Button sendNotificationButton;
+
     private Integer selectedUserId;
     private Long selectedMenuItemId;
     private ReportDownloader reportDownloader;
     private Long selectedOrderId;
-    private Timeline pollingTimeline;
+    private ScheduledExecutorService scheduler;
 
 
     /**
@@ -90,6 +110,7 @@ public class EmployeeViewController implements Initializable {
         setupPolling();
         userNameLabel.setText(UserService.getInstance().getUsername());
         showPane(ordersPane);
+        setupValidationListeners();
         reportDownloader = new ReportDownloader(navPane);
 
         if (UserService.getInstance().getUserRoles().contains("ROLE_MANAGER")) {
@@ -137,17 +158,19 @@ public class EmployeeViewController implements Initializable {
      * Sets up the polling timeline to refresh the orders table every 2 seconds.
      */
     private void setupPolling() {
-        pollingTimeline = new Timeline(
-                new KeyFrame(Duration.millis(2000), _ -> {
-                    try {
-                        refreshView(ordersTableView, orderPane, OrderService.getOrders());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-        );
-        pollingTimeline.setCycleCount(Timeline.INDEFINITE);
-        pollingTimeline.play();
+        scheduler = Executors.newScheduledThreadPool(1);
+
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                var orders = OrderService.getOrders();
+
+                Platform.runLater(() -> refreshView(ordersTableView, orderPane, orders));
+            } catch (IOException e) {
+                Platform.runLater(() -> {
+                    throw new RuntimeException(e);
+                });
+            }
+        }, 0, 2, TimeUnit.SECONDS);
     }
 
     /**
@@ -161,7 +184,7 @@ public class EmployeeViewController implements Initializable {
         menuItemAddButton.setVisible(isManager);
         menuItemDeleteButton.setVisible(isManager);
         menuItemEditButton.setVisible(isManager);
-
+        sendNotificationPaneButton.setVisible(isManager);
     }
 
     /**
@@ -177,7 +200,7 @@ public class EmployeeViewController implements Initializable {
      * Shows the pane based on the pane to show.
      */
     private void showPane(AnchorPane paneToShow) {
-        List<AnchorPane> allPanes = Arrays.asList(menuPane, staffPane, ordersPane);
+        List<AnchorPane> allPanes = Arrays.asList(menuPane, staffPane, ordersPane, notificationPane);
         allPanes.forEach(pane -> pane.setVisible(pane == paneToShow));
     }
 
@@ -327,7 +350,133 @@ public class EmployeeViewController implements Initializable {
     public void downloadReport(ActionEvent event) {
         reportDownloader.downloadReport(event);
     }
+    /**
+     * Displays the notification pane.
+     */
 
+    @FXML
+    public void sendNotif(ActionEvent event) {
+        showPane(notificationPane);
+    }
+
+    /**
+     * Handles the send notification action based on the button clicked.
+     */
+
+    @FXML
+    public void handleSendNotification(ActionEvent event) {
+        if (!validateNotificationFields()) {
+            return;
+        }
+        String title = notificationTitleField.getText();
+        String body = notificationBodyField.getText();
+        String image = notificationImageField.getText();
+
+        NotificationRequestDto notificationRequestDto = new NotificationRequestDto(title, body, image);
+        try {
+            String response = sendNotification("News", notificationRequestDto);
+
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Notification sent successfully:\n" + response);
+
+            notificationTitleField.clear();
+            notificationBodyField.clear();
+            notificationImageField.clear();
+
+            Timeline timeline = new Timeline(
+                    new KeyFrame(
+                            javafx.util.Duration.seconds(5),
+                            ae -> notificationResponseLabel.setText("")
+                    )
+            );
+            timeline.play();
+
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to send notification:\n" + e.getMessage());
+        }
+
+
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        alert.showAndWait();
+    }
+
+    private boolean validateNotificationFields() {
+        StringBuilder errorMessage = new StringBuilder();
+        boolean isValid = true;
+
+        // Check for empty fields
+        if (notificationTitleField.getText().trim().isEmpty()) {
+            errorMessage.append("Title cannot be empty\n");
+            notificationTitleField.setStyle("-fx-border-color: red;");
+            isValid = false;
+        } else {
+            notificationTitleField.setStyle("");
+        }
+
+        if (notificationBodyField.getText().trim().isEmpty()) {
+            errorMessage.append("Body cannot be empty\n");
+            notificationBodyField.setStyle("-fx-border-color: red;");
+            isValid = false;
+        } else {
+            notificationBodyField.setStyle("");
+        }
+
+        // Check if image URL is not empty and starts with http:// or https://
+        String imageUrl = notificationImageField.getText().trim();
+        if (!imageUrl.isEmpty()) {
+            if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+                errorMessage.append("Image URL must start with http:// or https://\n");
+                notificationImageField.setStyle("-fx-border-color: red;");
+                isValid = false;
+            } else {
+                notificationImageField.setStyle("");
+            }
+        } else {
+            errorMessage.append("Image URL cannot be empty\n");
+            notificationImageField.setStyle("-fx-border-color: red;");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            notificationResponseLabel.setStyle("-fx-text-fill: red;");
+            notificationResponseLabel.setText(errorMessage.toString());
+        }
+
+        return isValid;
+    }
+
+    // Add these methods to clear validation styling
+    private void clearValidationStyles() {
+        notificationTitleField.setStyle("");
+        notificationBodyField.setStyle("");
+        notificationImageField.setStyle("");
+        notificationResponseLabel.setText("");
+    }
+
+    // Add these field listeners in your initialize method
+    private void setupValidationListeners() {
+        // Add listeners to clear red border when user starts typing
+        notificationTitleField.textProperty().addListener((observable, oldValue, newValue) -> {
+            notificationTitleField.setStyle("");
+            notificationResponseLabel.setText("");
+        });
+
+        notificationBodyField.textProperty().addListener((observable, oldValue, newValue) -> {
+            notificationBodyField.setStyle("");
+            notificationResponseLabel.setText("");
+        });
+
+        notificationImageField.textProperty().addListener((observable, oldValue, newValue) -> {
+            notificationImageField.setStyle("");
+            notificationResponseLabel.setText("");
+        });
+    }
     /**
      * Handles the daily and weekly report actions based on the button clicked.
      */
@@ -400,14 +549,20 @@ public class EmployeeViewController implements Initializable {
         TableUtils.populateTable(tableView, items);
         pane.setVisible(true);
     }
+    /**
+     * Stops polling when it's no longer needed.
+     */
+    private void stopPolling() {
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
+        }
+    }
 
     /**
      * Handles the daily and weekly report actions based on the button clicked.
      */
     public void closeButtonOnAction() {
-        if (pollingTimeline != null) {
-            pollingTimeline.stop();
-        }
+        stopPolling();
         ((Stage) closeButton.getScene().getWindow()).close();
     }
 
