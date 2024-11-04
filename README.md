@@ -22,7 +22,7 @@ Welcome to the **Food Ordering App**! This project is designed to streamline the
   
 - **Frontend**: 
   - JavaFX (for the employee interface)
-  - Android (for the customer application)
+  - Android (for the customer application) API 35
 
 ## Getting Started
 
