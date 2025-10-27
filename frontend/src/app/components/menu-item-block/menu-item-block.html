@@ -1,0 +1,32 @@
+@if (bestSeller()) {
+  <div
+    class="absolute top-1 left-4 text-white bg-[#8fa704] font-bold px-2 py-1 rounded-md text-xs md:text-sm tracking-wider z-10"
+  >
+    Best Seller
+  </div>
+}
+@if (photoUrl()) {
+  <img [src]="photoUrl()" [alt]="name()" class="responsive md:rounded-lg mt-4 md:mt-0" />
+} @else {
+  <div class=""></div>
+}
+
+<p class="responsive block">
+  {{ name() }}
+</p>
+
+<p
+  class="font-medium text-xl"
+  [class.text-white]="bestSeller()"
+  [class.rounded-md]="bestSeller()"
+  [class.p-2]="bestSeller()"
+  [class.bg-red-600]="bestSeller()"
+>
+  {{ price() | currency: 'USD' }}
+</p>
+
+<button
+  class="absolute bottom-4 right-4 w-8 h-8 md:w-[2vw] md:h-[2vw] md:min-w-8 md:min-h-8 rounded-full shadow-lg bg-sky-100 flex items-center justify-center cursor-pointer z-20 hover:bg-creeme-300 transition-colors duration-150"
+>
+  <mat-icon fontIcon="add" class="text-gray-800"></mat-icon>
+</button>

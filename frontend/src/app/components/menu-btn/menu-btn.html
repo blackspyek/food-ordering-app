@@ -1,0 +1,20 @@
+<a class="flex w-full items-center gap-3 font-normal rounded-lg
+    hover:bg-orange-600 hover:text-white hover:font-semibold hover:-translate-y-1 hover:shadow-lg
+    focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-75
+    transition-all duration-200 ease-in-out
+
+    p-2 text-xs
+
+    md:p-3 md:text-sm
+
+    lg:px-4 lg:py-3 lg:text-base
+"
+   [class]="is_highlighted() ? 'outline-2 outline-orange-300' : '' "
+   [routerLink]="href()">
+
+  <div class="flex" [class]="is_highlighted() ? 'text-orange-300' : '' ">
+    <mat-icon aria-hidden="true" [fontIcon]="icon()"></mat-icon>
+  </div>
+
+  <span>{{ label() }}</span>
+</a>

@@ -25,11 +25,14 @@ public class UserService {
     }
 
     public Optional<User> findUserById(Long id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         return userRepository.findById(id);
     }
 
     public User findUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
+        return userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
     }
     public Optional<User> deleteUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
@@ -42,7 +45,7 @@ public class UserService {
         return user;
     }
     private void updateFieldsOfUserEntityWithUserDto(UserDto userDto, User userToUpdate) throws EntityNotFoundException {
-        userToUpdate.setUsername(userDto.getUserName());
+        userToUpdate.setEmail(userDto.getEmail());
         userToUpdate.setRoles(userDto.getRoles());
         userRepository.save(userToUpdate);
     }

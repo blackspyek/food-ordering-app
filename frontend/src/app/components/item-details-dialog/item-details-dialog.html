@@ -1,0 +1,37 @@
+<div class="flex flex-col gap-4 max-w-md w-full">
+  <h2 mat-dialog-title class="text-2xl font-bold min-w-0 truncate">{{ item.name }}</h2>
+
+  <mat-dialog-content class="flex flex-col gap-4 items-center">
+    @if (item.photoUrl) {
+      <img [src]="item.photoUrl" [alt]="item.name" class="w-full h-48 object-cover rounded-lg" />
+    } @else {
+      <div class="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+        <mat-icon>image_not_supported</mat-icon>
+      </div>
+    }
+
+    <p class="font-light text-center text-normal pt-4 pb-4">
+      {{ item.description }}
+    </p>
+
+    <p class="text-3xl font-light text-primary text-center">
+      {{ item.price | currency: 'USD' }}
+    </p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="pt-6 space-x-2">
+    <button
+      (click)="onClose()"
+      class="btn-secondary py-2 px-4 rounded-md font-medium text-gray-700 hover:bg-gray-100 cursor-pointer"
+    >
+      Anuluj
+    </button>
+
+    <button
+      (click)="addToCart()"
+      class="btn-primary py-2 px-4 rounded-md font-bold text-white hover:bg-gray-100 cursor-pointer"
+    >
+      Dodaj do koszyka
+    </button>
+  </mat-dialog-actions>
+</div>

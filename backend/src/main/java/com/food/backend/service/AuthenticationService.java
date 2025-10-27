@@ -12,8 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class AuthenticationService {
@@ -29,30 +31,32 @@ public class AuthenticationService {
 
     @Transactional
     public Optional<User> registerUser(RegisterUserDto registerUserDto) {
-        validateUserDoesNotExist(registerUserDto.getUsername());
+        validateUserDoesNotExist(registerUserDto.getEmail());
 
         User user = createUser(registerUserDto);
         User savedUser = userRepository.save(user);
 
         return Optional.of(savedUser);
     }
-    private void validateUserDoesNotExist(String username) {
-        if (findByUsername(username.toLowerCase()).isPresent()) {
+    private void validateUserDoesNotExist(String email) {
+        if (findByEmail(email.toLowerCase()).isPresent()) {
             throw new IllegalArgumentException("User already exists");
         }
     }
 
     private User createUser(RegisterUserDto registerUserDto) {
         User user = new User();
-        user.setUsername(registerUserDto.getUsername().toLowerCase());
+        user.setEmail(registerUserDto.getEmail().toLowerCase());
+        user.setName(registerUserDto.getName());
+        user.setPhoneNumber(registerUserDto.getPhone());
         user.setPassword(passwordEncoder.encode(registerUserDto.getPassword()));
-        user.setRoles(Set.of(Role.ROLE_EMPLOYEE));
+        user.setRoles(Set.of(Role.ROLE_USER));
         user.setEnabled(true);
         return user;
     }
     @Transactional
-    public Optional<User> changeRoles(String username, Set<Role> roles) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
+    public Optional<User> changeRoles(String email, Set<Role> roles) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setRoles(roles);
@@ -61,22 +65,57 @@ public class AuthenticationService {
         return Optional.empty();
     }
     public User authenticate(LoginUserDto loginUserDto) {
-        User user = userRepository.findByUsername(loginUserDto.getUsername())
+        User user = userRepository.findByEmail(loginUserDto.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         if (!user.isEnabled())
             throw new RuntimeException("User is disabled");
 
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginUserDto.getUsername(), loginUserDto.getPassword())
+                new UsernamePasswordAuthenticationToken(loginUserDto.getEmail(), loginUserDto.getPassword())
         );
 
         return user;
     }
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
+    @Transactional
+    public String generatePasswordResetToken(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email.toLowerCase());
+        if (userOptional.isEmpty()) {
+            return null;
+        }
 
+        User user = userOptional.get();
+        String token = UUID.randomUUID().toString();
+        user.setPasswordResetToken(token);
+        user.setPasswordResetTokenExpiry(LocalDateTime.now().plusHours(1));
+        userRepository.save(user);
+
+        return token;
+    }
+
+    @Transactional
+    public boolean resetPassword(String token, String newPassword) {
+        Optional<User> userOptional = userRepository.findByPasswordResetToken(token);
+        if (userOptional.isEmpty()) {
+            return false;
+        }
+
+        User user = userOptional.get();
+        if (user.getPasswordResetTokenExpiry() == null || 
+            user.getPasswordResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiry(null);
+        userRepository.save(user);
+
+        return true;
+    }
 
 }

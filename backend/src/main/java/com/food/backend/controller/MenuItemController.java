@@ -29,7 +29,7 @@ public class MenuItemController {
         this.menuItemService = menuItemService;
     }
 
-    @GetMapping("/")
+    @GetMapping()
     @Operation(
             summary = "Get all menu items",
             description = "Retrieves a list of all menu items in the system"
@@ -81,9 +81,15 @@ public class MenuItemController {
     )
     @ApiResponse(responseCode = "200", description = "Successfully retrieved menu items for the category")
     public ResponseEntity<List<MenuItem>> getMenuItemsByCategory(
-            @PathVariable("category") Category category
+            @PathVariable("category") String category
     ) {
-        return ResponseEntity.ok(menuItemService.findByCategory(category));
+        Category cat;
+        try {
+            cat = Category.valueOf(category.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(menuItemService.findByCategory(cat));
     }
 
     @GetMapping("/name/{name}")

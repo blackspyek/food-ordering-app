@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -20,14 +21,19 @@ import java.util.List;
 @Schema(description = "Entity representing an order")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(description = "Unique identifier of the order", example = "1001")
-    private Long orderId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Schema(description = "Unique identifier of the order", example = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+    private UUID orderId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "prepared_by_user_id", nullable = true)
     @Schema(description = "Employee who prepared the order")
     private User preparedBy;
+
+    @ManyToOne
+    @JoinColumn(name = "ordered_by_user_id", nullable = true)
+    @Schema(description = "Customer who placed the order")
+    private User orderedBy;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -54,6 +60,10 @@ public class Order {
     @Column(name = "email", nullable = false)
     @Schema(description = "Email of the customer", example = "customer@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
+
+    @Column(name = "name", nullable = false)
+    @Schema(description = "Name of the customer", example = "Joan", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String name;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Schema(description = "List of items in the order")

@@ -16,6 +16,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +31,8 @@ class EmailServiceTest {
     private MimeMessage mimeMessage;
 
     private EmailService emailService;
+    private static final UUID ORDER_ID = UUID.randomUUID();
+
 
     @BeforeEach
     void setUp() {
@@ -109,7 +112,7 @@ class EmailServiceTest {
     // Helper methods to create test data
     private OrderDto createSampleOrder() {
         OrderDto order = new OrderDto();
-        order.setOrderId(123L);
+        order.setOrderId(ORDER_ID);
         order.setOrderTime(LocalDateTime.now());
         order.setBoardCode("42");
 
@@ -124,7 +127,7 @@ class EmailServiceTest {
 
     private OrderDto createMultipleItemOrder() {
         OrderDto order = new OrderDto();
-        order.setOrderId(456L);
+        order.setOrderId(ORDER_ID);
         order.setOrderTime(LocalDateTime.now());
         order.setBoardCode("43");
 
@@ -144,7 +147,7 @@ class EmailServiceTest {
 
     private OrderDto createEmptyOrder() {
         OrderDto order = new OrderDto();
-        order.setOrderId(123L);
+        order.setOrderId(ORDER_ID);
         order.setOrderTime(LocalDateTime.now());
         order.setBoardCode("44");
         order.setOrderItems(List.of());

@@ -1,0 +1,22 @@
+@use 'variables';
+
+.orderNumber {
+  background-color: variables.$base-orange;
+  font-size: 2rem;
+  font-weight: 600;
+  border-radius: 1.5rem;
+  padding: .5rem;
+  text-align: center;
+}
+
+.orderId {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: black;
+}
+
+.orderValue {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: black;
+}

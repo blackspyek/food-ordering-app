@@ -1,0 +1,7 @@
+<div
+  class="md:max-w-3xl text-center grid shadow-md grid-cols-[1fr_4fr_1fr] items-center gap-6 p-4 pt-8 cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:shadow-lg"
+>
+  <span class="orderNumber min-w-20">{{ order().boardCode }}</span>
+  <span class="orderId">#{{ order().orderId }}</span>
+  <span class="orderValue">{{ order().totalPrice | currency }}</span>
+</div>

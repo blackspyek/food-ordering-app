@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,13 +27,21 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    @Schema(description = "Username", example = "johndoe")
-    private String username;
+    @Schema(description = "email", example = "johndoe")
+    private String email;
 
     @Column(nullable = false)
     @JsonIgnore
     @Schema(description = "Password", example = "password")
     private String password;
+
+    @Column(nullable = false)
+    @Schema(description = "phone_number", example = "+48515553432")
+    private String phoneNumber;
+
+    @Column(nullable = false)
+    @Schema(description = "name", example = "John")
+    private String name;
 
     @Column(nullable = false)
     @Schema(description = "Indicates if the user is enabled", example = "true")
@@ -45,8 +54,18 @@ public class User implements UserDetails {
     @Schema(description = "User's roles")
     private Set<Role> roles;
 
-    public User(String username, String password) {
-        this.username = username;
+    @Column
+    @JsonIgnore
+    @Schema(description = "Password reset token")
+    private String passwordResetToken;
+
+    @Column
+    @JsonIgnore
+    @Schema(description = "Password reset token expiry time")
+    private LocalDateTime passwordResetTokenExpiry;
+
+    public User(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
@@ -55,6 +74,11 @@ public class User implements UserDetails {
         return roles.stream()
                 .map(role -> (GrantedAuthority) role::name)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     @Override

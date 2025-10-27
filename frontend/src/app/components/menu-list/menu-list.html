@@ -1,0 +1,27 @@
+@if (isLoading()) {
+  <div class="flex items-center justify-center w-full h-64">
+    <div class="flex flex-col items-center gap-4">
+      <mat-icon class="animate-spin text-orange-500 !text-5xl !w-12 !h-12">sync</mat-icon>
+      <span class="text-gray-500 text-lg">Ładowanie menu...</span>
+    </div>
+  </div>
+} @else {
+  <ul
+    class="list-none custom-scroll w-full min-h-0 p-8 divide-y divide-gray-400 md:pb-16 md:h-screen md:max-h-[80vh] overflow-y-auto md:grid md:grid-cols-3 md:content-start md:gap-4 md:divide-y-0"
+  >
+    @for (item of menuItems(); track item.id) {
+      <li
+        app-menu-item-block
+        [name]="item.name"
+        [price]="item.price"
+        [photoUrl]="item.photoUrl"
+        [id]="item.id"
+        [description]="item.description"
+        [bestSeller]="item.bestSeller"
+        [class.md:col-span-2]="item.bestSeller"
+        [class.md:row-span-2]="item.bestSeller"
+        class="pb-2"
+      ></li>
+    }
+  </ul>
+}

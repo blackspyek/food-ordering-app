@@ -1,0 +1,71 @@
+<div class="flex flex-col items-center bg-white p-6 md:p-8 min-h-50 text-gray-900">
+  <div class="w-full max-w-sm">
+    <h3 class="text-xl font-regular mb-10 text-left">Order #{{ data.orderId }}</h3>
+  </div>
+
+  <div class="w-full max-w-sm text-center">
+    <p class="text-[120px] font-extrabold leading-none">{{ data.boardCode }}</p>
+    <p class="text-2xl font-normal tracking-wider mt-1">NUMBER</p>
+
+    @switch (data.status) {
+      @case ('IN_PREPARATION') {
+        <p
+          class="waitBtn hover:bg-orange-600 text-white font-bold py-4 px-10 rounded-lg shadow-lg mt-8 transition duration-150"
+        >
+          In Preparation
+        </p>
+      }
+
+      @case ('READY_FOR_PICKUP') {
+        <p
+          class="waitBtn hover:bg-orange-600 text-white font-bold py-4 px-10 rounded-lg shadow-lg mt-8 transition duration-150"
+        >
+          Ready for Pickup
+        </p>
+      }
+      @case ('PICKED_UP') {
+        <p
+          class="waitBtn hover:bg-orange-600 text-white font-bold py-4 px-10 rounded-lg shadow-lg mt-8 transition duration-150"
+        >
+          Picked Up
+        </p>
+      }
+      @case ('CANCELLED') {
+        <p
+          class="waitBtn hover:bg-orange-600 text-white font-bold py-4 px-10 rounded-lg shadow-lg mt-8 transition duration-150"
+        >
+          Cancelled
+        </p>
+      }
+      @case ('DIDNT_PICK_UP') {
+        <p
+          class="waitBtn hover:bg-orange-600 text-white font-bold py-4 px-10 rounded-lg shadow-lg mt-8 transition duration-150"
+        >
+          Didn't Pick Up
+        </p>
+      }
+    }
+  </div>
+
+  <div class=""></div>
+
+  <div class="w-full max-w-sm pt-6">
+    <div class="text-right text-base space-y-1 min-h-0 overflow-y-auto custom-scroll list-none">
+      @for (item of data.orderItems; track item.item.id) {
+        <div>
+          {{ item.quantity }}x {{ item.item.name }} -
+          {{ item.totalPrice | currency: 'USD' }}
+        </div>
+      } @empty {
+        <div>Brak przedmiotów w zamówieniu.</div>
+      }
+    </div>
+  </div>
+
+  <div class="w-full max-w-sm pt-6 text-sm">
+    <div class="flex justify-between items-end">
+      <div class="text-lg font-medium">Total: {{ data.totalPrice | currency: 'USD' }}</div>
+      <div class="text-gray-600">05/10/2024 22:29</div>
+    </div>
+  </div>
+</div>

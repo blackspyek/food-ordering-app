@@ -47,4 +47,8 @@ public class MenuItem {
     @Schema(description = "URL of the menu item's photo", example = "http://example.com/images/margherita.jpg", requiredMode = Schema.RequiredMode.REQUIRED)
     private String photoUrl;
 
+    @Column(name = "best_seller")
+    @Schema(description = "Indicates if the menu item is a best seller", example = "false", defaultValue = "false")
+    private Boolean bestSeller;
+
 }

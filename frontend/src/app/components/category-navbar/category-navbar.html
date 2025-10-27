@@ -1,0 +1,9 @@
+@for (category of menuStateService.getCategories(); track category) {
+  <button
+    (click)="menuStateService.changeSelectedNav(category)"
+    [class.navbarActive]="menuStateService.chosenNav() === category"
+    class="navbarBtn px-4 py-2 rounded-full"
+  >
+    {{ category | uppercase | categoryName }}
+  </button>
+}

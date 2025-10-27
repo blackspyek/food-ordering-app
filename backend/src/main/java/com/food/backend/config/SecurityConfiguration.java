@@ -1,9 +1,11 @@
 package com.food.backend.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,14 +18,17 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
-    private  final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public SecurityConfiguration(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.authenticationProvider = authenticationProvider;
@@ -34,15 +39,19 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/menu").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/menu/available").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/menu/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/menu/category/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/menu/name/{name}").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
+                        // Public endpoints
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/menu/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/{orderId}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/orders/{orderId}/status").permitAll()
+
+                        // WebSocket endpoint
+                        .requestMatchers("/ws/**").permitAll()
+
+                        // Swagger endpoints
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -50,21 +59,43 @@ public class SecurityConfiguration {
                                 "/swagger-resources/configuration/ui",
                                 "/swagger-resources/configuration/security"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
+
+                        // permit /error
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+                            Map<String, Object> error = new HashMap<>();
+                            error.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+                            error.put("error", "Unauthorized");
+                            error.put("message", "Authentication required");
+                            error.put("path", request.getRequestURI());
+                            error.put("timestamp", System.currentTimeMillis());
+
+                            objectMapper.writeValue(response.getOutputStream(), error);
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+                            Map<String, Object> error = new HashMap<>();
+                            error.put("status", HttpServletResponse.SC_FORBIDDEN);
+                            error.put("error", "Forbidden");
+                            error.put("message", "Access denied");
+                            error.put("path", request.getRequestURI());
+                            error.put("timestamp", System.currentTimeMillis());
+
+                            objectMapper.writeValue(response.getOutputStream(), error);
+                        })
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((_, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType("application/json");
-                            response.setCharacterEncoding("UTF-8");
-                            response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \""
-                                    + authException.getMessage() + "\"}");
-                        })
-                );
+                ;
         return http.build();
 
     }
@@ -72,9 +103,23 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:2137"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "X-Requested-With",
+                "Cache-Control"
+        ));
+        configuration.setExposedHeaders(List.of(
+                "Authorization",
+                "X-Total-Count"
+        ));
+
+        configuration.setAllowCredentials(true);
+
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

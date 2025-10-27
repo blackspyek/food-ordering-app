@@ -19,7 +19,13 @@ public class NotificationService {
                 .build();
 
         try {
-            String response = FirebaseMessaging.getInstance().send(message);
+            FirebaseMessaging instance = FirebaseMessaging.getInstance();
+            if (instance == null) {
+                throw new IllegalStateException("FirebaseMessaging instance is not initialized");
+            }
+            String response = instance.send(message);
+
+
             return "Notification sent: " + response;
         } catch (Exception e) {
             e.printStackTrace();

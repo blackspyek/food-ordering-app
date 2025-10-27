@@ -7,6 +7,7 @@ import com.food.backend.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -25,7 +27,7 @@ import java.util.Optional;
 public class OrderDto {
     @NotNull(message = "orderId cannot be empty")
     @Schema(description = "Unique identifier for the order", example = "1001", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long orderId;
+    private UUID orderId;
 
     @NotNull(message = "boardCode cannot be empty")
     @Schema(description = "Code for the board/table", example = "05", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -36,6 +38,11 @@ public class OrderDto {
     @Schema(description = "Email of the customer", example = "customer@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
 
+    @NotBlank(
+        message = "Name cannot be empty"
+    )
+    @Schema(description = "Name of the customer", example = "John Doe")
+    private String name;
     @Schema(description = "ID of the employee who prepared the order", example = "101")
     private Long preparedById;
 
@@ -66,6 +73,7 @@ public class OrderDto {
                 order.getOrderId(),
                 order.getBoardCode(),
                 order.getEmail(),
+                order.getName(),
                 employeeId,
                 order.getStatus(),
                 order.getOrderType(),

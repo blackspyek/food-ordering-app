@@ -1,0 +1,13 @@
+@use 'variables';
+
+.primary {
+  background-color: variables.$base-orange;
+  border-color: variables.$base-orange;
+  color: white;
+}
+
+.secondary {
+  background-color: white;
+  border-color: variables.$base-orange;
+  color: variables.$base-orange;
+}

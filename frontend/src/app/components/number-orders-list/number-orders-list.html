@@ -1,0 +1,14 @@
+<app-box-title [title]="title()" [state]="state()"></app-box-title>
+<ul
+  class="flex flex-col items-center flex-grow gap-4 min-h-0 overflow-y-auto p-4 custom-scroll list-none divide-y divide-gray-400"
+>
+  @for (item of items(); track $index) {
+    <li
+      class="text-5xl text-gray-800"
+      [class.font-bold]="state() === 'primary'"
+      [class.font-light]="state() === 'secondary'"
+    >
+      {{ item }}
+    </li>
+  }
+</ul>

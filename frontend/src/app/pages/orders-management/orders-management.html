@@ -1,0 +1,122 @@
+<div class="orders-management">
+  <header class="header">
+    <h1>Zarządzanie zamówieniami</h1>
+    <div class="connection-status" [class.connected]="kitchenSocketService.isConnected()">
+      <span class="status-dot"></span>
+      {{ kitchenSocketService.isConnected() ? 'Połączono' : 'Rozłączono' }}
+    </div>
+  </header>
+
+  @if (isLoading) {
+    <div class="loading">
+      <mat-icon class="spin">sync</mat-icon>
+      <span>Ładowanie zamówień...</span>
+    </div>
+  } @else {
+    <div class="boards-container" cdkDropListGroup>
+      <!-- IN_PREPARATION Board -->
+      <div class="board preparation-board">
+        <div class="board-header">
+          <mat-icon>restaurant</mat-icon>
+          <h2>W przygotowaniu</h2>
+          <span class="order-count">{{ inPreparationOrders.length }}</span>
+        </div>
+        <div
+          cdkDropList
+          id="preparation-list"
+          [cdkDropListData]="inPreparationOrders"
+          [cdkDropListConnectedTo]="['ready-list']"
+          class="order-list"
+          (cdkDropListDropped)="drop($event)"
+        >
+          @if (inPreparationOrders.length === 0) {
+            <div class="empty-board">
+              <mat-icon>check_circle</mat-icon>
+              <p>Brak zamówień w przygotowaniu</p>
+            </div>
+          }
+          @for (order of inPreparationOrders; track order.orderId) {
+            <div class="order-card" cdkDrag>
+              <div class="order-header">
+                <span class="board-code">#{{ order.boardCode }}</span>
+                <span class="order-type" [class.dine-in]="order.orderType === 'DINE_IN'">
+                  {{ getOrderTypeLabel(order.orderType) }}
+                </span>
+                <span class="order-time">{{ formatTime(order.orderTime) }}</span>
+              </div>
+              <div class="order-items">
+                @for (item of order.orderItems; track item.orderItemId) {
+                  <div class="order-item">
+                    <span class="item-quantity">{{ item.quantity }}x</span>
+                    <span class="item-name">{{ item.itemName }}</span>
+                  </div>
+                }
+              </div>
+              <div class="order-footer">
+                <span class="total-price">{{
+                  order.totalPrice | currency: 'PLN' : 'symbol' : '1.2-2'
+                }}</span>
+                <button class="cancel-btn" (click)="cancelOrder(order); $event.stopPropagation()">
+                  <mat-icon>close</mat-icon>
+                  Anuluj
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- READY_FOR_PICKUP Board -->
+      <div class="board ready-board">
+        <div class="board-header">
+          <mat-icon>done_all</mat-icon>
+          <h2>Gotowe do odbioru</h2>
+          <span class="order-count">{{ readyForPickupOrders.length }}</span>
+        </div>
+        <div
+          cdkDropList
+          id="ready-list"
+          [cdkDropListData]="readyForPickupOrders"
+          [cdkDropListConnectedTo]="['preparation-list']"
+          class="order-list"
+          (cdkDropListDropped)="drop($event)"
+        >
+          @if (readyForPickupOrders.length === 0) {
+            <div class="empty-board">
+              <mat-icon>hourglass_empty</mat-icon>
+              <p>Brak zamówień gotowych do odbioru</p>
+            </div>
+          }
+          @for (order of readyForPickupOrders; track order.orderId) {
+            <div class="order-card ready" cdkDrag>
+              <div class="order-header">
+                <span class="board-code">#{{ order.boardCode }}</span>
+                <span class="order-type" [class.dine-in]="order.orderType === 'DINE_IN'">
+                  {{ getOrderTypeLabel(order.orderType) }}
+                </span>
+                <span class="order-time">{{ formatTime(order.orderTime) }}</span>
+              </div>
+              <div class="order-items">
+                @for (item of order.orderItems; track item.orderItemId) {
+                  <div class="order-item">
+                    <span class="item-quantity">{{ item.quantity }}x</span>
+                    <span class="item-name">{{ item.itemName }}</span>
+                  </div>
+                }
+              </div>
+              <div class="order-footer">
+                <span class="total-price">{{
+                  order.totalPrice | currency: 'PLN' : 'symbol' : '1.2-2'
+                }}</span>
+                <button class="cancel-btn" (click)="cancelOrder(order); $event.stopPropagation()">
+                  <mat-icon>close</mat-icon>
+                  Anuluj
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

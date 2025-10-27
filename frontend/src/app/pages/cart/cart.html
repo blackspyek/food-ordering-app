@@ -1,0 +1,18 @@
+<ul
+  class="list-none custom-scroll w-full flex-grow min-h-0 divide-y divide-gray-400 overflow-y-auto"
+>
+  @for (item of cartService.cart(); track item.item.id) {
+    <li app-cart-item [cartItem]="item"></li>
+  }
+</ul>
+<div class="flex flex-row justify-between p-4">
+  <p class="p-4 text-xl">
+    <span class="font-bold">Total: </span>{{ cartService.totalPrice() | currency: 'USD' }}
+  </p>
+  <button
+    [routerLink]="'/finalize-order'"
+    class="btn-primary rounded-md font-bold text-white hover:bg-gray-100 cursor-pointer"
+  >
+    Checkout ({{ cartService.totalNumberOfItems() }} items)
+  </button>
+</div>

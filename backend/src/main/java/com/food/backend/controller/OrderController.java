@@ -21,12 +21,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -36,6 +42,8 @@ public class OrderController {
 
     private final OrderService orderService;
     private final UserService userService;
+    Logger logger = LoggerFactory.getLogger(OrderController.class);
+
 
     @Autowired
     public OrderController(OrderService orderService, UserService userService) {
@@ -66,6 +74,7 @@ public class OrderController {
             CreateOrderDto createOrderDTO) {
         try {
             Order order = orderService.createOrder(createOrderDTO);
+
             return ResponseUtil.successResponse(order, "Order created successfully");
         } catch (Exception e) {
             return ResponseUtil.badRequestResponse("Error creating order: " + e.getMessage());
@@ -81,7 +90,7 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Order not found")
     })
     @GetMapping("/{orderId}")
-    public ResponseEntity<?> getOrderById(@PathVariable Long orderId) {
+    public ResponseEntity<?> getOrderById(@PathVariable UUID orderId) {
         try {
             Order order = orderService.getOrderById(orderId)
                     .orElseThrow(() -> new OrderNotFoundException(orderId));
@@ -118,7 +127,7 @@ public class OrderController {
             @ApiResponse(responseCode = "400", description = "Invalid request")
     })
     @GetMapping("/{orderId}/status")
-    public ResponseEntity<?> getOrderStatus(@PathVariable Long orderId) {
+    public ResponseEntity<?> getOrderStatus(@PathVariable UUID orderId) {
         try {
             OrderStatus orderStatus = orderService.getOrderStatus(orderId);
             return ResponseUtil.successResponse(orderStatus, "Order status retrieved successfully");
@@ -140,8 +149,9 @@ public class OrderController {
             @ApiResponse(responseCode = "400", description = "Invalid status update request")
     })
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     @PutMapping("/{orderId}/status")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId,
+    public ResponseEntity<?> updateOrderStatus(@PathVariable UUID orderId,
                                                @RequestBody
                                                @Valid
                                                UpdateOrderStatusDto updateOrderStatusDto) {
@@ -165,8 +175,9 @@ public class OrderController {
             @ApiResponse(responseCode = "404", description = "Order not found")
     })
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     @DeleteMapping("/{orderId}")
-    public ResponseEntity<?> deleteOrder(@PathVariable Long orderId) {
+    public ResponseEntity<?> deleteOrder(@PathVariable UUID orderId) {
         try {
             orderService.deleteOrder(orderId);
             return ResponseUtil.successResponse(null, "Order deleted successfully");
@@ -185,6 +196,7 @@ public class OrderController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = Order.class)))
     )
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     @GetMapping("/status/{status}")
     public ResponseEntity<?> getOrdersByStatus(@PathVariable OrderStatus status) {
         List<Order> orders = orderService.getOrdersByStatus(status);
@@ -222,7 +234,7 @@ public class OrderController {
     @SecurityRequirement(name = "bearerAuth")
     @PatchMapping("/{orderId}/preparedBy")
     public ResponseEntity<?> updateOrderPreparedBy(
-            @PathVariable Long orderId,
+            @PathVariable UUID orderId,
             @RequestBody UpdatePreparedByDto dto) {
         try {
             Order updatedOrder = orderService.updateOrderPreparedBy(orderId, dto.getUserName());
@@ -234,16 +246,30 @@ public class OrderController {
             return ResponseUtil.badRequestResponse("Error updating order preparedBy: " + e.getMessage());
         }
     }
-
-
-    // For Presentation
-    @PostMapping("/presentation")
-    public ResponseEntity<?> createNewOrderNumberToTheBoard(){
+    @Operation(
+            summary = "Get last 10 orders by user ID",
+            description = "Retrieves the last 10 orders placed by a specific user"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved orders"),
+            @ApiResponse(responseCode = "404", description = "User not found"),
+            @ApiResponse(responseCode = "400", description = "Invalid request")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/my-orders")
+    public ResponseEntity<?> get10LastOrders(
+            @AuthenticationPrincipal UserDetails currentUser
+    ) {
         try {
-            return ResponseUtil.successResponse(orderService.forceAddOrderNumberToTheBoard(), "Order created successfully");
+            User authenticatedUser = userService.findUserByUsername(currentUser.getUsername());
+            List<Order> orders = orderService.get10LastOrdersByUserId(authenticatedUser.getId());
+            return ResponseUtil.successResponse(orders, "Orders retrieved successfully");
+        } catch (EntityNotFoundException e) {
+            return ResponseUtil.notFoundResponse(e.getMessage());
         } catch (Exception e) {
-            return ResponseUtil.badRequestResponse("Error creating order: " + e.getMessage());
+            return ResponseUtil.badRequestResponse("Error retrieving orders: " + e.getMessage());
         }
     }
+
 
 }

@@ -1,0 +1,31 @@
+<div class="h-full w-full flex flex-col items-center flex-grow">
+  <img
+    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0"
+    src="/shape.svg"
+    alt="Decorative Shape"
+  />
+
+  <div class="flex flex-row gap-16 z-10 flex-grow justify-center items-center">
+    <button
+      (click)="selectDeliveryMethod('DINE_IN')"
+      class="delivery-option flex flex-col items-center cursor-pointer hover:scale-105 transition-transform"
+    >
+      <img id="eatIn" src="/eatin.png" class="w-25 h-25 object-cover" alt="Eat In Ramen Image" />
+      <p>DINE IN</p>
+    </button>
+
+    <button
+      (click)="selectDeliveryMethod('TAKE_OUT')"
+      class="delivery-option flex flex-col items-center hover:scale-105 transition-transform"
+    >
+      <img
+        src="/takeout.png"
+        class="w-25 h-25 object-cover cursor-pointer"
+        alt="Takeout Noodles Image"
+      />
+      <p>TAKE OUT</p>
+    </button>
+  </div>
+
+  <p class="z-10 font-normal text-base">Choose how you'd like to enjoy your meal</p>
+</div>

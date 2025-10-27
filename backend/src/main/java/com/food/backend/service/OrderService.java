@@ -15,6 +15,8 @@ import com.food.backend.repository.OrderItemRepository;
 import com.food.backend.exception.OrderNotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class OrderService {
     private final LiveOrderBoard liveOrderBoard;
     private final EmailService emailService;
     private final UserService userService;
+    Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
     public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, MenuItemService menuItemService, @Lazy LiveOrderBoard liveOrderBoard, EmailService emailService, UserService userService) {
@@ -46,7 +49,8 @@ public class OrderService {
 
     @Transactional
     public Order createOrder(CreateOrderDto createOrderDto)  {
-        Order order = initializeOrder(createOrderDto.getOrderType(), createOrderDto.getEmail());
+
+        Order order = initializeOrder(createOrderDto.getOrderType(), createOrderDto.getEmail(), createOrderDto.getName(), createOrderDto.getUserId());
         Order savedOrder = orderRepository.save(order);
         List<OrderItem> orderItemsList = createOrderItemsList(savedOrder, createOrderDto.getOrderItems());
         calculateAndSetTotalPrice(order, orderItemsList);
@@ -60,6 +64,8 @@ public class OrderService {
             order.setBoardCode(liveOrderBoard.generateOrderBoardCode());
             orderRepository.save(order);
             saveOrderItems(order, orderItemsList);
+            order.setOrderItems(orderItemsList);
+            liveOrderBoard.sendKitchenOrderUpdate(order, "NEW");
         } catch (Exception e) {
             liveOrderBoard.removeOrderCode(order.getBoardCode());
             throw new RuntimeException("Failed to create order", e);
@@ -85,23 +91,29 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<Order> getOrderById(Long orderId) {
+    public Optional<Order> getOrderById(UUID orderId) {
         return orderRepository.findById(orderId);
     }
-    public OrderStatus getOrderStatus(Long orderId) {
+    public OrderStatus getOrderStatus(UUID orderId) {
         return orderRepository.findStatusById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
 
     @Transactional
-    public Order updateOrderStatus(Long orderId, OrderStatus newStatus) throws IllegalArgumentException {
+    public Order updateOrderStatus(UUID orderId, OrderStatus newStatus) throws IllegalArgumentException {
         checkIfStatusIsValid(newStatus.toString());
 
         Order order = findOrderOrThrow(orderId);
         order.setStatus(newStatus);
         moveOrderNumberOnTheBoardBasedOnStatus(newStatus, order);
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        
+        String action = (newStatus == OrderStatus.CANCELLED || newStatus == OrderStatus.PICKED_UP || newStatus == OrderStatus.DIDNT_PICK_UP) 
+                ? "REMOVED" : "STATUS_CHANGED";
+        liveOrderBoard.sendKitchenOrderUpdate(savedOrder, action);
+        
+        return savedOrder;
     }
 
     private void moveOrderNumberOnTheBoardBasedOnStatus(OrderStatus newStatus, Order order) {
@@ -124,14 +136,15 @@ public class OrderService {
     }
 
     @Transactional
-    public void deleteOrder(Long orderId) {
+    public void deleteOrder(UUID orderId) {
         Order order = findOrderOrThrow(orderId);
         liveOrderBoard.removeOrderCode(order.getBoardCode());
+        liveOrderBoard.sendKitchenOrderUpdate(order, "REMOVED");
         orderRepository.deleteById(orderId);
     }
 
     public List<Order> getOrdersByStatus(OrderStatus status) {
-        return orderRepository.getOrdersByStatus(status);
+        return orderRepository.findByStatusWithItems(status);
     }
 
     public List<Order> getOrdersByPreparedBy(User preparedBy) {
@@ -139,17 +152,21 @@ public class OrderService {
     }
 
     public List<Order> getAllOrdersWithItems() {
-        return orderRepository.findAllWithItemsOrderByOrderId();
+        return orderRepository.findAllWithItemsOrderByOrderTimeDesc();
     }
 
 
-    private Order initializeOrder(OrderType orderType, String email) throws IllegalArgumentException {
+    private Order initializeOrder(OrderType orderType, String email, String name, Long userId) throws IllegalArgumentException {
         checkIfTypeIsValid(orderType.toString());
+        Optional<User> user = userService.findUserById(userId);
         Order order = new Order();
         order.setEmail(email);
         order.setOrderType(orderType);
         order.setStatus(OrderStatus.IN_PREPARATION);
         order.setOrderTime(LocalDateTime.now());
+        order.setName(name);
+
+        order.setOrderedBy(user.orElse(null));
         return order;
     }
 
@@ -167,7 +184,7 @@ public class OrderService {
         });
     }
 
-    private Order findOrderOrThrow(Long orderId) {
+    private Order findOrderOrThrow(UUID orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
@@ -197,7 +214,7 @@ public class OrderService {
         }
     }
 
-    public Order updateOrderPreparedBy(Long orderId, String userName) {
+    public Order updateOrderPreparedBy(UUID orderId, String userName) {
         validateParameters(orderId, userName);
         Order order = findOrderOrThrow(orderId);
         User user = userService.findUserByUsername(userName);
@@ -205,7 +222,7 @@ public class OrderService {
         order.setPreparedBy(user);
         return orderRepository.save(order);
     }
-    private void validateParameters(Long orderId, String userName) {
+    private void validateParameters(UUID orderId, String userName) {
         if (orderId == null || userName == null || userName.isEmpty()) {
             throw new IllegalArgumentException("Invalid orderId or userName");
         }
@@ -213,5 +230,9 @@ public class OrderService {
 
     public String forceAddOrderNumberToTheBoard() {
         return liveOrderBoard.generateOrderBoardCode();
+    }
+
+    public List<Order> get10LastOrdersByUserId(Long userId) {
+        return orderRepository.findTop10ByOrderedByIdOrderByOrderTimeDesc(userId);
     }
 }

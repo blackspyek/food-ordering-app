@@ -1,0 +1,105 @@
+<div class="w-full h-full custom-scroll overflow-y-auto relative">
+  <h1 class="text-2xl m-10 md:text-3xl">Finalize The Order</h1>
+  <div class="md:grid-cols-2 md:grid gap-10 max-w-4xl mx-auto">
+    <div class="flex flex-col mx-10 mt-10 md:mt-0 text-lg divide-y divide-gray-600">
+      @for (item of getItems(); track item.item.id) {
+        <div class="flex justify-between py-3">
+          <span class="wrap-anywhere">{{ item.quantity }} x {{ item.item.name }}</span>
+          <span>${{ item.quantity * item.item.price }}</span>
+        </div>
+      }
+      <div class="flex text-2xl justify-end py-3 font-bold">
+        Total ${{ cartService.totalPrice() }}
+      </div>
+    </div>
+    <div class="max-w-md mx-auto p-10 md:p-4 bg-white rounded-lg shadow-sm md:order-first">
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+        <div>
+          <label for="name" class="block text-lg font-medium text-black mb-1"> Name </label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            placeholder="John Doe"
+            class="w-full p-2 border border-gray-300 rounded outline-none transition-colors focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+            [class.border-red-500]="f['name'].invalid && (f['name'].dirty || f['name'].touched)"
+          />
+
+          @if (f['name'].invalid && (f['name'].dirty || f['name'].touched)) {
+            <div class="text-red-500 text-regular mt-1">
+              @if (f['name'].errors?.['required']) {
+                <span>Name is required.</span>
+              }
+
+              @if (f['name'].errors?.['minlength']) {
+                <span>Name must be at least 2 characters.</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div>
+          <label for="email" class="block text-lg font-medium text-black mb-1"> E-mail </label>
+          <input
+            type="email"
+            id="email"
+            placeholder="j.doe@gmail.com"
+            formControlName="email"
+            class="w-full p-2 border border-gray-300 rounded outline-none transition-colors focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+            [class.border-red-500]="f['email'].invalid && (f['email'].dirty || f['email'].touched)"
+          />
+
+          @if (f['email'].invalid && (f['email'].dirty || f['email'].touched)) {
+            <div class="text-red-500 text-regular mt-1">
+              @if (f['email'].errors?.['required']) {
+                <span>E-mail is required.</span>
+              }
+
+              @if (f['email'].errors?.['email']) {
+                <span>Enter a valid e-mail address.</span>
+              }
+            </div>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="bg-[#FDA403] text-white py-2 px-4 mx-16 md:mx-0 font-bold text-regular rounded hover:bg-orange-500 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FDA403]"
+          [disabled]="contactForm.invalid"
+        >
+          Payment
+        </button>
+      </form>
+    </div>
+  </div>
+  @if (isLoading()) {
+    <div
+      class="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center"
+    >
+      <svg
+        class="animate-spin h-16 w-16 text-[#FDA403] mb-4"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        ></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        ></path>
+      </svg>
+
+      <span class="text-xl font-bold text-gray-700 animate-pulse">
+        Przetwarzanie zamówienia...
+      </span>
+    </div>
+  }
+</div>

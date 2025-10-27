@@ -1,0 +1,90 @@
+<div class="flex flex-col h-full items-center" [class.menu-visible]="viewState() != 'selecting'">
+  <nav
+    class="flex w-full relative justify-between items-center pt-8 pr-8 pl-8 md:pt-2 md:pr-8 md:pl-8 md:mb-2"
+  >
+    @if (viewState() === 'showing-menu') {
+      <button
+        (click)="resetSelection()"
+        class="md:absolute -bottom-1/2 left-10 text-white cursor-pointer flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:bg-white/20 hover:scale-105 active:scale-95"
+      >
+        <mat-icon aria-hidden="true" fontIcon="arrow_back"></mat-icon>
+        <span class="hidden md:block font-medium">Back</span>
+      </button>
+    }
+
+    <div>
+      <a class="hidden md:block" routerLink="/menu">
+        <img class="h-auto object-cover w-[6vw]" src="/logo.png" alt="Logo" />
+      </a>
+    </div>
+    <div class="flex flex-row gap-4">
+      @if (authService.isEmployee()) {
+        <a routerLink="/orders-management" class="flex gap-2 items-center">
+          <span class="hidden md:block text-white text-2xl hover:text-gray-200"> Kitchen </span>
+        </a>
+      }
+      <a routerLink="/orders" class="flex items-center">
+        <img src="/ordersBag.svg" alt="Lista zamówień" class="cursor-pointer h-6 w-6 md:hidden" />
+        <span class="hidden md:block text-white text-2xl hover:text-gray-200"> Orders </span>
+      </a>
+      <a routerLink="/cart" class="relative flex items-center">
+        <img src="/shopping-bag.svg" alt="Cart" class="cursor-pointer h-6 w-6 md:hidden" />
+        <span class="hidden md:block text-white text-2xl hover:text-gray-200">
+          Cart
+          {{
+            cartService.totalNumberOfItems() ? ' (' + cartService.totalNumberOfItems() + ')' : ''
+          }}
+        </span>
+
+        @if (cartService.cart().length > 0) {
+          <span
+            class="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white bg-red-500 text-xs rounded-full h-5 w-5 flex items-center justify-center md:hidden"
+          >
+            {{ cartService.cart().length }}
+          </span>
+        }
+      </a>
+      @if (isLoggedIn()) {
+        <button (click)="logout()" class="flex items-center cursor-pointer">
+          <mat-icon class="cursor-pointer h-6 w-6 md:hidden! !text-white" fontIcon="logout">
+          </mat-icon>
+
+          <span class="hidden md:block text-white text-2xl hover:text-gray-200"> Logout </span>
+        </button>
+      } @else {
+        <a routerLink="/login" class="flex items-center">
+          <mat-icon
+            class="cursor-pointer h-6 w-6 md:hidden !text-white"
+            fontIcon="person"
+          ></mat-icon>
+          <span class="hidden md:block text-white text-2xl hover:text-gray-200"> Login </span>
+        </a>
+      }
+    </div>
+  </nav>
+  <a routerLink="/menu" class="md:hidden">
+    <img src="/logo.png" alt="Logo" class="w-62 transition-all duration-600 ease-in-out md:w-36" />
+  </a>
+
+  @switch (viewState()) {
+    @case ('showing-menu') {
+      <app-category-navbar />
+    }
+    @case ('orders') {
+      <app-order-navbar />
+    }
+    @default {}
+  }
+
+  @if (viewState() != 'selecting') {}
+
+  <div
+    class="flex-1 justify-center relative flex w-full flex-col pb-2 white-panel"
+    [class.bg-white]="viewState() !== 'orders-management'"
+    [class.rounded-tl-\[15vw\]]="viewState() !== 'orders-management'"
+    [class.rounded-tr-\[15vw\]]="viewState() !== 'orders-management'"
+    [class.items-center]="viewState() !== 'orders-management'"
+  >
+    <router-outlet></router-outlet>
+  </div>
+</div>

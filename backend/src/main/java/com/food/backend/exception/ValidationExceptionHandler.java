@@ -2,8 +2,11 @@ package com.food.backend.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.food.backend.model.Enums.Category;
+import com.food.backend.model.Enums.OrderType;
 import com.food.backend.model.Role;
+import com.google.gson.stream.MalformedJsonException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -57,34 +60,27 @@ public class ValidationExceptionHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ObjectMapper().writeValueAsString(errorMap));
     }
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<String> handleInvalidEnum(HttpMessageNotReadableException e) throws JsonProcessingException {
-        String message;
-        message = getValidMessageFromExceptionMessage(e);
-        return getResponseEntity("Invalid Enum", message);
-    }
+    public ResponseEntity<String> handleInvalidEnum(HttpMessageNotReadableException ex) throws JsonProcessingException {
 
-    private static String getValidMessageFromExceptionMessage(HttpMessageNotReadableException e) {
-        String errorType = getErrorTypeFromExceptionMessage(e);
-        return switch (errorType) {
-            case "Category" -> "Invalid Category. Allowed values are " + Arrays.toString(Category.values());
-            case "Role" -> "Invalid Role. Allowed values are " + Arrays.toString(Role.values());
-            default -> "Invalid Enum";
-        };
-    }
+        if (ex.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException ifx = (InvalidFormatException) ex.getCause();
 
-    private static String getErrorTypeFromExceptionMessage(HttpMessageNotReadableException e) {
-        String errorType;
-        if (e.getMessage().contains("Category")) {
-            errorType = "Category";
-        } else if (e.getMessage().contains("Role")) {
-            errorType = "Role";
-        } else {
-            errorType = "Other";
+            if (ifx.getTargetType() != null && ifx.getTargetType().isEnum()) {
+                String fieldName = ifx.getPath().isEmpty() ? "unknown" : ifx.getPath().get(ifx.getPath().size()-1).getFieldName();
+                String invalidValue = ifx.getValue().toString();
+                String allowedValues = Arrays.toString(ifx.getTargetType().getEnumConstants());
+
+                String message = String.format("Invalid value '%s' for field '%s'. Allowed values are %s",
+                        invalidValue, fieldName, allowedValues);
+
+                return getResponseEntity("Invalid Enum Value", message);
+            }
         }
-        return errorType;
+
+        return getResponseEntity("Malformed JSON request", "The request body is not readable or is malformed.");
     }
+
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handleBadRequest(Exception e) throws JsonProcessingException {

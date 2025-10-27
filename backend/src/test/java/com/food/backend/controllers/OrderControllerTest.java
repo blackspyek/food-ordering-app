@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -52,6 +53,7 @@ class OrderControllerTest {
     private User testUser;
     private CreateOrderDto createOrderDto;
     private static final String BASE_URL = "/api/orders";
+    private static final UUID ORDER_ID = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
@@ -60,7 +62,10 @@ class OrderControllerTest {
         testUser.setUsername("testUser");
 
         testOrder = new Order();
-        testOrder.setOrderId(1L);
+        testOrder.setOrderId(
+                ORDER_ID
+        );
+
         testOrder.setOrderType(OrderType.DINE_IN);
         testOrder.setStatus(OrderStatus.IN_PREPARATION);
         testOrder.setOrderTime(LocalDateTime.now());
@@ -106,20 +111,20 @@ class OrderControllerTest {
     @Test
     @WithMockUser
     void getOrderById_Success() throws Exception {
-        when(orderService.getOrderById(1L)).thenReturn(Optional.of(testOrder));
+        when(orderService.getOrderById(ORDER_ID)).thenReturn(Optional.of(testOrder));
 
         mockMvc.perform(get(BASE_URL + "/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Order retrieved successfully"))
                 .andExpect(jsonPath("$.data.orderId").value(1L));
 
-        verify(orderService).getOrderById(1L);
+        verify(orderService).getOrderById(ORDER_ID);
     }
 
     @Test
     @WithMockUser
     void getOrderById_NotFound() throws Exception {
-        when(orderService.getOrderById(999L)).thenReturn(Optional.empty());
+        when(orderService.getOrderById(UUID.randomUUID())).thenReturn(Optional.empty());
 
         mockMvc.perform(get(BASE_URL + "/999"))
                 .andExpect(status().isNotFound());
@@ -141,7 +146,7 @@ class OrderControllerTest {
     @Test
     @WithMockUser
     void getOrderStatus_Success() throws Exception {
-        when(orderService.getOrderStatus(1L)).thenReturn(OrderStatus.IN_PREPARATION);
+        when(orderService.getOrderStatus(ORDER_ID)).thenReturn(OrderStatus.IN_PREPARATION);
 
         mockMvc.perform(get(BASE_URL + "/1/status"))
                 .andExpect(status().isOk())
@@ -155,7 +160,7 @@ class OrderControllerTest {
         UpdateOrderStatusDto statusDto = new UpdateOrderStatusDto();
         statusDto.setOrderStatus(OrderStatus.PICKED_UP);
 
-        when(orderService.updateOrderStatus(eq(1L), any(OrderStatus.class))).thenReturn(testOrder);
+        when(orderService.updateOrderStatus(eq(ORDER_ID), any(OrderStatus.class))).thenReturn(testOrder);
 
         mockMvc.perform(put(BASE_URL + "/1/status")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -167,13 +172,13 @@ class OrderControllerTest {
     @Test
     @WithMockUser
     void deleteOrder_Success() throws Exception {
-        doNothing().when(orderService).deleteOrder(1L);
+        doNothing().when(orderService).deleteOrder(ORDER_ID);
 
         mockMvc.perform(delete(BASE_URL + "/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Order deleted successfully"));
 
-        verify(orderService).deleteOrder(1L);
+        verify(orderService).deleteOrder(ORDER_ID);
     }
 
     @Test
@@ -211,7 +216,7 @@ class OrderControllerTest {
 
 
         // Mock the service call
-        when(orderService.updateOrderPreparedBy(eq(1L), eq("testUser")))
+        when(orderService.updateOrderPreparedBy(eq(ORDER_ID), eq("testUser")))
                 .thenReturn(testOrder);
 
         // When & Then
@@ -228,8 +233,9 @@ class OrderControllerTest {
         UpdatePreparedByDto dto = new UpdatePreparedByDto();
         dto.setUserName("testUser");
 
-        when(orderService.updateOrderPreparedBy(eq(999L), eq("testUser")))
-                .thenThrow(new OrderNotFoundException(999L));
+        UUID randomOrderId = UUID.randomUUID();
+        when(orderService.updateOrderPreparedBy(eq(randomOrderId), eq("testUser")))
+                .thenThrow(new OrderNotFoundException(randomOrderId));
 
         mockMvc.perform(patch(BASE_URL + "/999/preparedBy")
                         .contentType(MediaType.APPLICATION_JSON)

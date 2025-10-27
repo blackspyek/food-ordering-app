@@ -1,0 +1,14 @@
+<button
+  (click)="menuStateService.changeSelectedNav('BOARD')"
+  [class.navbarActive]="menuStateService.chosenNav() === 'BOARD'"
+  class="navbarBtn px-4 py-2 rounded-full"
+>
+  BOARD
+</button>
+<button
+  (click)="menuStateService.changeSelectedNav('ORDERS')"
+  [class.navbarActive]="menuStateService.chosenNav() === 'ORDERS'"
+  class="navbarBtn px-4 py-2 rounded-full"
+>
+  ORDERS
+</button>

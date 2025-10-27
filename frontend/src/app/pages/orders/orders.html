@@ -1,0 +1,13 @@
+@switch (menuStateService.chosenNav()) {
+  @case ('BOARD') {
+    <app-number-orders-list [title]="'Preparing'" />
+    <app-number-orders-list [title]="'Serving'" [state]="'primary'" />
+  }
+  @case ('ORDERS') {
+    @if (authService.isLoggedIn()) {
+      <app-orders-list></app-orders-list>
+    } @else {
+      <h1 class="text-center text-xl mt-5">Please log in to view your orders.</h1>
+    }
+  }
+}

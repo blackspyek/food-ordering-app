@@ -1,0 +1,17 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon class="warning-icon">warning</mat-icon>
+  Anulowanie zamówienia
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p>
+    Czy na pewno chcesz anulować zamówienie <strong>#{{ data.boardCode }}</strong
+    >?
+  </p>
+  <p class="warning-text">Ta operacja jest nieodwracalna.</p>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button class="btn-cancel" (click)="onCancel()">Nie, wróć</button>
+  <button class="btn-confirm" (click)="onConfirm()">Tak, anuluj zamówienie</button>
+</mat-dialog-actions>

@@ -1,0 +1,27 @@
+<nav
+  class="flex flex-col justify-between h-full items-center p-3 w-56 md:p-5 md:w-64 lg:p-8 lg:w-80 transition-all duration-300 ease-in-out"
+>
+  <a routerLink="/">
+    <img
+      src="/logo.png"
+      alt="logo"
+      class="[width:10vw] [height:10vw] mb-5 md:[width:8vw] md:[height:8vw] lg:[width:10vw] lg:[height:10vw]"
+    />
+  </a>
+
+  <div class="flex flex-col gap-3 items-stretch w-full">
+    <app-menu-btn label="HOME" href="/" icon="home" [is_highlighted]="true" />
+    <app-menu-btn label="ORDERS" href="/" icon="inventory" [is_highlighted]="false" />
+    <app-menu-btn label="NOTIFICATION" href="/" icon="notification_add" [is_highlighted]="false" />
+    @if (authService.isEmployee()) {
+      <app-menu-btn
+        label="KITCHEN"
+        href="/orders-management"
+        icon="restaurant"
+        [is_highlighted]="false"
+      />
+    }
+  </div>
+
+  <div class="h-33"></div>
+</nav>

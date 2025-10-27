@@ -1,36 +1,21 @@
-/**
- * JWT Authentication Filter for handling JWT-based authentication in Spring Security.
- * <p>
- * This filter intercepts incoming HTTP requests to validate JWT tokens and authenticate users.
- * It extends OncePerRequestFilter to ensure the filter is only executed once per request.
- * <p>
- * The filter performs the following operations:
- * 1. Extracts JWT token from the Authorization header
- * 2. Validates the token and extracts user information
- * 3. Creates and sets the authentication context if the token is valid
- * 4. Handles various authentication errors with appropriate HTTP responses
- *
- * @author Your Name
- * @version 1.0
- * @see OncePerRequestFilter
- * @see JwtService
- * @see UserDetailsService
- */
 package com.food.backend.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.food.backend.model.User;
 import com.food.backend.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -38,152 +23,140 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
+/**
+ * JWT Authentication Filter for handling JWT-based authentication in Spring Security.
+ * Intercepts requests, validates JWT tokens, and sets authentication context.
+ */
+@Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final Logger LOGGER = Logger.getLogger(JwtAuthenticationFilter.class.getName());
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
 
-    /**
-     * Constructs a new JwtAuthenticationFilter with the required services.
-     *
-     * @param jwtService Service for JWT operations
-     * @param userDetailsService Service for user details operations
-     */
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(
+            JwtService jwtService,
+            UserDetailsService userDetailsService
+    ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.objectMapper = new ObjectMapper();
     }
 
-    /**
-     * Processes the incoming request for JWT authentication.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param filterChain Filter chain to execute
-     * @throws IOException if there's an I/O error
-     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
-    ) throws IOException {
-        try {
-            String jwt = extractJwtFromRequest(request);
-            if (jwt == null) {
-                filterChain.doFilter(request, response);
-                return;
-            }
+    ) throws ServletException, IOException {
 
-            processJwtAuthentication(jwt, request, response, filterChain);
+        // Extract JWT from request
+        String jwt = extractJwtFromRequest(request);
+
+        // If no JWT, continue filter chain
+        if (jwt == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            authenticateWithJwt(jwt, request);
+            filterChain.doFilter(request, response);
+
+        } catch (ExpiredJwtException e) {
+            log.warn("JWT token has expired: {}", e.getMessage());
+            sendErrorResponse(response, "Token has expired", HttpServletResponse.SC_UNAUTHORIZED);
+
+        } catch (JwtException e) {
+            log.warn("Invalid JWT token: {}", e.getMessage());
+            sendErrorResponse(response, "Invalid token", HttpServletResponse.SC_UNAUTHORIZED);
+
+        } catch (UsernameNotFoundException e) {
+            log.warn("User not found: {}", e.getMessage());
+            sendErrorResponse(response, "User not found", HttpServletResponse.SC_UNAUTHORIZED);
+
         } catch (Exception e) {
-            LOGGER.severe("JWT Authentication error: " + e.getMessage());
-            sendErrorResponse(response, "Authentication failed: " + e.getMessage()
-            );
+            log.error("Authentication error", e);
+            sendErrorResponse(response, "Authentication failed", HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
 
     /**
-     * Extracts JWT token from the Authorization header.
-     *
-     * @param request HTTP request
-     * @return JWT token or null if not present
+     * Extracts JWT token from Authorization header
      */
     private String extractJwtFromRequest(HttpServletRequest request) {
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
-            return null;
+
+        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
+            return authHeader.substring(BEARER_PREFIX.length()).trim();
         }
-        return authHeader.substring(BEARER_PREFIX.length()).trim();
+
+        return null;
     }
 
     /**
-     * Processes JWT authentication and sets security context if valid.
-     *
-     * @param jwt JWT token
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param filterChain Filter chain
-     * @throws IOException if there's an I/O error
-     * @throws ServletException if there's a servlet error
+     * Authenticates user with JWT token
      */
-    private void processJwtAuthentication(
-            String jwt,
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws IOException, ServletException {
-        if (jwtService.hasTokenExpired(jwt) ) {
-            sendErrorResponse(response, "Token has expired");
+    private void authenticateWithJwt(String jwt, HttpServletRequest request) {
+
+        // Skip if already authenticated
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
             return;
         }
 
-        String username = jwtService.extractUsername(jwt);
-        if (!isValidAuthenticationContext(username)) {
-            sendErrorResponse(response, "Invalid Username");
-            return;
+        // Extract email from token (will throw exception if expired/invalid)
+        String email = jwtService.extractEmail(jwt);
+
+        if (email == null) {
+            throw new JwtException("Token does not contain valid email");
         }
 
-        User user = (User) userDetailsService.loadUserByUsername(username);
+        // Load user details
+        User user = (User) userDetailsService.loadUserByUsername(email);
+
+        // Validate token
         if (!jwtService.isTokenValid(jwt, user)) {
-            sendErrorResponse(response, "Token is not valid");
-            return;
+            throw new JwtException("Token validation failed");
         }
 
-        setAuthenticationContext(user, request);
-        filterChain.doFilter(request, response);
-    }
+        // Set authentication in security context
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(
+                        user,
+                        null,
+                        user.getAuthorities()
+                );
 
-    /**
-     * Checks if the authentication context is valid for processing.
-     *
-     * @param username Extracted username from JWT
-     * @return true if context is valid for processing
-     */
-    private boolean isValidAuthenticationContext(String username) {
-        Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
-        return username != null && existingAuth == null;
-    }
-
-    /**
-     * Sets the authentication context with the validated user details.
-     *
-     * @param user Authenticated user
-     * @param request HTTP request
-     */
-    private void setAuthenticationContext(User user, HttpServletRequest request) {
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                user,
-                null,
-                user.getAuthorities()
+        authToken.setDetails(
+                new WebAuthenticationDetailsSource().buildDetails(request)
         );
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
         SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        log.debug("User {} authenticated successfully", email);
     }
 
     /**
-     * Sends error response with specified details.
-     *
-     * @param response HTTP response
-     * @param message  Error message
-     * @throws IOException if there's an I/O error
+     * Sends JSON error response
      */
-    private void sendErrorResponse(HttpServletResponse response, String message)
-            throws IOException {
+    private void sendErrorResponse(
+            HttpServletResponse response,
+            String message,
+            int statusCode
+    ) throws IOException {
+
         Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+        errorDetails.put("status", statusCode);
         errorDetails.put("error", "Unauthorized");
         errorDetails.put("message", message);
+        errorDetails.put("timestamp", System.currentTimeMillis());
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(statusCode);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         objectMapper.writeValue(response.getOutputStream(), errorDetails);
     }

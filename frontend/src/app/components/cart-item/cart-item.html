@@ -1,0 +1,33 @@
+<div class="grid grid-cols-[80px_1fr_30px_60px] gap-4 items-center p-8 border-b border-gray-300">
+  <div class="relative group">
+    <img
+      src="{{ cartItem().item.photoUrl }}"
+      alt="{{ cartItem().item.name }}"
+      class="w-full h-20 object-cover rounded-[1.5rem] transition-all duration-200"
+    />
+
+    <button
+      (click)="deleteFromCart()"
+      class="absolute top-1/2 left-1/2 p-1 m-2 bg-red-600 rounded-full text-white transition-opacity duration-200 z-10 hover:bg-red-700 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+      aria-label="Usuń przedmiot z koszyka"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        stroke-width="3"
+        stroke="currentColor"
+        class="w-4 h-4"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <p class="truncate">{{ cartItem().item.name }}</p>
+  <input
+    type="number"
+    value="{{ cartItem().quantity }}"
+    class="border border-gray-400 rounded w-full text-center"
+    (change)="updateQuantity($event.target?.value)"
+  />
+  <p class="text-right font-semibold">${{ cartItem().totalPrice }}</p>
+</div>

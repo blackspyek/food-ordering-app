@@ -1,0 +1,67 @@
+@use 'variables';
+@use 'sass:color';
+
+@reference 'tailwindcss';
+
+.white-panel {
+  transition: height 0.6s ease-in-out;
+  font-family: "Sen", "Inter", serif;
+
+  @media (min-width: 768px) {
+    border-radius: 0;
+  }
+}
+
+.loginBtn {
+  @media (min-width: 768px) {
+    background-color: white;
+    color: variables.$base-orange;
+    border: 2px solid variables.$base-orange;
+    transition: all 0.3s ease;
+    padding: .8rem;
+    gap: .5rem;
+
+    &:hover {
+      background-color: variables.$base-orange;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.menu-visible {
+
+  img[alt="Logo"] {
+    @apply w-32 md:w-24;
+  }
+
+
+}
+
+.categoryBtn {
+  border: #C8C561 2px solid;
+  border-radius: 15px;
+  font-weight: 200;
+  color: white;
+  font-size: 1rem;
+  min-width: 25vw;
+  max-width: 25vw;
+
+  &:hover {
+    background-color: color.scale(variables.$base-green, $lightness: -50%);
+    font-weight: bold;
+    cursor: pointer;
+  }
+}
+
+.active {
+  background-color: variables.$base-green;
+  color: white;
+  font-weight: bold;
+}
