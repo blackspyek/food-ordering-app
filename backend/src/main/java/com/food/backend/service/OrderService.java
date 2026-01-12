@@ -10,10 +10,10 @@ import com.food.backend.model.MenuItem;
 import com.food.backend.model.User;
 import com.food.backend.model.Enums.OrderStatus;
 import com.food.backend.model.Enums.OrderType;
-import com.food.backend.repository.OrderRepository;
-import com.food.backend.repository.OrderItemRepository;
+import com.food.backend.repository.IOrderRepository;
+import com.food.backend.repository.IOrderItemRepository;
 import com.food.backend.exception.OrderNotFoundException;
-import jakarta.mail.MessagingException;
+import com.food.backend.service.interfaces.IOrderService;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +27,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderService {
+public class OrderService implements IOrderService {
 
-    private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
+    private final IOrderRepository IOrderRepository;
+    private final IOrderItemRepository IOrderItemRepository;
     private final MenuItemService menuItemService;
     private final LiveOrderBoard liveOrderBoard;
     private final EmailService emailService;
@@ -38,9 +38,9 @@ public class OrderService {
     Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, MenuItemService menuItemService, @Lazy LiveOrderBoard liveOrderBoard, EmailService emailService, UserService userService) {
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
+    public OrderService(IOrderRepository IOrderRepository, IOrderItemRepository IOrderItemRepository, MenuItemService menuItemService, @Lazy LiveOrderBoard liveOrderBoard, EmailService emailService, UserService userService) {
+        this.IOrderRepository = IOrderRepository;
+        this.IOrderItemRepository = IOrderItemRepository;
         this.menuItemService = menuItemService;
         this.liveOrderBoard = liveOrderBoard;
         this.emailService = emailService;
@@ -51,7 +51,7 @@ public class OrderService {
     public Order createOrder(CreateOrderDto createOrderDto)  {
 
         Order order = initializeOrder(createOrderDto.getOrderType(), createOrderDto.getEmail(), createOrderDto.getName(), createOrderDto.getUserId());
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = IOrderRepository.save(order);
         List<OrderItem> orderItemsList = createOrderItemsList(savedOrder, createOrderDto.getOrderItems());
         calculateAndSetTotalPrice(order, orderItemsList);
         saveOrder(order, orderItemsList);
@@ -62,7 +62,7 @@ public class OrderService {
     private void saveOrder(Order order, List<OrderItem> orderItemsList) {
         try {
             order.setBoardCode(liveOrderBoard.generateOrderBoardCode());
-            orderRepository.save(order);
+            IOrderRepository.save(order);
             saveOrderItems(order, orderItemsList);
             order.setOrderItems(orderItemsList);
             liveOrderBoard.sendKitchenOrderUpdate(order, "NEW");
@@ -92,22 +92,37 @@ public class OrderService {
     }
 
     public Optional<Order> getOrderById(UUID orderId) {
-        return orderRepository.findById(orderId);
+        return IOrderRepository.findById(orderId);
     }
     public OrderStatus getOrderStatus(UUID orderId) {
-        return orderRepository.findStatusById(orderId)
+        return IOrderRepository.findStatusById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
 
     @Transactional
-    public Order updateOrderStatus(UUID orderId, OrderStatus newStatus) throws IllegalArgumentException {
+    public Order updateOrderStatus(UUID orderId, OrderStatus newStatus, String username) throws IllegalArgumentException {
         checkIfStatusIsValid(newStatus.toString());
 
         Order order = findOrderOrThrow(orderId);
         order.setStatus(newStatus);
+        
+        // Set preparedBy when order becomes READY_FOR_PICKUP
+        if (newStatus == OrderStatus.READY_FOR_PICKUP && username != null && !username.isEmpty()) {
+            try {
+                User preparer = userService.findUserByUsername(username);
+                order.setPreparedBy(preparer);
+            } catch (Exception e) {
+                logger.warn("Could not set preparedBy for order {}: {}", orderId, e.getMessage());
+            }
+        }
+        // Clear preparedBy when order goes back to IN_PREPARATION
+        else if (newStatus == OrderStatus.IN_PREPARATION) {
+            order.setPreparedBy(null);
+        }
+        
         moveOrderNumberOnTheBoardBasedOnStatus(newStatus, order);
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = IOrderRepository.save(order);
         
         String action = (newStatus == OrderStatus.CANCELLED || newStatus == OrderStatus.PICKED_UP || newStatus == OrderStatus.DIDNT_PICK_UP) 
                 ? "REMOVED" : "STATUS_CHANGED";
@@ -140,19 +155,19 @@ public class OrderService {
         Order order = findOrderOrThrow(orderId);
         liveOrderBoard.removeOrderCode(order.getBoardCode());
         liveOrderBoard.sendKitchenOrderUpdate(order, "REMOVED");
-        orderRepository.deleteById(orderId);
+        IOrderRepository.deleteById(orderId);
     }
 
     public List<Order> getOrdersByStatus(OrderStatus status) {
-        return orderRepository.findByStatusWithItems(status);
+        return IOrderRepository.findByStatusWithItems(status);
     }
 
     public List<Order> getOrdersByPreparedBy(User preparedBy) {
-        return orderRepository.getOrdersByPreparedBy(preparedBy);
+        return IOrderRepository.getOrdersByPreparedBy(preparedBy);
     }
 
     public List<Order> getAllOrdersWithItems() {
-        return orderRepository.findAllWithItemsOrderByOrderTimeDesc();
+        return IOrderRepository.findAllWithItemsOrderByOrderTimeDesc();
     }
 
 
@@ -180,12 +195,12 @@ public class OrderService {
     private void saveOrderItems(Order order, List<OrderItem> orderItems) {
         orderItems.forEach(item -> {
             item.setOrder(order);
-            orderItemRepository.save(item);
+            IOrderItemRepository.save(item);
         });
     }
 
     private Order findOrderOrThrow(UUID orderId) {
-        return orderRepository.findById(orderId)
+        return IOrderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
@@ -207,11 +222,7 @@ public class OrderService {
     }
 
     private void sendOrderConfirmationEmail(String to, OrderDto order) {
-        try{
-            emailService.sendOrderConfirmationEmail(to, order);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send order confirmation email", e);
-        }
+        emailService.sendOrderConfirmationEmail(to, order);
     }
 
     public Order updateOrderPreparedBy(UUID orderId, String userName) {
@@ -220,7 +231,7 @@ public class OrderService {
         User user = userService.findUserByUsername(userName);
 
         order.setPreparedBy(user);
-        return orderRepository.save(order);
+        return IOrderRepository.save(order);
     }
     private void validateParameters(UUID orderId, String userName) {
         if (orderId == null || userName == null || userName.isEmpty()) {
@@ -233,6 +244,6 @@ public class OrderService {
     }
 
     public List<Order> get10LastOrdersByUserId(Long userId) {
-        return orderRepository.findTop10ByOrderedByIdOrderByOrderTimeDesc(userId);
+        return IOrderRepository.findTop10ByOrderedByIdOrderByOrderTimeDesc(userId);
     }
 }

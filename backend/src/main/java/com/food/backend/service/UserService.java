@@ -2,7 +2,8 @@ package com.food.backend.service;
 
 import com.food.backend.dto.UserDto;
 import com.food.backend.model.User;
-import com.food.backend.repository.UserRepository;
+import com.food.backend.repository.IUserRepository;
+import com.food.backend.service.interfaces.IUserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,14 +14,14 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class UserService {
-    private final UserRepository userRepository;
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+public class UserService implements IUserService {
+    private final IUserRepository IUserRepository;
+    public UserService(IUserRepository IUserRepository) {
+        this.IUserRepository = IUserRepository;
     }
     public List<User> allUsers() {
         List<User> users = new ArrayList<>();
-        userRepository.findAll().forEach(users::add);
+        IUserRepository.findAll().forEach(users::add);
         return users;
     }
 
@@ -28,26 +29,26 @@ public class UserService {
         if (id == null) {
             return Optional.empty();
         }
-        return userRepository.findById(id);
+        return IUserRepository.findById(id);
     }
 
     public User findUserByUsername(String username) {
-        return userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
+        return IUserRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("User with username " + username + " not found"));
     }
     public Optional<User> deleteUserById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        userRepository.deleteById(id);
+        Optional<User> user = IUserRepository.findById(id);
+        IUserRepository.deleteById(id);
         return user;
     }
     public Optional<User> updateUserById(Long id, UserDto userDto) {
-        Optional<User> user = userRepository.findById(id);
+        Optional<User> user = IUserRepository.findById(id);
         user.ifPresent(value -> updateFieldsOfUserEntityWithUserDto(userDto, value));
         return user;
     }
     private void updateFieldsOfUserEntityWithUserDto(UserDto userDto, User userToUpdate) throws EntityNotFoundException {
         userToUpdate.setEmail(userDto.getEmail());
         userToUpdate.setRoles(userDto.getRoles());
-        userRepository.save(userToUpdate);
+        IUserRepository.save(userToUpdate);
     }
 
     public static Boolean hasRoles(UserDto userDto) {

@@ -1,7 +1,7 @@
 package com.food.backend.controller;
 
 import com.food.backend.dto.NotificationRequestDto;
-import com.food.backend.service.NotificationService;
+import com.food.backend.service.interfaces.INotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/notifications")
 @Tag(name = "Notifications", description = "Endpoints for sending notifications to a topic")
 @Validated
+@RequiredArgsConstructor
 public class NotificationController {
 
-    @Autowired
-    private NotificationService notificationService;
+    private final INotificationService notificationService;
 
     @Operation(
             summary = "Sends Notification to all clients within a topic",

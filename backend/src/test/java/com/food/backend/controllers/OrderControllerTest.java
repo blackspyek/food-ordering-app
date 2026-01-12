@@ -160,7 +160,7 @@ class OrderControllerTest {
         UpdateOrderStatusDto statusDto = new UpdateOrderStatusDto();
         statusDto.setOrderStatus(OrderStatus.PICKED_UP);
 
-        when(orderService.updateOrderStatus(eq(ORDER_ID), any(OrderStatus.class))).thenReturn(testOrder);
+        when(orderService.updateOrderStatus(eq(ORDER_ID), any(OrderStatus.class), any())).thenReturn(testOrder);
 
         mockMvc.perform(put(BASE_URL + "/1/status")
                         .contentType(MediaType.APPLICATION_JSON)

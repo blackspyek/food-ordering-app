@@ -1,6 +1,7 @@
 package com.food.backend.service;
 
 import com.food.backend.model.User;
+import com.food.backend.service.interfaces.IJwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -19,7 +20,7 @@ import java.util.function.Function;
 
 @Slf4j
 @Service
-public class JwtService {
+public class JwtService implements IJwtService {
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;

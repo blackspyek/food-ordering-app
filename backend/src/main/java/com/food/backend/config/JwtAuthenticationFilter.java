@@ -138,7 +138,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        log.debug("User {} authenticated successfully", email);
     }
 
     /**

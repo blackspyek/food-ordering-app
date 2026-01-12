@@ -3,6 +3,7 @@ package com.food.backend.service;
 import com.food.backend.dto.orderdtos.KitchenOrderUpdateDto;
 import com.food.backend.model.Enums.OrderStatus;
 import com.food.backend.model.Order;
+import com.food.backend.service.interfaces.ILiveOrderBoard;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Getter
 @Service
-public class LiveOrderBoard {
+public class LiveOrderBoard implements ILiveOrderBoard {
     private final SortedSet<String> liveOrderBoardCodes;
     private final Set<String> readyOrderBoardCodes;
     private final OrderService orderService;
@@ -34,8 +35,6 @@ public class LiveOrderBoard {
         this.liveOrderBoardCodes = new TreeSet<>();
         this.readyOrderBoardCodes = new HashSet<>();
         initializeOrderSets();
-        // for testing purpose every 5 s send the "test" message to the /topic/orderBoard
-
 
     }
 
@@ -114,14 +113,11 @@ public class LiveOrderBoard {
         sendUpdatedOrderBoard();
     }
     public void sendUpdatedOrderBoard() {
-        this.logger.info("Sending updated order board state");
         Map<String, Set<String>> orderBoardState = getOrderBoardState();
-        this.logger.info("Order board state: " + orderBoardState);
         messagingTemplate.convertAndSend("/topic/orderBoard", orderBoardState);
     }
 
     public void sendKitchenOrderUpdate(Order order, String action) {
-        this.logger.info("Sending kitchen order update: " + action + " for order " + order.getOrderId());
         KitchenOrderUpdateDto updateDto = KitchenOrderUpdateDto.fromOrder(order, action);
         messagingTemplate.convertAndSend("/topic/kitchenOrders", updateDto);
     }

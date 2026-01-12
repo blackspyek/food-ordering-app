@@ -6,9 +6,9 @@ import com.food.backend.dto.orderdtos.UpdatePreparedByDto;
 import com.food.backend.model.Order;
 import com.food.backend.model.User;
 import com.food.backend.model.Enums.OrderStatus;
-import com.food.backend.service.OrderService;
+import com.food.backend.service.interfaces.IOrderService;
 import com.food.backend.exception.OrderNotFoundException;
-import com.food.backend.service.UserService;
+import com.food.backend.service.interfaces.IUserService;
 import com.food.backend.utils.classes.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -20,10 +20,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -38,18 +36,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/orders")
 @Tag(name = "Orders", description = "Order Management APIs")
+@RequiredArgsConstructor
 public class OrderController {
 
-    private final OrderService orderService;
-    private final UserService userService;
-    Logger logger = LoggerFactory.getLogger(OrderController.class);
+    private final IOrderService orderService;
+    private final IUserService userService;
 
-
-    @Autowired
-    public OrderController(OrderService orderService, UserService userService) {
-        this.orderService = orderService;
-        this.userService = userService;
-    }
 
     @Operation(
             summary = "Create a new order",
@@ -154,9 +146,11 @@ public class OrderController {
     public ResponseEntity<?> updateOrderStatus(@PathVariable UUID orderId,
                                                @RequestBody
                                                @Valid
-                                               UpdateOrderStatusDto updateOrderStatusDto) {
+                                               UpdateOrderStatusDto updateOrderStatusDto,
+                                               @AuthenticationPrincipal UserDetails currentUser) {
         try {
-            Order updatedOrder = orderService.updateOrderStatus(orderId, updateOrderStatusDto.getOrderStatus());
+            String username = currentUser != null ? currentUser.getUsername() : null;
+            Order updatedOrder = orderService.updateOrderStatus(orderId, updateOrderStatusDto.getOrderStatus(), username);
             return ResponseUtil.successResponse(updatedOrder, "Order status updated successfully");
         } catch (OrderNotFoundException e) {
             return ResponseUtil.notFoundResponse(e.getMessage());

@@ -1,6 +1,6 @@
 package com.food.backend.controller;
 
-import com.food.backend.service.ReportService;
+import com.food.backend.service.interfaces.IReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,15 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @PreAuthorize("hasRole('MANAGER')")
 @Tag(name = "Reports", description = "Endpoints for generating sales reports")
+@RequiredArgsConstructor
 public class ReportController {
 
-    private final ReportService reportService;
+    private final IReportService reportService;
 
-
-    @Autowired
-    public ReportController(ReportService reportService) {
-        this.reportService = reportService;
-    }
 
     @GetMapping("/daily/json")
     @Operation(

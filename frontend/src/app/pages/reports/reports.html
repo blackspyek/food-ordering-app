@@ -1,0 +1,158 @@
+<div class="reports-page">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>{{ reportTitle() }}</h1>
+      <p class="subtitle">{{ reportSubtitle() }}</p>
+    </div>
+    <div class="header-actions">
+      <mat-button-toggle-group [value]="reportType()" (change)="onReportTypeChange($event.value)">
+        <mat-button-toggle value="daily">
+          <mat-icon>today</mat-icon>
+          Dzienny
+        </mat-button-toggle>
+        <mat-button-toggle value="weekly">
+          <mat-icon>date_range</mat-icon>
+          Tygodniowy
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+      <button class="download-btn" (click)="downloadReport()">
+        <mat-icon>download</mat-icon>
+        Pobierz raport
+      </button>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Ładowanie raportu...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error() }}</p>
+      <button class="retry-btn" (click)="loadReport()">Spróbuj ponownie</button>
+    </div>
+  } @else {
+    <div class="stats-grid">
+      <!-- Total Orders Card -->
+      <div class="stat-card orders-card">
+        <div class="stat-icon">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ totalOrders() }}</span>
+          <span class="stat-label">Zamówień odebranych</span>
+        </div>
+      </div>
+
+      <!-- Total Amount Card -->
+      <div class="stat-card revenue-card">
+        <div class="stat-icon">
+          <mat-icon>payments</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ totalAmount() | currency: 'PLN' : 'symbol' : '1.2-2' }}</span>
+          <span class="stat-label">Łączny przychód</span>
+        </div>
+      </div>
+
+      <!-- Average Amount Card -->
+      <div class="stat-card average-card">
+        <div class="stat-icon">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ averageAmount() | currency: 'PLN' : 'symbol' : '1.2-2' }}</span>
+          <span class="stat-label">Średnia wartość zamówienia</span>
+        </div>
+      </div>
+
+      <!-- Total Items Card -->
+      <div class="stat-card items-card">
+        <div class="stat-icon">
+          <mat-icon>fastfood</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ totalItems() }}</span>
+          <span class="stat-label">Sprzedanych produktów</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-section">
+      <!-- Donut Chart -->
+      <div class="chart-card">
+        <h2 class="card-title">
+          <mat-icon>pie_chart</mat-icon>
+          Sprzedaż według kategorii
+        </h2>
+        @if (categoryEntries().length > 0) {
+          <div class="chart-container">
+            <canvas #chartCanvas class="donut-chart"></canvas>
+            <div class="chart-legend">
+              @for (entry of categoryEntries(); track entry.category; let i = $index) {
+                <div class="legend-item">
+                  <span class="legend-color" [style.background-color]="getCategoryColor(i)"></span>
+                  <span class="legend-label">{{ entry.category }}</span>
+                  <span class="legend-value">{{ entry.count }} ({{ entry.percentage }}%)</span>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <div class="empty-chart">
+            <mat-icon>bar_chart</mat-icon>
+            <p>Brak danych do wyświetlenia</p>
+          </div>
+        }
+      </div>
+
+      <!-- Category Table -->
+      <div class="table-card">
+        <h2 class="card-title">
+          <mat-icon>table_chart</mat-icon>
+          Zestawienie kategorii
+        </h2>
+        @if (categoryEntries().length > 0) {
+          <table class="category-table">
+            <thead>
+              <tr>
+                <th>Kategoria</th>
+                <th>Ilość</th>
+                <th>Udział</th>
+                <th>Wykres</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of categoryEntries(); track entry.category; let i = $index) {
+                <tr>
+                  <td class="category-name">
+                    <span class="category-dot" [style.background-color]="getCategoryColor(i)"></span>
+                    {{ entry.category }}
+                  </td>
+                  <td class="category-count">{{ entry.count }}</td>
+                  <td class="category-percentage">{{ entry.percentage }}%</td>
+                  <td class="category-bar">
+                    <div class="bar-container">
+                      <div
+                        class="bar-fill"
+                        [style.width.%]="entry.percentage"
+                        [style.background-color]="getCategoryColor(i)"
+                      ></div>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <div class="empty-table">
+            <mat-icon>inbox</mat-icon>
+            <p>Brak sprzedaży w wybranym okresie</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

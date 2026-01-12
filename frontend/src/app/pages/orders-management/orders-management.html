@@ -108,10 +108,16 @@
                 <span class="total-price">{{
                   order.totalPrice | currency: 'PLN' : 'symbol' : '1.2-2'
                 }}</span>
-                <button class="cancel-btn" (click)="cancelOrder(order); $event.stopPropagation()">
-                  <mat-icon>close</mat-icon>
-                  Anuluj
-                </button>
+                <div class="footer-buttons">
+                  <button class="pickup-btn" (click)="markAsPickedUp(order); $event.stopPropagation()">
+                    <mat-icon>check_circle</mat-icon>
+                    Odebrane
+                  </button>
+                  <button class="cancel-btn" (click)="cancelOrder(order); $event.stopPropagation()">
+                    <mat-icon>close</mat-icon>
+                    Anuluj
+                  </button>
+                </div>
               </div>
             </div>
           }

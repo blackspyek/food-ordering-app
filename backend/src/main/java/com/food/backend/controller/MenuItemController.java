@@ -3,7 +3,7 @@ package com.food.backend.controller;
 import com.food.backend.dto.MenuItemDto;
 import com.food.backend.model.Enums.Category;
 import com.food.backend.model.MenuItem;
-import com.food.backend.service.MenuItemService;
+import com.food.backend.service.interfaces.IMenuItemService;
 import com.food.backend.utils.classes.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,12 +23,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/menu")
 @Tag(name = "Menu Items", description = "Menu Item Management APIs")
+@RequiredArgsConstructor
 public class MenuItemController {
-    private final MenuItemService menuItemService;
+    private final IMenuItemService menuItemService;
 
-    public MenuItemController(MenuItemService menuItemService) {
-        this.menuItemService = menuItemService;
-    }
 
     @GetMapping()
     @Operation(

@@ -1,13 +1,13 @@
 package com.food.backend.controller;
 
-import com.food.backend.service.LiveOrderBoard;
+import com.food.backend.service.interfaces.ILiveOrderBoard;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
@@ -15,13 +15,10 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @Tag(name = "Live Order Board Events", description = "WebSocket endpoints for real-time order board updates")
+@RequiredArgsConstructor
 public class EventController {
-    private final LiveOrderBoard liveOrderBoard;
+    private final ILiveOrderBoard liveOrderBoard;
 
-    @Autowired
-    public EventController(LiveOrderBoard liveOrderBoard) {
-        this.liveOrderBoard = liveOrderBoard;
-    }
 
     @Operation(
             summary = "Subscribe to order board updates",

@@ -3,6 +3,7 @@ package com.food.backend.controller;
 import com.food.backend.dto.UserDto;
 import com.food.backend.model.User;
 import com.food.backend.service.UserService;
+import com.food.backend.service.interfaces.IUserService;
 
 import com.food.backend.utils.classes.ApiResponse;
 import com.food.backend.utils.classes.MessageUtil;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -26,14 +28,11 @@ import java.util.List;
 @RequestMapping("/users")
 @RestController
 @Tag(name = "User Management", description = "APIs for managing users and user profiles")
+@RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final IUserService userService;
 
-
-    UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @Operation(
             summary = "Get authenticated user",

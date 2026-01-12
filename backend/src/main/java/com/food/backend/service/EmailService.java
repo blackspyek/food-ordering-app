@@ -2,9 +2,10 @@ package com.food.backend.service;
 
 import com.food.backend.dto.orderdtos.OrderDto;
 import com.food.backend.dto.orderdtos.OrderItemListingDto;
+import com.food.backend.service.interfaces.IEmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -13,18 +14,17 @@ import java.util.Calendar;
 import java.util.List;
 
 @Service
-public class EmailService {
+@RequiredArgsConstructor
+public class EmailService implements IEmailService {
     private final JavaMailSender emailSender;
 
-    @Autowired
-    public EmailService(JavaMailSender emailSender) {
-        this.emailSender = emailSender;
-    }
-
-
-    public void sendOrderConfirmationEmail(String recipient, OrderDto order) throws MessagingException {
-        MimeMessage message = createEmailMessage(recipient, order);
-        emailSender.send(message);
+    public void sendOrderConfirmationEmail(String recipient, OrderDto order) {
+        try {
+            MimeMessage message = createEmailMessage(recipient, order);
+            emailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send order confirmation email", e);
+        }
     }
 
     private MimeMessage createEmailMessage(String recipient, OrderDto order) throws MessagingException {
@@ -64,22 +64,18 @@ public class EmailService {
                         "   .intro-text { color: #555555; font-size: 16px; line-height: 1.6; margin-bottom: 20px; text-align: center; }" +
                         "   .order-meta { text-align: center; color: #888888; font-size: 14px; margin-bottom: 30px; }" +
 
-                        /* --- STYLIZACJA NUMERKA (Board Number) --- */
                         "   .board-wrapper { text-align: center; margin: 30px 0; }" +
                         "   .board-table { margin: 0 auto; border-spacing: 0; border-collapse: separate; border-radius: 12px; overflow: hidden; border: 1px solid #000000; }" +
                         "   .board-num-cell { background-color: #fda403; color: #1a1a1a; font-size: 64px; font-weight: bold; padding: 10px 25px; vertical-align: middle; line-height: 1; border-right: 1px solid #fda403; }" +
                         "   .board-text-cell { background-color: #000000; color: #fda403; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; padding: 0 20px; vertical-align: middle; text-align: left; }" +
 
-                        /* --- STYLIZACJA PRZYCISKU TRACKINGOWEGO --- */
                         "   .btn-wrapper { text-align: center; margin-top: 30px; margin-bottom: 10px; }" +
                         "   .track-btn { background-color: #fda403; color: #1a1a1a; padding: 14px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-block; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }" +
 
-                        /* --- TABELA PRODUKTÓW --- */
                         "   .items-table { width: 100%%; border-collapse: collapse; margin-top: 20px; }" +
                         "   .items-table th { padding: 12px; background-color: #f8f8f8; color: #555; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #eaeaea; }" +
                         "   .items-table td { padding: 12px; border-bottom: 1px solid #eaeaea; color: #333; font-size: 14px; }" +
 
-                        /* Automatyczne wyrównanie kolumn */
                         "   .items-table th:nth-child(1), .items-table td:nth-child(1) { text-align: left; }" +
                         "   .items-table th:nth-child(2), .items-table td:nth-child(2) { text-align: center; }" +
                         "   .items-table th:nth-child(3), .items-table td:nth-child(3) { text-align: right; }" +
@@ -125,11 +121,9 @@ public class EmailService {
                         "               </tbody>" +
                         "           </table>" +
 
-                        /* --- PRZYCISK TRACKINGOWY --- */
                         "           <div class=\"btn-wrapper\">" +
                         "               <a href=\"http://localhost:4200/order-details/%s\" class=\"track-btn\">Track Your Order</a>" +
                         "           </div>" +
-                        /* ---------------------------- */
 
                         "       </div>" +
                         "       <div class=\"footer\">" +

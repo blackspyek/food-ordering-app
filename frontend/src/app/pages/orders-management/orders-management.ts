@@ -116,6 +116,17 @@ export class OrdersManagement implements OnInit, OnDestroy {
     });
   }
 
+  markAsPickedUp(order: KitchenOrder): void {
+    this.orderService.updateOrderStatus(order.orderId, 'PICKED_UP').subscribe({
+      next: () => {
+        console.log('Order marked as picked up successfully');
+      },
+      error: (err) => {
+        console.error('Failed to mark order as picked up', err);
+      },
+    });
+  }
+
   getOrderTypeLabel(orderType: string): string {
     return orderType === 'DINE_IN' ? 'Na miejscu' : 'Na wynos';
   }

@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID; // Upewnij się, że ten import jest
 
 @Repository
-public interface OrderRepository extends CrudRepository<Order, UUID> { // Tu jest OK (UUID)
+public interface IOrderRepository extends CrudRepository<Order, UUID> { // Tu jest OK (UUID)
 
     List<Order> getOrdersByStatus(OrderStatus status);
     List<Order> getOrdersByPreparedBy(User preparedBy);

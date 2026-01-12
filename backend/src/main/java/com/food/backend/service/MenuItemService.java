@@ -3,7 +3,8 @@ package com.food.backend.service;
 import com.food.backend.dto.MenuItemDto;
 import com.food.backend.model.Enums.Category;
 import com.food.backend.model.MenuItem;
-import com.food.backend.repository.MenuItemsRepository;
+import com.food.backend.repository.IMenuItemsRepository;
+import com.food.backend.service.interfaces.IMenuItemService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -14,37 +15,37 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class MenuItemService {
-    private final MenuItemsRepository menuItemsRepository;
+public class MenuItemService implements IMenuItemService {
+    private final IMenuItemsRepository IMenuItemsRepository;
 
-    public MenuItemService(MenuItemsRepository menuItemsRepository) {
-        this.menuItemsRepository = menuItemsRepository;
+    public MenuItemService(IMenuItemsRepository IMenuItemsRepository) {
+        this.IMenuItemsRepository = IMenuItemsRepository;
     }
 
     public Optional<MenuItem> findByNameIgnoreCase(String name) {
-        return menuItemsRepository.findByNameIgnoreCase(name);
+        return IMenuItemsRepository.findByNameIgnoreCase(name);
     }
 
     public List<MenuItem> findByAvailable(boolean available) {
-        return menuItemsRepository.findByAvailable(available);
+        return IMenuItemsRepository.findByAvailable(available);
     }
 
     public List<MenuItem> findByCategory(Category category) {
-        return menuItemsRepository.findByCategory(category);
+        return IMenuItemsRepository.findByCategory(category);
     }
 
     public List<MenuItem> findAll() {
-        return (List<MenuItem>) menuItemsRepository.findAll();
+        return (List<MenuItem>) IMenuItemsRepository.findAll();
     }
 
     public MenuItem createNewMenuItem(MenuItemDto menuItemDto) throws BadRequestException {
         checkIfCategoryIsValid(getCategoryNameFromDto(menuItemDto));
-        if (menuItemsRepository.findByNameIgnoreCase(menuItemDto.getName()).isPresent()) {
+        if (IMenuItemsRepository.findByNameIgnoreCase(menuItemDto.getName()).isPresent()) {
             throw new IllegalArgumentException("Menu item with name " + menuItemDto.getName() + " already exists");
         }
         MenuItem newMenuItem = createMenuItemObject(menuItemDto);
         try {
-            menuItemsRepository.save(newMenuItem);
+            IMenuItemsRepository.save(newMenuItem);
         } catch (Exception e) {
             throw new RuntimeException("Failed to create new menu item", e);
         }
@@ -73,12 +74,12 @@ public class MenuItemService {
 
     public MenuItem updateMenuItem(int id, MenuItemDto menuItemDto) throws BadRequestException {
         checkIfCategoryIsValid(getCategoryNameFromDto(menuItemDto));
-        MenuItem menuItemToUpdate = menuItemsRepository.findById(id)
+        MenuItem menuItemToUpdate = IMenuItemsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Menu item with id " + id + " does not exist"));
 
         setMenuItemFieldsFromDto(menuItemToUpdate, menuItemDto);
 
-        return menuItemsRepository.save(menuItemToUpdate);
+        return IMenuItemsRepository.save(menuItemToUpdate);
     }
 
     private static void setMenuItemFieldsFromDto(MenuItem menuItem, MenuItemDto menuItemDto) {
@@ -90,29 +91,29 @@ public class MenuItemService {
     }
 
     public void deleteMenuItem(int id) {
-        Optional<MenuItem> menuItem = menuItemsRepository.findById(id);
+        Optional<MenuItem> menuItem = IMenuItemsRepository.findById(id);
         if (menuItem.isEmpty()) {
             throw new IllegalArgumentException("Menu item with id " + id + " does not exist");
         }
         try {
-            menuItemsRepository.delete(menuItem.get());
+            IMenuItemsRepository.delete(menuItem.get());
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete menu item with id " + id, e);
         }
     }
 
     public Optional<MenuItem> findById(Long id) {
-        return menuItemsRepository.findById(id);
+        return IMenuItemsRepository.findById(id);
     }
     private MenuItem findByIdOrThrow(Long id) {
-        return menuItemsRepository.findById(id)
+        return IMenuItemsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Menu item with id " + id + " not found"));
     }
 
     public MenuItem changeAvailability(Long id){
         MenuItem menuItem = findByIdOrThrow(id);
         menuItem.setAvailable(!menuItem.getAvailable());
-        return menuItemsRepository.save(menuItem);
+        return IMenuItemsRepository.save(menuItem);
     }
 
 }

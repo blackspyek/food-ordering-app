@@ -7,9 +7,9 @@ import com.food.backend.dto.ResetPasswordDto;
 import com.food.backend.model.Role;
 import com.food.backend.model.User;
 import com.food.backend.responses.LoginResponse;
-import com.food.backend.service.AuthenticationService;
-import com.food.backend.service.EmailService;
-import com.food.backend.service.JwtService;
+import com.food.backend.service.interfaces.IAuthenticationService;
+import com.food.backend.service.interfaces.IEmailService;
+import com.food.backend.service.interfaces.IJwtService;
 import com.food.backend.utils.classes.ApiResponse;
 import com.food.backend.utils.classes.ResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,19 +31,15 @@ import java.util.Set;
 @Tag(name = "Authentication", description = "Authentication management APIs")
 @RequestMapping("/api/auth")
 @RestController
+@RequiredArgsConstructor
 public class AuthenticationController {
-    private final JwtService jwtService;
-    private final AuthenticationService authenticationService;
-    private final EmailService emailService;
+    private final IJwtService jwtService;
+    private final IAuthenticationService authenticationService;
+    private final IEmailService emailService;
 
     @Value("${app.frontend.url:http://localhost:4200}")
     private String frontendUrl;
 
-    public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService, EmailService emailService) {
-        this.jwtService = jwtService;
-        this.authenticationService = authenticationService;
-        this.emailService = emailService;
-    }
     @Operation(summary = "Register a new user", description = "Creates a new user account")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User registered successfully",

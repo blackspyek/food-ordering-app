@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MenuItemsRepository extends CrudRepository<MenuItem, Long> {
+public interface IMenuItemsRepository extends CrudRepository<MenuItem, Long> {
     Optional<MenuItem> findByNameIgnoreCase(String name);
     List<MenuItem> findByAvailable(boolean available);
 

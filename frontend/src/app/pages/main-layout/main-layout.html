@@ -23,6 +23,11 @@
           <span class="hidden md:block text-white text-2xl hover:text-gray-200"> Kitchen </span>
         </a>
       }
+      @if (isManager()) {
+        <a routerLink="/reports" class="flex gap-2 items-center">
+          <span class="hidden md:block text-white text-2xl hover:text-gray-200"> Reports </span>
+        </a>
+      }
       <a routerLink="/orders" class="flex items-center">
         <img src="/ordersBag.svg" alt="Lista zamówień" class="cursor-pointer h-6 w-6 md:hidden" />
         <span class="hidden md:block text-white text-2xl hover:text-gray-200"> Orders </span>

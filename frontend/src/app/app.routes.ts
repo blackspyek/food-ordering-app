@@ -15,6 +15,8 @@ import { OrdersManagement } from './pages/orders-management/orders-management';
 import { employeeAuthGuard } from './guards/employee-auth-guard';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { ResetPassword } from './pages/reset-password/reset-password';
+import { Reports } from './pages/reports/reports';
+import { managerAuthGuard } from './guards/manager-auth-guard';
 
 export const routes: Routes = [
   {
@@ -79,6 +81,12 @@ export const routes: Routes = [
         component: OrdersManagement,
         data: { view: 'orders-management' },
         canActivate: [employeeAuthGuard],
+      },
+      {
+        path: 'reports',
+        component: Reports,
+        data: { view: 'reports' },
+        canActivate: [managerAuthGuard],
       },
       {
         path: '**',

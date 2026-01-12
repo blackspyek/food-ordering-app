@@ -20,6 +20,7 @@ export class Register {
 
 	showPassword = signal(false);
 	isLoading = signal(false);
+	errorMessage = signal<string | null>(null);
 
 	constructor(
 		private authService: AuthService,
@@ -54,6 +55,7 @@ export class Register {
 	onSubmit() {
 		if (this.registerForm.valid) {
 			this.isLoading.set(true);
+			this.errorMessage.set(null);
 			this.authService.signUp(this.registerForm.value).subscribe({
 				next: () => {
 					this.isLoading.set(false);
@@ -61,7 +63,8 @@ export class Register {
 				},
 				error: (error) => {
 					this.isLoading.set(false);
-					console.log(error);
+					const message = error?.error?.message || "Registration failed. Please try again.";
+					this.errorMessage.set(message);
 				},
 			});
 		} else {

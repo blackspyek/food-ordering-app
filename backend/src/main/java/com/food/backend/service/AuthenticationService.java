@@ -4,7 +4,8 @@ import com.food.backend.dto.LoginUserDto;
 import com.food.backend.dto.RegisterUserDto;
 import com.food.backend.model.Role;
 import com.food.backend.model.User;
-import com.food.backend.repository.UserRepository;
+import com.food.backend.repository.IUserRepository;
+import com.food.backend.service.interfaces.IAuthenticationService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,13 +19,13 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-public class AuthenticationService {
-    private final UserRepository userRepository;
+public class AuthenticationService implements IAuthenticationService {
+    private final IUserRepository IUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
-        this.userRepository = userRepository;
+    public AuthenticationService(IUserRepository IUserRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+        this.IUserRepository = IUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
     }
@@ -34,7 +35,7 @@ public class AuthenticationService {
         validateUserDoesNotExist(registerUserDto.getEmail());
 
         User user = createUser(registerUserDto);
-        User savedUser = userRepository.save(user);
+        User savedUser = IUserRepository.save(user);
 
         return Optional.of(savedUser);
     }
@@ -56,16 +57,16 @@ public class AuthenticationService {
     }
     @Transactional
     public Optional<User> changeRoles(String email, Set<Role> roles) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        Optional<User> userOptional = IUserRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setRoles(roles);
-            return Optional.of(userRepository.save(user));
+            return Optional.of(IUserRepository.save(user));
         }
         return Optional.empty();
     }
     public User authenticate(LoginUserDto loginUserDto) {
-        User user = userRepository.findByEmail(loginUserDto.getEmail())
+        User user = IUserRepository.findByEmail(loginUserDto.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         if (!user.isEnabled())
             throw new RuntimeException("User is disabled");
@@ -78,12 +79,12 @@ public class AuthenticationService {
     }
 
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return IUserRepository.findByEmail(email);
     }
 
     @Transactional
     public String generatePasswordResetToken(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email.toLowerCase());
+        Optional<User> userOptional = IUserRepository.findByEmail(email.toLowerCase());
         if (userOptional.isEmpty()) {
             return null;
         }
@@ -92,14 +93,14 @@ public class AuthenticationService {
         String token = UUID.randomUUID().toString();
         user.setPasswordResetToken(token);
         user.setPasswordResetTokenExpiry(LocalDateTime.now().plusHours(1));
-        userRepository.save(user);
+        IUserRepository.save(user);
 
         return token;
     }
 
     @Transactional
     public boolean resetPassword(String token, String newPassword) {
-        Optional<User> userOptional = userRepository.findByPasswordResetToken(token);
+        Optional<User> userOptional = IUserRepository.findByPasswordResetToken(token);
         if (userOptional.isEmpty()) {
             return false;
         }
@@ -113,7 +114,7 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setPasswordResetToken(null);
         user.setPasswordResetTokenExpiry(null);
-        userRepository.save(user);
+        IUserRepository.save(user);
 
         return true;
     }

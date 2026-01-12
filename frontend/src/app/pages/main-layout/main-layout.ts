@@ -47,4 +47,8 @@ export class MainLayout {
   logout() {
     return this.authService.logout();
   }
+  isManager() {
+    const roles = this.authService.getRoles();
+    return roles?.includes('ROLE_MANAGER') || false;
+  }
 }

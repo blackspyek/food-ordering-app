@@ -1,12 +1,13 @@
 package com.food.backend.service;
 
+import com.food.backend.service.interfaces.INotificationService;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import org.springframework.stereotype.Service;
 
 @Service
-public class NotificationService {
+public class NotificationService implements INotificationService {
 
     public String sendNotificationToTopic(String topic, String title, String body, String image) {
         Message message = Message.builder()

@@ -5,7 +5,8 @@ import com.food.backend.dto.ReportDto;
 import com.food.backend.exception.ReportGenerationException;
 import com.food.backend.model.Enums.Category;
 import com.food.backend.model.Enums.OrderStatus;
-import com.food.backend.repository.OrderRepository;
+import com.food.backend.repository.IOrderRepository;
+import com.food.backend.service.interfaces.IReportService;
 import com.food.backend.utils.other.DateRange;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,8 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ReportService {
-    private final OrderRepository orderRepository;
+public class ReportService implements IReportService {
+    private final IOrderRepository IOrderRepository;
     private final ObjectMapper objectMapper;
 
     public ResponseEntity<byte[]> generateDailyReport() {
@@ -44,8 +45,6 @@ public class ReportService {
     }
 
     private ReportDto generateReportData(DateRange dateRange) {
-        log.info("Generating report for date range: {}", dateRange);
-        log.info("Fetching report data from database" + getCompletedOrdersCount(dateRange).toString());
         return ReportDto.builder()
                 .totalOrders(getCompletedOrdersCount(dateRange))
                 .totalAmount(getTotalSalesAmount(dateRange))
@@ -55,7 +54,7 @@ public class ReportService {
     }
 
     private Number getCompletedOrdersCount(DateRange dateRange) {
-        return orderRepository.countOrderByOrderTimeBetweenAndStatus(
+        return IOrderRepository.countOrderByOrderTimeBetweenAndStatus(
                 dateRange.start(),
                 dateRange.end(),
                 OrderStatus.PICKED_UP
@@ -63,7 +62,7 @@ public class ReportService {
     }
 
     private Double getTotalSalesAmount(DateRange dateRange) {
-        return orderRepository.sumTotalPriceByOrderTimeBetweenAndStatus(
+        return IOrderRepository.sumTotalPriceByOrderTimeBetweenAndStatus(
                 dateRange.start(),
                 dateRange.end(),
                 OrderStatus.PICKED_UP
@@ -71,7 +70,7 @@ public class ReportService {
     }
 
     private Double getAverageSalesAmount(DateRange dateRange) {
-        return orderRepository.averageTotalPriceByOrderTimeBetweenAndStatus(
+        return IOrderRepository.averageTotalPriceByOrderTimeBetweenAndStatus(
                 dateRange.start(),
                 dateRange.end(),
                 OrderStatus.PICKED_UP
@@ -79,7 +78,7 @@ public class ReportService {
     }
 
     private Map<String, Number> getCategorySales(DateRange dateRange) {
-        List<Object[]> categorySalesData = orderRepository.countItemsSoldByCategory(OrderStatus.PICKED_UP, dateRange.start(), dateRange.end());
+        List<Object[]> categorySalesData = IOrderRepository.countItemsSoldByCategory(OrderStatus.PICKED_UP, dateRange.start(), dateRange.end());
         Map<String, Number> categorySalesMap = new HashMap<>();
 
         for (Object[] result : categorySalesData) {
